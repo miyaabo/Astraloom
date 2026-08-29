@@ -102,7 +102,7 @@ Status: Done (Human Check 待ち)
 
 ### Task 7 — コードレビュー
 
-Status: In Progress
+Status: Done
 
 - `/code-review` で Task 1〜6 の差分をレビュー(責務分離が守られているか、shader 内のマジックナンバー化、不要な抽象化・依存がないか等)
 - 指摘があれば修正し、再確認する
