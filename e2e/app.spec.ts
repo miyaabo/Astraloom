@@ -10,5 +10,6 @@ test('loads the page without console errors', async ({ page }) => {
   await page.goto('/')
 
   await expect(page).toHaveTitle('Veluna')
+  await expect(page.locator('canvas')).toBeVisible()
   expect(errors).toEqual([])
 })

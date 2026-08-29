@@ -138,7 +138,10 @@ export class StarfieldRenderer {
   private readonly renderer: THREE.WebGLRenderer
   private readonly scene: THREE.Scene
   private readonly camera: THREE.OrthographicCamera
-  private readonly points: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>
+  private readonly points: THREE.Points<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
+  >
   private readonly unwatchReducedMotion: () => void
   private readonly unwatchVisibility: () => void
 

@@ -90,12 +90,12 @@ npm run dev
 品質確認:
 
 ```bash
-npm run typecheck   # tsc -b --noEmit
-npm run lint        # eslint .
+npm run typecheck     # tsc -b --noEmit
+npm run lint          # eslint .
 npm run format:check  # prettier --check .
-npm run test         # vitest run
-npm run test:e2e     # playwright test（初回は `npx playwright install` が必要）
-npm run build        # tsc -b && vite build
+npm run test          # vitest run
+npm run build         # tsc -b && vite build
+npm run test:e2e      # playwright test（dist の build が必須。初回は `npx playwright install` も必要）
 ```
 
 ## Development Documents

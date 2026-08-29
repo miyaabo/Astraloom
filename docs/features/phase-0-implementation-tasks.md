@@ -113,7 +113,7 @@ Status: Done
 
 ### Task 8 — 自動検証の仕上げ
 
-Status: Not Started
+Status: Done
 
 - Playwright smoke test(ページロード、canvas 存在、console error なし)
 - typecheck / lint / unit test / production build を一通り実行し確認
