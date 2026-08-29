@@ -145,7 +145,9 @@ export class StarfieldRenderer {
   private reducedMotionScale = 1
   private rafId: number | null = null
   private startTimeMs = 0
-  private wasRunningBeforeHide = false
+  private isVisible = true
+  /** Whether start() has been requested (independent of whether the rAF loop is actually running, which also depends on tab visibility). */
+  private running = false
 
   constructor(canvas: HTMLCanvasElement, stars: StarData[]) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
@@ -182,11 +184,11 @@ export class StarfieldRenderer {
     })
 
     this.unwatchVisibility = watchVisibility((visible) => {
+      this.isVisible = visible
       if (visible) {
-        if (this.wasRunningBeforeHide) this.start()
+        if (this.running) this.startLoop()
       } else {
-        this.wasRunningBeforeHide = this.rafId !== null
-        this.stop()
+        this.stopLoop()
       }
     })
   }
@@ -228,8 +230,23 @@ export class StarfieldRenderer {
     this.renderer.render(this.scene, this.camera)
   }
 
-  /** Starts the continuous animation loop (twinkle + drift). Safe to call once; a second call is a no-op. */
+  /**
+   * Requests the continuous animation loop (twinkle + drift). Safe to call
+   * once; a second call is a no-op. While the tab is hidden, the request is
+   * remembered but the rAF loop stays paused until visibility returns (see
+   * the watchVisibility callback above).
+   */
   start(): void {
+    this.running = true
+    if (this.isVisible) this.startLoop()
+  }
+
+  stop(): void {
+    this.running = false
+    this.stopLoop()
+  }
+
+  private startLoop(): void {
     if (this.rafId !== null) return
 
     this.startTimeMs = performance.now()
@@ -241,7 +258,7 @@ export class StarfieldRenderer {
     this.rafId = requestAnimationFrame(loop)
   }
 
-  stop(): void {
+  private stopLoop(): void {
     if (this.rafId === null) return
     cancelAnimationFrame(this.rafId)
     this.rafId = null
