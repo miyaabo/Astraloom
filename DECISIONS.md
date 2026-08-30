@@ -233,6 +233,16 @@ Status: Accepted as Direction, not detailed UI spec
 
 これらは設定機能を実装するフェーズで決める。
 
+### Implementation Note(Task 5 — 日時指定 UI)
+
+Task 5 で実装した右上トグルボタン + 最小パネル(`src/DateTimeOverlay.tsx`)は、
+D009 の「オーバーレイ方向」を満たすための **暫定的な最小実装** であり、
+具体的な見た目・配置・インタラクションを正式決定したものではない。
+
+将来、日時・場所・その他設定をまとめた本格的な設定 UI を作る際に、
+このコンポーネントの外観は作り直される想定。
+「実装済みだから仕様」として扱わないこと。
+
 ---
 
 ## D010 — Security is incremental, not deferred
@@ -304,3 +314,38 @@ Status: Accepted
 ### Reason
 
 文章だけでは見た目の解釈幅が広すぎるため、Visual Target を仕様の一部として明示した方がズレを減らせる。
+
+---
+
+## D013 — 1次の星カタログとして HYG Database を正式採用する
+
+Status: Accepted
+
+### Decision
+
+1次の実星データソースとして [HYG Database](https://codeberg.org/astronexus/hyg)(astronexus、Hipparcos + Yale Bright Star Catalog + Gliese の統合データセット)を採用する。
+
+### Comparison
+
+| カタログ | 商用利用 | mag≤6.5 の星数 | 主要フィールド |
+|---|---|---|---|
+| **HYG Database** | 明示的に可(CC BY-SA 4.0) | 約9,000〜9,600 | RA/Dec, Vmag, B-V, スペクトル型, 固有名(統合済み) |
+| Hipparcos(-2) | 制限記載なし(グレー、実務上は長年の商用利用実績あり) | 約9,000 | RA/Dec, Vmag, B-V, スペクトル型 |
+| Yale BSC5 | 制限記載なし(同上) | 9,110(等級6.5でほぼ完全) | RA/Dec, Vmag, B-V(UBV), スペクトル型 |
+| Tycho-2 | 制限記載なし | 250万件から要フィルタ、前処理負担大 | RA/Dec, BT/VT(スペクトル型なし) |
+| Gaia | 不可(CC BY-NC 3.0 IGO) | — | 非常に豊富だが商用利用不可・データ量過大 |
+
+### Reasons
+
+- 候補の中で唯一、商用利用が明文で許諾されている(Product Principle 7「商用利用条件が不明なものを中核依存にしない」に合致)
+- ライセンス条件は表示義務(attribution)と、データファイル自体を再配布・改変する場合の ShareAlike のみ。アプリのソースコードや課金モデルには影響しない
+- Hipparcos / Yale BSC5 は商用利用を妨げる記載はないが、明文の許諾もないグレーな状態であり、将来の収益化を前提とする Veluna では避ける
+- Gaia は CC BY-NC のため今回は不採用(将来、より高密度な星空が必要になった際に別途ライセンス確認のうえ再検討する候補として残す)
+- Hipparcos・Yale BSC・Gliese を統合済みの CSV で、RA/Dec・視等級・B-V 色指数・スペクトル型・固有名を含み前処理の手間が少ない
+- mag≤6.5 でのフィルタ後の星数(約9,000〜9,600)が 0次の仮データ密度(6,000)と近く、見かけの密度感を維持しやすい
+
+### Consequences
+
+- Task 2 以降、`src/stars/` の実データ前処理は HYG Database の CSV を入力形式として実装する
+- データファイルを加工・再配布する場合は CC BY-SA 4.0 の attribution 表記を README 等に残す
+- 将来 Gaia 等より高精度なデータへ移行する場合は、本 Decision を更新し商用利用条件を再確認する
