@@ -375,3 +375,74 @@ Status: Accepted
 - `StarfieldRenderer` のカメラを `PerspectiveCamera` へ変更し、`resize()` のフラスタム計算(aspect 対応)を Perspective 用に書き換える
 - Orthographic 前提で `camera.position` を動かしていた drift 演出(`starfieldConfig.motion`)は、Perspective + カメラ回転ベースの実装に合わせて見直す
 - 平面表示は残さないため、1次の `projectHorizontalToScreen` は 2次完了後に不要になる見込み(Task 2 で削除するか判断する)
+
+---
+
+## D015 — 3次の星座線・星座名データソースとして d3-celestial(Olaf Frohn)を正式採用する
+
+Status: Accepted
+
+### Decision
+
+3次の星座線・星座名データソースとして [d3-celestial](https://github.com/ofrohn/d3-celestial)(Olaf Frohn)の `data/constellations.lines.json`(星座線)・`data/constellations.json`(星座名)を採用する。
+
+### Comparison
+
+| 候補 | ライセンス | 商用利用 | データ形式 | 備考 |
+|---|---|---|---|---|
+| **d3-celestial** | BSD-3-Clause(リポジトリ直下 `LICENSE` に明記) | 明示的に可 | GeoJSON、RA/Dec 座標(`MultiLineString`) | IAU 公式 88 星座を元に Olaf Frohn が編集。星座名は多言語対応(日本語なし、英語 `en`/ラテン語 `la` 等) |
+| Stellarium `constellationship.fab` | 本体は GPLv2+ だが、作者 xalioth が GitHub Discussion 上のコメントで星座線定義のみ MIT への再ライセンスを許諾 | 許諾コメントはあるが正式な LICENSE ファイルではない | Yale BSC(HR)番号ベースの頂点ペア | 星 ID ベースで HYG と直接紐付けやすいが、ライセンスの確実性で d3-celestial に劣る |
+
+### Reasons
+
+- d3-celestial はリポジトリ直下の `LICENSE` ファイルで BSD-3-Clause が明示されており、商用利用可否が明確(D013 の HYG 採用時と同じ判断基準)
+- Stellarium の星座線データは GitHub Discussion のコメントで非公式に許諾されたものであり、正式なライセンス文書に基づかないため、将来の商用利用を前提とする Veluna では中核依存として避ける(Product Principle 7)
+- d3-celestial のデータは IAU 公式 88 星座(実データは 89 features、Serpens が Caput/Cauda で分割されているため)を元にしており、座標系(J2000, RA/Dec)が HYG Database と整合する
+- 星座線データは星 ID ではなく RA/Dec 座標(GeoJSON `MultiLineString`)で提供されるため、Task 2 で HYG の星データと座標近傍マッチングして頂点を対応付ける前処理が必要になる
+
+### Consequences
+
+- Task 2 以降、`src/stars/`(または新設モジュール)で d3-celestial の `constellations.lines.json`・`constellations.json` をビルド時に取り込み・前処理する
+- データを取り込む際は BSD-3-Clause の copyright 表記を README 等に残す
+- 頂点は HYG の星 ID への直接参照ではなく座標近傍マッチングで対応付ける(完全一致しない場合の許容誤差を Task 2 で設計する)
+
+---
+
+## D016 — 3次でも惑星・月・代表的天体を引き続き Out of Scope とする
+
+Status: Accepted
+
+### Decision
+
+3次では惑星・月・代表的天体の位置表示を実装しない。恒星・星座情報のみを扱う。
+
+### Reasons
+
+- `docs/features/phase-3-star-knowledge.md` の Out of Scope では既に対象外として整理していたが、`PRODUCT.md` 側は「要否・時期は Small Spec で確認(未決定)」という曖昧な記載のままだったため、Task 1 で人間確認のうえ確定させた
+- 惑星・月は恒星と異なり軌道計算(暦計算)という別種の技術要素が必要になり、スコープ・技術方針が大きく変わる
+
+### Consequences
+
+- `PRODUCT.md` の 3次 Out of Scope の記載を「未決定」から確定表現へ更新する
+- 惑星・月・代表的天体は将来フェーズで、軌道計算の技術調査とあわせて Small Spec を作成のうえ再検討する
+
+---
+
+## D017 — 星座線は選択時のみ表示する
+
+Status: Accepted
+
+### Decision
+
+星座線は通常状態では表示しない。星または星座を選択したときに、その星座の線のみを表示する。常時表示はしない。
+
+### Reasons
+
+- Product Principle 5「Calm by Default」を優先し、通常状態では星空そのものが主役であることを維持する
+- 実際のプラネタリウム解説でも星座線は説明時にのみ提示されることが多く、この挙動と一致する
+- 常時表示は Visual Target が想定する落ち着いた星空の密度感・静けさを損なうリスクがある
+
+### Consequences
+
+- Task 3(星座線の球面描画)は選択状態に連動する表示ロジックとして実装する(常時表示のオプションは作らない)
+- 線の太さ・色は Task 3 実装時に Human Check で調整する
