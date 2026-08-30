@@ -204,7 +204,7 @@ Human Check で以下を満たすこと。
 
 ### Scope
 
-Task 1(スコープ確定)で人間確認のうえ確定する。候補・Out of Scope・詳細は `docs/features/phase-4-relaxation.md` を参照。進め方は `docs/features/phase-4-implementation-tasks.md` を参照。
+Task 1 で人間確認のうえ、**天の川・地平線/風景**(既存 shader の拡張、画像アセット不使用)に確定した(D018)。Sound / その他の表現プリセット / スリープタイマー等は今回のスコープに含めない。詳細は `docs/features/phase-4-relaxation.md`、進め方は `docs/features/phase-4-implementation-tasks.md` を参照。
 
 ## Future Capability Inventory
 
