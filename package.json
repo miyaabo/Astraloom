@@ -13,7 +13,9 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "build:star-catalog": "node scripts/build-hyg-catalog.mjs",
+    "build:constellation-catalog": "node scripts/build-constellation-catalog.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

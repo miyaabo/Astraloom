@@ -12,3 +12,15 @@ body,
 body {
   background: #000;
 }
+
+.starfield-canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  /* Falls back to 100vh above on browsers without dvh support; on mobile
+     Safari/Chrome, 100vh is sized for the collapsed browser chrome, which can
+     leave fixed-bottom UI (PlaybackOverlay) hidden under the address bar
+     when it's expanded. 100dvh tracks the actual visible viewport instead. */
+  height: 100dvh;
+  touch-action: none;
+}

@@ -4,19 +4,35 @@
  * instead of scattering magic numbers across the codebase.
  */
 export interface StarfieldConfig {
-  /** Number of stars to generate; PRODUCT.md targets a few thousand to ~10000. */
-  starCount: number
+  camera: {
+    /** Vertical field of view, in degrees, for the sky-sphere PerspectiveCamera (D014). */
+    fovDegrees: number
+  }
+  controls: {
+    drag: {
+      /** Camera yaw/pitch rotation, in degrees, per pixel of drag movement (D014: drag-only view control). */
+      degreesPerPixel: number
+      /** Clamp on how far up/down the view can pitch, in degrees, so it can't flip past looking straight up/down. */
+      pitchLimitDegrees: number
+    }
+    zoom: {
+      minFovDegrees: number
+      maxFovDegrees: number
+      /** FOV change, in degrees, per unit of wheel/trackpad deltaY. */
+      wheelDegreesPerUnit: number
+      /** FOV change, in degrees, per pixel of two-finger pinch distance change. */
+      pinchDegreesPerPixel: number
+    }
+    tap: {
+      /** Max pointer movement, in px, between pointerdown/up for a gesture to still count as a tap/click rather than a drag (Task 5). */
+      maxMovementPixels: number
+      /** Hit-test radius, in px, around a tap/click position for selecting a star (Task 5) — wider than the star's rendered point size for comfortable touch accuracy. */
+      hitRadiusPixels: number
+    }
+  }
   brightness: {
     min: number
     max: number
-    /** Exponent applied to a uniform random value; >1 skews the population toward dim stars. */
-    curvePower: number
-  }
-  /** Selection weights for colorCategory; must sum to 1. */
-  colorCategoryWeights: {
-    white: number
-    blueWhite: number
-    paleOrange: number
   }
   twinkle: {
     minAmplitude: number
@@ -31,7 +47,7 @@ export interface StarfieldConfig {
     max: number
   }
   motion: {
-    /** Camera pan radius, in NDC units, for the gentle overall drift (PRODUCT.md Motion). */
+    /** Camera sway amplitude, in radians, for the gentle overall drift (PRODUCT.md Motion; a small yaw/pitch sway since D014's PerspectiveCamera lives at the origin). */
     driftAmplitude: number
     /** Radians/sec the camera sweeps around the drift circle. */
     driftSpeed: number
@@ -65,20 +81,38 @@ export interface StarfieldConfig {
       /** Maximum halo opacity contribution at brightness 1; kept low to avoid a neon look. */
       intensity: number
     }
+    constellationLines: {
+      /** Line color; kept cool/subtle so lines read as a guide, not a bright overlay (D017). */
+      color: string
+      /** Opacity; low so lines never compete with the stars for attention. */
+      opacity: number
+    }
   }
 }
 
 export const starfieldConfig: StarfieldConfig = {
-  starCount: 6000,
+  camera: {
+    fovDegrees: 70,
+  },
+  controls: {
+    drag: {
+      degreesPerPixel: 0.15,
+      pitchLimitDegrees: 85,
+    },
+    zoom: {
+      minFovDegrees: 30,
+      maxFovDegrees: 90,
+      wheelDegreesPerUnit: 0.03,
+      pinchDegreesPerPixel: 0.2,
+    },
+    tap: {
+      maxMovementPixels: 10,
+      hitRadiusPixels: 20,
+    },
+  },
   brightness: {
     min: 0,
     max: 1,
-    curvePower: 2.4,
-  },
-  colorCategoryWeights: {
-    white: 0.8,
-    blueWhite: 0.12,
-    paleOrange: 0.08,
   },
   twinkle: {
     minAmplitude: 0,
@@ -112,6 +146,10 @@ export const starfieldConfig: StarfieldConfig = {
       power: 1.8,
       radiusMultiplier: 3.5,
       intensity: 0.55,
+    },
+    constellationLines: {
+      color: '#8fa8d9',
+      opacity: 0.35,
     },
   },
 }

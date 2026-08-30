@@ -5,3 +5,5 @@ node_modules
 .claude
 .kiro
 *.md
+src/stars/data/hygCatalog.json
+src/constellations/data/constellationCatalog.json

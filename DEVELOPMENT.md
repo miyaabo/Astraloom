@@ -115,7 +115,7 @@ Claude Code は以下を調査してから Plan する。
 このロードマップは詳細仕様ではない。
 フェーズ開始時に必要性を再確認し、不要なものは作らない。
 
-### 0次 — プラネタリウム基準の星空表現
+### 0次 — プラネタリウム基準の星空表現(Done)
 
 目的:
 
@@ -136,7 +136,9 @@ Claude Code は以下を調査してから Plan する。
 
 ユーザー向け設定 UI は作らない。
 
-### 1次 — 本物の夜空
+### 1次 — 本物の夜空(Done)
+
+Small Spec: `docs/features/phase-1-real-sky.md` / タスク分割: `docs/features/phase-1-implementation-tasks.md`
 
 目的:
 
@@ -155,16 +157,16 @@ Claude Code は以下を調査してから Plan する。
 - 最初の設定 UI
 - 外部データ／API の安全な取り扱い
 
-未決定:
+決定済み(詳細は `DECISIONS.md`):
 
-- 正式な星カタログ
-- 地名検索サービス
-- 天文計算ライブラリ
-- バックエンド要否
+- 星カタログ: HYG Database(D013)
+- 天文計算: 自前実装(`src/astronomy/coordinates.ts`)。ライブラリは不採用
+- 場所指定: 本格的な地名検索 API は使わず、最小の場所プリセットリスト(`src/locationPresets.ts`)
+- バックエンド: 引き続き不要(D007 を維持)、前処理はビルド時(`scripts/build-hyg-catalog.mjs`)
 
-これらは 1 次開始時に調査し、必要なら人間へ提案する。
+### 2次 — 時間を流して眺める(Done)
 
-### 2次 — 時間を流して眺める
+Small Spec: `docs/features/phase-2-playback.md` / タスク分割: `docs/features/phase-2-implementation-tasks.md`
 
 目的:
 
@@ -183,7 +185,9 @@ Claude Code は以下を調査してから Plan する。
 - 表示／時間／場所設定の整理
 - スマホ負荷への自動品質調整
 
-### 3次 — 星空を知る
+### 3次 — 星空を知る(Done)
+
+Small Spec: `docs/features/phase-3-star-knowledge.md` / タスク分割: `docs/features/phase-3-implementation-tasks.md`
 
 目的:
 
@@ -198,9 +202,11 @@ Claude Code は以下を調査してから Plan する。
 - 星タップ／クリック
 - 軽い基本情報
 - 豆知識
-- 惑星／月／代表的天体
+- 惑星／月／代表的天体(Scope に含めるかは Small Spec で未決定)
 
-### 4次 — 癒し体験の強化
+### 4次 — 癒し体験の強化(Small Spec 作成済み、実装未着手)
+
+Small Spec: `docs/features/phase-4-relaxation.md` / タスク分割: `docs/features/phase-4-implementation-tasks.md`
 
 目的:
 

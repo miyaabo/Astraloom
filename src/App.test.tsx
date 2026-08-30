@@ -10,6 +10,7 @@ vi.mock('./render/StarfieldRenderer', () => ({
     render = vi.fn()
     start = vi.fn()
     dispose = vi.fn()
+    updateStars = vi.fn()
   },
 }))
 

@@ -101,7 +101,9 @@ PC だけ高品質でスマホを簡易版にしない。
 Purpose / Vision / Product Principles は安易に変更しない。
 実装方法は、実物から得た学びに合わせて柔軟に変更する。
 
-## Current Phase: 0次開発
+## Phase 0 Foundation(0次開発, Done)
+
+0次開発で確立した基準。星空表現の品質基準として、以降のフェーズでも維持する。
 
 ### Phase Goal
 
@@ -179,6 +181,30 @@ Human Check で以下を満たすこと。
 - AR／端末方向追従
 
 これらは「不要」ではなく「0次では作らない」。
+
+## Phase 1 Foundation(1次開発, Done)
+
+信頼できる実データ(HYG Database)を土台に、指定した場所と日時に対応する星空を再現した。星の位置計算を仮データから実データ + 天文座標変換へ置き換え、0次の見た目レイヤーはそのまま維持した。詳細は `docs/features/phase-1-real-sky.md` を参照。
+
+## Phase 2 Foundation(2次開発, Done)
+
+信頼できる実データに基づく星空を、時間を流しながら好きな速度で再生・停止・巻き戻しできるようにした。球面表示(`PerspectiveCamera`)への完全移行、ドラッグによる視点移動・ズームも実装した(D014)。星の見た目(shader・`starVisualAttributes`)は 0次/1次の資産をそのまま維持している。詳細は `docs/features/phase-2-playback.md` を参照。
+
+## Phase 3 Foundation(3次開発, Done)
+
+没入感を壊さず、興味を持った星や星座を知れるようにした。星座線・星座名・星名(英名+日本語名)・星タップ/クリックによる選択・軽い基本情報表示・検索・豆知識を、選択時のみ表示する形(Calm by Default, D017)で実装した。1次〜2次で確立した星の見た目(shader・`starVisualAttributes`)・位置計算・カメラ/再生エンジンには手を入れていない。詳細は `docs/features/phase-3-star-knowledge.md` を参照。
+
+## Current Phase: 4次開発
+
+### Phase Goal
+
+**星空を自分好みのリラックス空間にできるようにする。**
+
+1次〜3次で「実際の星空を、時間を流しながら眺め、興味を持てば星・星座を知れる」体験を確立した。4次では、その体験を各自の癒し用途に合わせて調整・拡張できるようにする。ただし Product Principle 1(Planetarium-like First)・2(Relaxation Over Information Density)・5(Calm by Default)は維持する。
+
+### Scope
+
+Task 1(スコープ確定)で人間確認のうえ確定する。候補・Out of Scope・詳細は `docs/features/phase-4-relaxation.md` を参照。進め方は `docs/features/phase-4-implementation-tasks.md` を参照。
 
 ## Future Capability Inventory
 

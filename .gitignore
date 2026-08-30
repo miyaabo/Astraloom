@@ -17,6 +17,10 @@ playwright-report
 test-results
 coverage
 
+# Raw star catalog download (see scripts/build-hyg-catalog.mjs); the filtered
+# output committed under src/stars/data/ is what the app actually ships.
+data/raw
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

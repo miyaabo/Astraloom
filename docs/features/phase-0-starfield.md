@@ -1,5 +1,11 @@
 # Phase 0 — Starfield Rendering
 
+## Status
+
+**Done** — Human Check 完了。Acceptance Criteria(Automated / Human Check Must Pass 全 13 項目)をすべて満たし、1次開発へ移行可能。
+
+次フェーズ: `docs/features/phase-1-real-sky.md`(1次 — 本物の夜空)
+
 ## Goal
 
 完成系につながる品質の星空表現を作り、ユーザーが実物を見て「ちゃんとした夜空に見える。この見た目なら今後も開発したい」と判断できる状態にする。
