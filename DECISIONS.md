@@ -349,3 +349,29 @@ Status: Accepted
 - Task 2 以降、`src/stars/` の実データ前処理は HYG Database の CSV を入力形式として実装する
 - データファイルを加工・再配布する場合は CC BY-SA 4.0 の attribution 表記を README 等に残す
 - 将来 Gaia 等より高精度なデータへ移行する場合は、本 Decision を更新し商用利用条件を再確認する
+
+---
+
+## D014 — 2次は球面表示へ完全移行し、PerspectiveCamera + ドラッグ操作を採用する
+
+Status: Accepted
+
+### Decision
+
+2次(`docs/features/phase-2-playback.md`)では、1次の平面表示(天頂中心の円形投影)を球面表示へ**完全に置き換える**。平面表示との切替共存は行わない。
+
+カメラは `THREE.OrthographicCamera` から `THREE.PerspectiveCamera` へ変更する。視点移動の入力方式は**ドラッグ操作のみ**とする(ジャイロセンサー入力は対象外)。
+
+### Reasons
+
+- 2次のゴールは「時間経過に伴う星の動きを没入感を持って眺める」ことであり、平面(天頂のみを見上げる円形投影)を維持するメリットは薄い。2つの描画経路(平面/球面)を並行維持するコスト(実装・テスト・UI の二重化)の方が大きい
+- 星をカメラ原点から見た固定半径の球面(ドーム)上に配置し、原点から Perspective で見渡す方式が一般的なプラネタリウム/スカイビューアーの実装と合致する。視点回転(yaw/pitch)はカメラの向きで、ズームは FOV 操作で行う想定(星は原点から固定半径の球面上にあるため、カメラ位置を星へ近づける方式は不自然になる)
+- 視点移動をドラッグ操作のみにするのは、D001 が想定する「スマホから Nebula Capsule 3 Laser へ AirPlay ミラーリングする利用形態」との相性を優先したため。スマホを空へ向けて構えるジャイロ操作は、画面を見ながら操作する体験(および画面をミラーリングして眺める体験)と相性が悪い。ドラッグ操作なら PC・スマホで同じ操作体系にできる
+- 将来ジャイロセンサー入力を追加する余地は残すが、2次時点では対象外とする
+
+### Consequences
+
+- `src/stars/skyProjection.ts`(平面専用の `projectHorizontalToScreen`)は Task 2 で球面用のマッピング層に置き換える。天文計算(`src/astronomy/coordinates.ts`)・星データ・shader / `starVisualAttributes.ts` は変更しない(D003)
+- `StarfieldRenderer` のカメラを `PerspectiveCamera` へ変更し、`resize()` のフラスタム計算(aspect 対応)を Perspective 用に書き換える
+- Orthographic 前提で `camera.position` を動かしていた drift 演出(`starfieldConfig.motion`)は、Perspective + カメラ回転ベースの実装に合わせて見直す
+- 平面表示は残さないため、1次の `projectHorizontalToScreen` は 2次完了後に不要になる見込み(Task 2 で削除するか判断する)
