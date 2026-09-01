@@ -1,8 +1,18 @@
 import * as THREE from 'three'
+import type {
+  CelestialBodyRenderData,
+  SupportedCelestialBodyId,
+} from '../celestialBodies/celestialBodyTypes'
 import type { ConstellationLineSegment } from '../constellations/constellationTypes'
+import { generateHorizonMeshData } from '../stars/horizon'
 import { DEG_TO_RAD, clamp, normalizeDegrees } from '../mathUtils'
+import type { MilkyWayPoint } from '../stars/milkyWay'
 import { SKY_SPHERE_RADIUS } from '../stars/skyProjection'
-import { starfieldConfig } from '../stars/starfieldConfig'
+import {
+  resolveStarfieldVisualPreset,
+  starfieldConfig,
+  type StarfieldVisualPresetKey,
+} from '../stars/starfieldConfig'
 import type { StarData, StarPosition } from '../stars/starTypes'
 import { watchReducedMotion } from './reducedMotion'
 import { findNearestScreenPoint, projectToScreen } from './screenProjection'
@@ -27,6 +37,8 @@ const CAMERA_FAR = SKY_SPHERE_RADIUS * 2
 
 /** Below this on-screen distance (px), a lower-priority label is hidden rather than drawn overlapping a higher-priority one — see updateLabelPositions(). Tuned by eye against typical label text size (12-15px font). */
 const LABEL_THINNING_RADIUS_PIXELS = 28
+const SELECTED_CELESTIAL_BODY_SIZE_MULTIPLIER = 1.65
+const SELECTED_CELESTIAL_BODY_BRIGHTNESS_BOOST = 0.16
 
 /**
  * Sharp core + soft halo point shader (Task 4), plus per-star twinkle (Task 5).
@@ -42,11 +54,13 @@ const vertexShader = `
   attribute float aBrightness;
   attribute float aTwinklePhase;
   attribute float aTwinkleAmplitude;
+  attribute float aSelected;
 
   uniform float uHaloThreshold;
   uniform float uHaloPower;
   uniform float uHaloRadiusMultiplier;
   uniform float uHaloIntensity;
+  uniform float uPointSizeScale;
   uniform float uTime;
   uniform float uTwinkleSpeed;
   uniform float uReducedMotionScale;
@@ -56,10 +70,12 @@ const vertexShader = `
   varying float vCoreRadius;
   varying float vHaloStrength;
   varying float vTwinkle;
+  varying float vSelected;
 
   void main() {
     vColor = aColor;
     vBrightness = aBrightness;
+    vSelected = aSelected;
 
     float haloAmount = pow(
       clamp((aBrightness - uHaloThreshold) / (1.0 - uHaloThreshold), 0.0, 1.0),
@@ -77,7 +93,7 @@ const vertexShader = `
 
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
-    gl_PointSize = aSize * sizeMultiplier;
+    gl_PointSize = aSize * sizeMultiplier * uPointSizeScale;
   }
 `
 
@@ -87,6 +103,7 @@ const fragmentShader = `
   varying float vCoreRadius;
   varying float vHaloStrength;
   varying float vTwinkle;
+  varying float vSelected;
 
   void main() {
     vec2 fromCenter = gl_PointCoord - vec2(0.5);
@@ -101,9 +118,146 @@ const fragmentShader = `
 
     float alpha = clamp(core + halo, 0.0, 1.0) * mix(0.45, 1.0, vBrightness);
     alpha = clamp(alpha * vTwinkle, 0.0, 1.0);
-    gl_FragColor = vec4(vColor, alpha);
+
+    float selectionRing = 0.0;
+    if (vSelected > 0.5) {
+      float innerRing = smoothstep(vCoreRadius * 1.05, vCoreRadius * 1.22, dist);
+      float outerRing = 1.0 - smoothstep(vCoreRadius * 1.22, vCoreRadius * 1.42, dist);
+      selectionRing = innerRing * outerRing;
+    }
+
+    vec3 color = mix(vColor, vec3(1.0, 0.2, 0.2), selectionRing);
+    float finalAlpha = max(alpha, selectionRing * 0.95);
+    gl_FragColor = vec4(color, finalAlpha);
   }
 `
+
+/**
+ * Soft round particle shader for the Milky Way band (4次 Task 2, D018).
+ * Deliberately simpler than the star shader above — no core/halo tiers, no
+ * twinkle — since the band is meant to read as a diffuse glow behind the
+ * stars, not as individually distinguishable points. Additive blending (see
+ * the material setup below) lets overlapping particles build up density
+ * toward the center of the band without ever fully occluding stars behind them.
+ */
+const milkyWayVertexShader = `
+  attribute float aBrightness;
+  uniform float uSizePixels;
+  varying float vBrightness;
+
+  void main() {
+    vBrightness = aBrightness;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+    gl_PointSize = uSizePixels;
+  }
+`
+
+const milkyWayFragmentShader = `
+  uniform float uBaseOpacity;
+  uniform vec3 uColor;
+  varying float vBrightness;
+
+  void main() {
+    vec2 fromCenter = gl_PointCoord - vec2(0.5);
+    float dist = length(fromCenter);
+    if (dist > 0.5) discard;
+
+    float falloff = 1.0 - smoothstep(0.0, 0.5, dist);
+    float alpha = falloff * falloff * vBrightness * uBaseOpacity;
+    gl_FragColor = vec4(uColor, alpha);
+  }
+`
+
+/**
+ * Ground/horizon dome shader (4次 Task 4, D018). Vertex shader only passes
+ * through the precomputed per-vertex depth (see generateHorizonMeshData);
+ * the fragment shader turns that into a solid ground fill below the horizon
+ * plus a soft glow band right at the horizon line, both capped well below
+ * the stars' own alpha so the ground never competes with the sky for
+ * attention (Product Principle 1/5, same reasoning as the Milky Way shader).
+ */
+const horizonVertexShader = `
+  attribute float aDepth;
+  varying float vDepth;
+
+  void main() {
+    vDepth = aDepth;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`
+
+const horizonFragmentShader = `
+  uniform vec3 uGroundColor;
+  uniform vec3 uGlowColor;
+  uniform float uGlowOpacity;
+  uniform float uGroundOpacity;
+  uniform float uGlowSpan;
+  uniform float uRimOpacity;
+  uniform float uRimSpan;
+  varying float vDepth;
+
+  void main() {
+    float depthBelowHorizon = max(vDepth, 0.0);
+    // Keep the horizon transition broad and soft so the lower sky doesn't
+    // collapse into a harsh black half-screen as soon as the camera dips
+    // slightly below altitude 0°.
+    float groundAmount = smoothstep(0.06, 0.82, depthBelowHorizon);
+    float glowAmount = 1.0 - smoothstep(0.0, uGlowSpan, abs(vDepth));
+    // Fade the glow back out as we move deeper below the horizon so it stays
+    // a thin atmospheric band rather than tinting the whole ground dome.
+    glowAmount *= 1.0 - smoothstep(uGlowSpan * 0.5, uGlowSpan * 1.6, depthBelowHorizon);
+    // Separate from the broader atmospheric glow above: this very thin ridge
+    // gives the eye a clearer horizon read without becoming a drawn outline.
+    float rimAmount = 1.0 - smoothstep(0.0, uRimSpan, abs(vDepth));
+    rimAmount *= rimAmount;
+
+    vec3 color = mix(uGlowColor, uGroundColor, groundAmount);
+    float alpha = max(
+      max(groundAmount * uGroundOpacity, glowAmount * uGlowOpacity),
+      rimAmount * uRimOpacity
+    );
+    if (alpha <= 0.0) discard;
+    gl_FragColor = vec4(color, alpha);
+  }
+`
+
+function buildHorizonGeometry(): THREE.BufferGeometry {
+  const { azimuthSegments, altitudeSegments, glowSpanDegrees } =
+    starfieldConfig.horizon
+  const { positions, depths, indices } = generateHorizonMeshData(
+    azimuthSegments,
+    altitudeSegments,
+    glowSpanDegrees,
+  )
+
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('aDepth', new THREE.BufferAttribute(depths, 1))
+  geometry.setIndex(new THREE.BufferAttribute(indices, 1))
+  return geometry
+}
+
+function buildMilkyWayGeometry(points: MilkyWayPoint[]): THREE.BufferGeometry {
+  const positions = new Float32Array(points.length * 3)
+  const brightnesses = new Float32Array(points.length)
+
+  points.forEach((point, i) => {
+    positions[i * 3] = point.position.x
+    positions[i * 3 + 1] = point.position.y
+    positions[i * 3 + 2] = point.position.z
+    brightnesses[i] = point.brightness
+  })
+
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute(
+    'aBrightness',
+    new THREE.BufferAttribute(brightnesses, 1),
+  )
+  return geometry
+}
 
 function buildStarGeometry(stars: StarData[]): THREE.BufferGeometry {
   const positions = new Float32Array(stars.length * 3)
@@ -112,6 +266,7 @@ function buildStarGeometry(stars: StarData[]): THREE.BufferGeometry {
   const brightnesses = new Float32Array(stars.length)
   const twinklePhases = new Float32Array(stars.length)
   const twinkleAmplitudes = new Float32Array(stars.length)
+  const selectedFlags = new Float32Array(stars.length)
 
   const { min: sizeMin, max: sizeMax } = starfieldConfig.render.pointSizePixels
   const color = new THREE.Color()
@@ -132,6 +287,7 @@ function buildStarGeometry(stars: StarData[]): THREE.BufferGeometry {
     brightnesses[i] = star.brightness
     twinklePhases[i] = star.twinklePhase
     twinkleAmplitudes[i] = star.twinkleAmplitude
+    selectedFlags[i] = 0
   })
 
   const geometry = new THREE.BufferGeometry()
@@ -150,6 +306,68 @@ function buildStarGeometry(stars: StarData[]): THREE.BufferGeometry {
     'aTwinkleAmplitude',
     new THREE.BufferAttribute(twinkleAmplitudes, 1),
   )
+  geometry.setAttribute('aSelected', new THREE.BufferAttribute(selectedFlags, 1))
+  return geometry
+}
+
+function buildCelestialBodyGeometry(
+  bodies: CelestialBodyRenderData[],
+  highlightedBodyId: SupportedCelestialBodyId | null = null,
+): THREE.BufferGeometry {
+  const positions = new Float32Array(bodies.length * 3)
+  const colors = new Float32Array(bodies.length * 3)
+  const sizes = new Float32Array(bodies.length)
+  const brightnesses = new Float32Array(bodies.length)
+  const twinklePhases = new Float32Array(bodies.length)
+  const twinkleAmplitudes = new Float32Array(bodies.length)
+  const selectedFlags = new Float32Array(bodies.length)
+
+  const { min: sizeMin, max: sizeMax } = starfieldConfig.render.pointSizePixels
+  const color = new THREE.Color()
+
+  bodies.forEach((body, i) => {
+    positions[i * 3] = body.position.x
+    positions[i * 3 + 1] = body.position.y
+    positions[i * 3 + 2] = body.position.z
+
+    color.set(starfieldConfig.render.celestialBodyColor[body.visualClass])
+    colors[i * 3] = color.r
+    colors[i * 3 + 1] = color.g
+    colors[i * 3 + 2] = color.b
+
+    const isHighlighted = body.id === highlightedBodyId
+    sizes[i] =
+      THREE.MathUtils.lerp(sizeMin, sizeMax, body.brightness) *
+      body.sizeScale *
+      (isHighlighted ? SELECTED_CELESTIAL_BODY_SIZE_MULTIPLIER : 1)
+    brightnesses[i] = clamp(
+      body.brightness +
+        (isHighlighted ? SELECTED_CELESTIAL_BODY_BRIGHTNESS_BOOST : 0),
+      starfieldConfig.brightness.min,
+      starfieldConfig.brightness.max,
+    )
+    twinklePhases[i] = 0
+    twinkleAmplitudes[i] = 0
+    selectedFlags[i] = isHighlighted ? 1 : 0
+  })
+
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('aColor', new THREE.BufferAttribute(colors, 3))
+  geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1))
+  geometry.setAttribute(
+    'aBrightness',
+    new THREE.BufferAttribute(brightnesses, 1),
+  )
+  geometry.setAttribute(
+    'aTwinklePhase',
+    new THREE.BufferAttribute(twinklePhases, 1),
+  )
+  geometry.setAttribute(
+    'aTwinkleAmplitude',
+    new THREE.BufferAttribute(twinkleAmplitudes, 1),
+  )
+  geometry.setAttribute('aSelected', new THREE.BufferAttribute(selectedFlags, 1))
   return geometry
 }
 
@@ -167,9 +385,21 @@ export class StarfieldRenderer {
     THREE.BufferGeometry,
     THREE.ShaderMaterial
   >
+  private readonly celestialBodyPoints: THREE.Points<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
+  >
   private readonly constellationLines: THREE.LineSegments<
     THREE.BufferGeometry,
     THREE.LineBasicMaterial
+  >
+  private readonly milkyWay: THREE.Points<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
+  >
+  private readonly horizon: THREE.Mesh<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
   >
   private readonly unwatchReducedMotion: () => void
   private readonly unwatchVisibility: () => void
@@ -196,10 +426,16 @@ export class StarfieldRenderer {
   private labelTargets: LabelTarget[] = []
   /** The star data currently rendered, kept for tap/click hit-testing (Task 5, see hitTestStar) — not otherwise needed after buildStarGeometry consumes it. */
   private stars: StarData[]
+  private celestialBodies: CelestialBodyRenderData[]
+  private highlightedCelestialBodyId: SupportedCelestialBodyId | null = null
+  private visualPreset: StarfieldVisualPresetKey = 'planetarium-like'
+  private isProjectorMode = false
 
   constructor(
     canvas: HTMLCanvasElement,
     stars: StarData[],
+    celestialBodies: CelestialBodyRenderData[],
+    milkyWayPoints: MilkyWayPoint[],
     onHeadingChange?: (headingDegrees: number) => void,
     onLabelPositionsChange?: (positions: LabelScreenPosition[]) => void,
     onZoomChange?: (fovDegrees: number) => void,
@@ -208,7 +444,8 @@ export class StarfieldRenderer {
     this.onLabelPositionsChange = onLabelPositionsChange
     this.onZoomChange = onZoomChange
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-    this.renderer.setClearColor(starfieldConfig.render.backgroundColor, 1)
+    const initialPreset = resolveStarfieldVisualPreset(this.visualPreset)
+    this.renderer.setClearColor(initialPreset.render.backgroundColor, 1)
 
     this.scene = new THREE.Scene()
     // Aspect is a placeholder; the ResizeObserver in Starfield.tsx calls
@@ -223,9 +460,54 @@ export class StarfieldRenderer {
     // introduces unwanted roll — the standard order for a look-around camera.
     this.camera.rotation.order = 'YXZ'
 
+    // Added first so it renders behind everything else (renderOrder), as
+    // the ground/horizon is the furthest-back background layer.
+    const { horizon } = starfieldConfig
+    const horizonMaterial = new THREE.ShaderMaterial({
+      vertexShader: horizonVertexShader,
+      fragmentShader: horizonFragmentShader,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.BackSide,
+      uniforms: {
+        uGroundColor: { value: new THREE.Color(horizon.groundColor) },
+        uGlowColor: { value: new THREE.Color(initialPreset.horizon.glowColor) },
+        uGlowOpacity: { value: initialPreset.horizon.glowOpacity },
+        uGroundOpacity: { value: horizon.groundOpacity },
+        uGlowSpan: { value: horizon.glowSpanDegrees / 90 },
+        uRimOpacity: { value: initialPreset.horizon.rimOpacity },
+        uRimSpan: { value: horizon.rimSpanDegrees / 90 },
+      },
+    })
+    this.horizon = new THREE.Mesh(buildHorizonGeometry(), horizonMaterial)
+    this.horizon.renderOrder = -2
+    this.scene.add(this.horizon)
+
+    // Added before the star points below so it renders behind them
+    // (renderOrder), matching the Milky Way's role as a background glow.
+    const { milkyWay } = starfieldConfig
+    const milkyWayMaterial = new THREE.ShaderMaterial({
+      vertexShader: milkyWayVertexShader,
+      fragmentShader: milkyWayFragmentShader,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uSizePixels: { value: milkyWay.pointSizePixels },
+        uBaseOpacity: { value: initialPreset.milkyWay.baseOpacity },
+        uColor: { value: new THREE.Color(initialPreset.milkyWay.color) },
+      },
+    })
+    this.milkyWay = new THREE.Points(
+      buildMilkyWayGeometry(milkyWayPoints),
+      milkyWayMaterial,
+    )
+    this.milkyWay.renderOrder = -1
+    this.scene.add(this.milkyWay)
+
     this.stars = stars
     const geometry = buildStarGeometry(stars)
-    const { halo } = starfieldConfig.render
+    const { halo } = initialPreset.render
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
@@ -236,6 +518,7 @@ export class StarfieldRenderer {
         uHaloPower: { value: halo.power },
         uHaloRadiusMultiplier: { value: halo.radiusMultiplier },
         uHaloIntensity: { value: halo.intensity },
+        uPointSizeScale: { value: initialPreset.pointSizeScale },
         uTime: { value: 0 },
         uTwinkleSpeed: { value: starfieldConfig.twinkle.speed },
         uReducedMotionScale: { value: 1 },
@@ -244,6 +527,34 @@ export class StarfieldRenderer {
     this.points = new THREE.Points(geometry, material)
     this.scene.add(this.points)
 
+    this.celestialBodies = celestialBodies
+    const celestialBodyGeometry = buildCelestialBodyGeometry(
+      celestialBodies,
+      this.highlightedCelestialBodyId,
+    )
+    const celestialBodyMaterial = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      depthWrite: false,
+      uniforms: {
+        uHaloThreshold: { value: halo.brightnessThreshold },
+        uHaloPower: { value: halo.power },
+        uHaloRadiusMultiplier: { value: halo.radiusMultiplier },
+        uHaloIntensity: { value: halo.intensity },
+        uPointSizeScale: { value: initialPreset.pointSizeScale },
+        uTime: { value: 0 },
+        uTwinkleSpeed: { value: starfieldConfig.twinkle.speed },
+        uReducedMotionScale: { value: 1 },
+      },
+    })
+    this.celestialBodyPoints = new THREE.Points(
+      celestialBodyGeometry,
+      celestialBodyMaterial,
+    )
+    this.celestialBodyPoints.renderOrder = 1
+    this.scene.add(this.celestialBodyPoints)
+
     // Hidden by default (D017: constellation lines only appear once a
     // constellation is selected — see showConstellationLines/Task 5).
     this.constellationLines = new THREE.LineSegments(
@@ -251,9 +562,12 @@ export class StarfieldRenderer {
       new THREE.LineBasicMaterial({
         color: starfieldConfig.render.constellationLines.color,
         transparent: true,
-        opacity: starfieldConfig.render.constellationLines.opacity,
+        opacity: initialPreset.render.constellationLines.opacity,
         depthWrite: false,
       }),
+    )
+    this.constellationLines.material.color.set(
+      initialPreset.render.constellationLines.color,
     )
     this.constellationLines.visible = false
     this.scene.add(this.constellationLines)
@@ -329,6 +643,24 @@ export class StarfieldRenderer {
   }
 
   /**
+   * Snapshot of the user-chosen view state, excluding the small ambient drift
+   * layered on top in update(). Save/restore should round-trip where the user
+   * intentionally aimed the camera, not whichever drift phase happened to be
+   * active at the save instant.
+   */
+  getViewStateSnapshot(): {
+    azimuthDegrees: number
+    altitudeDegrees: number
+    fovDegrees: number
+  } {
+    return {
+      azimuthDegrees: normalizeDegrees(-THREE.MathUtils.radToDeg(this.userYawRadians)),
+      altitudeDegrees: THREE.MathUtils.radToDeg(this.userPitchRadians),
+      fovDegrees: this.camera.fov,
+    }
+  }
+
+  /**
    * Points the camera at a given horizontal direction (Task 6: search result
    * selection moves the view there) — the inverse of the alt/az → XYZ
    * convention in projectHorizontalToSphere, and consistent with
@@ -346,6 +678,22 @@ export class StarfieldRenderer {
       -pitchLimitRadians,
       pitchLimitRadians,
     )
+    this.render()
+  }
+
+  /** Restores a saved view state using the same clamping rules as live camera input. */
+  restoreViewState(
+    azimuthDegrees: number,
+    altitudeDegrees: number,
+    fovDegrees: number,
+  ): void {
+    this.lookAt(azimuthDegrees, altitudeDegrees)
+    this.camera.fov = clamp(
+      fovDegrees,
+      starfieldConfig.controls.zoom.minFovDegrees,
+      starfieldConfig.controls.zoom.maxFovDegrees,
+    )
+    this.camera.updateProjectionMatrix()
     this.render()
   }
 
@@ -377,6 +725,47 @@ export class StarfieldRenderer {
     this.points.geometry.dispose()
     this.points.geometry = newGeometry
     this.render()
+  }
+
+  /** Same purpose as updateStars, for visible planets/moon rendered as a separate layer above the star field. */
+  updateCelestialBodies(bodies: CelestialBodyRenderData[]): void {
+    this.celestialBodies = bodies
+    const newGeometry = buildCelestialBodyGeometry(
+      bodies,
+      this.highlightedCelestialBodyId,
+    )
+    this.celestialBodyPoints.geometry.dispose()
+    this.celestialBodyPoints.geometry = newGeometry
+    this.render()
+  }
+
+  highlightCelestialBody(id: SupportedCelestialBodyId | null): void {
+    this.highlightedCelestialBodyId = id
+    const newGeometry = buildCelestialBodyGeometry(
+      this.celestialBodies,
+      this.highlightedCelestialBodyId,
+    )
+    this.celestialBodyPoints.geometry.dispose()
+    this.celestialBodyPoints.geometry = newGeometry
+    this.render()
+  }
+
+  /** Same purpose as updateStars, for the Milky Way band (4次 Task 2): swaps in newly computed particle placement after a date/time or location change. */
+  updateMilkyWay(points: MilkyWayPoint[]): void {
+    const newGeometry = buildMilkyWayGeometry(points)
+    this.milkyWay.geometry.dispose()
+    this.milkyWay.geometry = newGeometry
+    this.render()
+  }
+
+  applyVisualPreset(preset: StarfieldVisualPresetKey): void {
+    this.visualPreset = preset
+    this.applyDisplayAdjustments()
+  }
+
+  applyProjectorMode(isProjectorMode: boolean): void {
+    this.isProjectorMode = isProjectorMode
+    this.applyDisplayAdjustments()
   }
 
   /**
@@ -570,14 +959,86 @@ export class StarfieldRenderer {
     if (this.labelTargets.length > 0) this.updateLabelPositions()
   }
 
+  private applyDisplayAdjustments(): void {
+    const resolved = resolveStarfieldVisualPreset(this.visualPreset)
+    const projector = starfieldConfig.projector.render
+
+    this.renderer.setClearColor(
+      this.isProjectorMode
+        ? projector.backgroundColor
+        : resolved.render.backgroundColor,
+      1,
+    )
+
+    const starUniforms = this.points.material.uniforms
+    starUniforms.uHaloThreshold.value = resolved.render.halo.brightnessThreshold
+    starUniforms.uHaloPower.value = resolved.render.halo.power
+    starUniforms.uHaloRadiusMultiplier.value =
+      resolved.render.halo.radiusMultiplier
+    starUniforms.uHaloIntensity.value = this.isProjectorMode
+      ? resolved.render.halo.intensity * projector.haloIntensityMultiplier
+      : resolved.render.halo.intensity
+    starUniforms.uPointSizeScale.value = this.isProjectorMode
+      ? resolved.pointSizeScale * projector.pointSizeScale
+      : resolved.pointSizeScale
+
+    const celestialBodyUniforms = this.celestialBodyPoints.material.uniforms
+    celestialBodyUniforms.uHaloThreshold.value =
+      resolved.render.halo.brightnessThreshold
+    celestialBodyUniforms.uHaloPower.value = resolved.render.halo.power
+    celestialBodyUniforms.uHaloRadiusMultiplier.value =
+      resolved.render.halo.radiusMultiplier
+    celestialBodyUniforms.uHaloIntensity.value = this.isProjectorMode
+      ? resolved.render.halo.intensity * projector.haloIntensityMultiplier
+      : resolved.render.halo.intensity
+    celestialBodyUniforms.uPointSizeScale.value = this.isProjectorMode
+      ? resolved.pointSizeScale * projector.pointSizeScale
+      : resolved.pointSizeScale
+
+    const milkyWayUniforms = this.milkyWay.material.uniforms
+    milkyWayUniforms.uBaseOpacity.value = this.isProjectorMode
+      ? resolved.milkyWay.baseOpacity * projector.milkyWayOpacityMultiplier
+      : resolved.milkyWay.baseOpacity
+    ;(milkyWayUniforms.uColor.value as THREE.Color).set(resolved.milkyWay.color)
+
+    const horizonUniforms = this.horizon.material.uniforms
+    ;(horizonUniforms.uGlowColor.value as THREE.Color).set(
+      this.isProjectorMode
+        ? projector.horizonGlowColor
+        : resolved.horizon.glowColor,
+    )
+    horizonUniforms.uGlowOpacity.value = this.isProjectorMode
+      ? resolved.horizon.glowOpacity * projector.horizonGlowOpacityMultiplier
+      : resolved.horizon.glowOpacity
+    horizonUniforms.uRimOpacity.value = this.isProjectorMode
+      ? resolved.horizon.rimOpacity * projector.horizonRimOpacityMultiplier
+      : resolved.horizon.rimOpacity
+
+    this.constellationLines.material.color.set(
+      resolved.render.constellationLines.color,
+    )
+    this.constellationLines.material.opacity = this.isProjectorMode
+      ? resolved.render.constellationLines.opacity *
+        projector.constellationLineOpacityMultiplier
+      : resolved.render.constellationLines.opacity
+
+    this.render()
+  }
+
   dispose(): void {
     this.stop()
     this.unwatchReducedMotion()
     this.unwatchVisibility()
     this.points.geometry.dispose()
     this.points.material.dispose()
+    this.celestialBodyPoints.geometry.dispose()
+    this.celestialBodyPoints.material.dispose()
     this.constellationLines.geometry.dispose()
     this.constellationLines.material.dispose()
+    this.milkyWay.geometry.dispose()
+    this.milkyWay.material.dispose()
+    this.horizon.geometry.dispose()
+    this.horizon.material.dispose()
     this.renderer.dispose()
   }
 }

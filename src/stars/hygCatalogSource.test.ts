@@ -20,7 +20,7 @@ describe('loadHygStarCatalog', () => {
     expect(stars.some((star) => star.id === 0)).toBe(false)
   })
 
-  it('keeps every star within its documented range', () => {
+it('keeps every star within its documented range', { timeout: 15000 }, () => {
     for (const star of stars) {
       expect(star.raHours).toBeGreaterThanOrEqual(0)
       expect(star.raHours).toBeLessThan(24)

@@ -1,3 +1,7 @@
+import {
+  createCelestialBodySearchRecords,
+  type CelestialBodySearchRecord,
+} from '../celestialBodies/celestialBodyTypes'
 import { loadConstellationCatalog } from '../constellations/constellationCatalogSource'
 import type { ConstellationRecord } from '../constellations/constellationTypes'
 import { loadHygStarCatalog } from '../stars/hygCatalogSource'
@@ -16,7 +20,15 @@ export interface StarSearchResult {
   properName: string
 }
 
-export type SearchResult = ConstellationSearchResult | StarSearchResult
+export interface CelestialBodySearchResult {
+  type: 'celestialBody'
+  celestialBody: CelestialBodySearchRecord
+}
+
+export type SearchResult =
+  | ConstellationSearchResult
+  | CelestialBodySearchResult
+  | StarSearchResult
 
 interface SearchEntry {
   result: SearchResult
@@ -36,6 +48,13 @@ function buildEntries(): SearchEntry[] {
     })
   }
 
+  for (const celestialBody of createCelestialBodySearchRecords()) {
+    entries.push({
+      result: { type: 'celestialBody', celestialBody },
+      searchText: celestialBody.searchText,
+    })
+  }
+
   // Only proper-named stars are searchable by name — matches how Task 4's
   // labels and Task 5's info panel already treat unnamed stars ("名前のない星").
   for (const star of loadHygStarCatalog()) {
@@ -50,6 +69,9 @@ function buildEntries(): SearchEntry[] {
 }
 
 const MAX_RESULTS = 20
+const MAX_CONSTELLATION_RESULTS = 8
+const MAX_CELESTIAL_BODY_RESULTS = 6
+const MAX_STAR_RESULTS = 6
 
 /**
  * Simple substring matching over constellation/star names (Task 6;
@@ -66,36 +88,53 @@ export function searchCatalog(query: string): SearchResult[] {
   if (cachedEntries === null) cachedEntries = buildEntries()
 
   const constellationMatches: SearchResult[] = []
+  const celestialBodyMatches: SearchResult[] = []
   const starMatches: SearchResult[] = []
   for (const entry of cachedEntries) {
     if (!entry.searchText.includes(trimmed)) continue
     if (entry.result.type === 'constellation') {
       constellationMatches.push(entry.result)
+    } else if (entry.result.type === 'celestialBody') {
+      celestialBodyMatches.push(entry.result)
     } else {
       starMatches.push(entry.result)
     }
   }
 
-  // Split the result cap evenly between constellations and stars: all 89
-  // constellations are indexed (and therefore matched) before any star (see
-  // buildEntries), so a broad query — even a single common letter — can
-  // match 20+ constellations on its own and, with a single combined cap,
-  // would crowd out every star match without ever checking one.
-  const halfBudget = Math.ceil(MAX_RESULTS / 2)
-  const starCount = Math.min(starMatches.length, halfBudget)
+  // Results are grouped by meaning rather than a single global match order:
+  // all constellations are indexed before celestial bodies and stars, so a
+  // broad query would otherwise let the first category crowd out the rest.
   const constellationCount = Math.min(
     constellationMatches.length,
-    MAX_RESULTS - starCount,
+    MAX_CONSTELLATION_RESULTS,
   )
+  const celestialBodyCount = Math.min(
+    celestialBodyMatches.length,
+    MAX_CELESTIAL_BODY_RESULTS,
+  )
+  const remainingBudget =
+    MAX_RESULTS - constellationCount - celestialBodyCount
+  const starCount = Math.min(
+    starMatches.length,
+    Math.min(MAX_STAR_RESULTS, remainingBudget),
+  )
+
   return [
     ...constellationMatches.slice(0, constellationCount),
+    ...celestialBodyMatches.slice(0, celestialBodyCount),
     ...starMatches.slice(0, starCount),
   ]
 }
 
 /** Display label for one search result, matching how its name already appears elsewhere (constellation name labels, StarInfoOverlay). */
 export function searchResultDisplayName(result: SearchResult): string {
-  return result.type === 'constellation'
-    ? `${result.constellation.name} (${result.constellation.nameJa})`
-    : toDisplayStarName(result.properName)
+  if (result.type === 'constellation') {
+    return `${result.constellation.name} (${result.constellation.nameJa})`
+  }
+
+  if (result.type === 'celestialBody') {
+    return `${result.celestialBody.displayName} (${result.celestialBody.displayNameJa})`
+  }
+
+  return toDisplayStarName(result.properName)
 }

@@ -12,6 +12,7 @@
  * time.
  */
 
+import type { CelestialBodySearchRecord } from './celestialBodies/celestialBodyTypes'
 import { useState } from 'react'
 import type { ConstellationRecord } from './constellations/constellationTypes'
 import {
@@ -26,6 +27,7 @@ import type { HygStarRecord } from './stars/starTypes'
 interface SearchOverlayProps {
   isOpen: boolean
   onToggleOpen: () => void
+  onSelectCelestialBody: (celestialBody: CelestialBodySearchRecord) => void
   onSelectConstellation: (constellation: ConstellationRecord) => void
   onSelectStar: (star: HygStarRecord) => void
 }
@@ -33,6 +35,7 @@ interface SearchOverlayProps {
 export function SearchOverlay({
   isOpen,
   onToggleOpen,
+  onSelectCelestialBody,
   onSelectConstellation,
   onSelectStar,
 }: SearchOverlayProps) {
@@ -65,8 +68,8 @@ export function SearchOverlay({
             type="text"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="星座名・星名で検索"
-            aria-label="星座名・星名で検索"
+            placeholder="星座名・星名・主要天体で検索"
+            aria-label="星座名・星名・主要天体で検索"
             style={{
               display: 'block',
               width: '100%',
@@ -93,19 +96,34 @@ export function SearchOverlay({
                 <li style={{ opacity: 0.6, padding: '4px 2px' }}>該当なし</li>
               )}
               {results.map((result) => {
-                const key =
-                  result.type === 'constellation'
-                    ? `constellation-${result.constellation.name}`
-                    : `star-${result.star.id}`
+                const key = (() => {
+                  if (result.type === 'constellation') {
+                    return `constellation-${result.constellation.name}`
+                  }
+
+                  if (result.type === 'celestialBody') {
+                    return `celestial-${result.celestialBody.id}`
+                  }
+
+                  return `star-${result.star.id}`
+                })()
                 return (
                   <li key={key}>
                     <button
                       type="button"
-                      onClick={() =>
-                        result.type === 'constellation'
-                          ? onSelectConstellation(result.constellation)
-                          : onSelectStar(result.star)
-                      }
+                      onClick={() => {
+                        if (result.type === 'constellation') {
+                          onSelectConstellation(result.constellation)
+                          return
+                        }
+
+                        if (result.type === 'celestialBody') {
+                          onSelectCelestialBody(result.celestialBody)
+                          return
+                        }
+
+                        onSelectStar(result.star)
+                      }}
                       style={{
                         display: 'block',
                         width: '100%',

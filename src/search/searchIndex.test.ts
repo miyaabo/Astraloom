@@ -42,18 +42,37 @@ describe('searchCatalog', () => {
     ).toBe(true)
   })
 
+  it('matches a celestial body by its English name', () => {
+    const results = searchCatalog('jupiter')
+    expect(
+      results.some(
+        (r) =>
+          r.type === 'celestialBody' && r.celestialBody.id === 'jupiter',
+      ),
+    ).toBe(true)
+  })
+
+  it('matches a celestial body by its Japanese name', () => {
+    const results = searchCatalog('月')
+    expect(
+      results.some((r) => r.type === 'celestialBody' && r.celestialBody.id === 'moon'),
+    ).toBe(true)
+  })
+
   it('returns an empty array when nothing matches', () => {
     expect(searchCatalog('xyznonexistentquery')).toEqual([])
   })
 
-  it('still surfaces star matches for a broad query that alone matches 20+ constellations', () => {
+  it('still surfaces celestial-body and star matches for a broad query that alone matches many constellations', () => {
     // All 89 constellations are indexed before any star (see buildEntries),
-    // so a single common letter matches far more than MAX_RESULTS
-    // constellations on its own — a shared cap would exhaust the result
-    // budget before ever checking a star.
+    // and celestial bodies sit before stars, so a single common letter could
+    // otherwise let earlier categories crowd out later ones under one cap.
     const results = searchCatalog('a')
     expect(
       results.filter((r) => r.type === 'constellation').length,
+    ).toBeGreaterThan(0)
+    expect(
+      results.filter((r) => r.type === 'celestialBody').length,
     ).toBeGreaterThan(0)
     expect(results.filter((r) => r.type === 'star').length).toBeGreaterThan(0)
   })
@@ -75,5 +94,12 @@ describe('searchResultDisplayName', () => {
       (r) => r.type === 'star' && r.properName === 'Altair',
     )
     expect(searchResultDisplayName(result)).toBe(toDisplayStarName('Altair'))
+  })
+
+  it('pairs a celestial body English/Japanese names from its static metadata', () => {
+    const [result] = searchCatalog('venus').filter(
+      (r) => r.type === 'celestialBody' && r.celestialBody.id === 'venus',
+    )
+    expect(searchResultDisplayName(result)).toBe('Venus (金星)')
   })
 })

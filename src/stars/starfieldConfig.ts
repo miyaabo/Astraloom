@@ -68,6 +68,12 @@ export interface StarfieldConfig {
       blueWhite: string
       paleOrange: string
     }
+    celestialBodyColor: {
+      moon: string
+      neutral: string
+      warm: string
+      cool: string
+    }
     halo: {
       /**
        * Brightness (0-1) above which a halo starts to appear. Keeps glow
@@ -87,6 +93,104 @@ export interface StarfieldConfig {
       /** Opacity; low so lines never compete with the stars for attention. */
       opacity: number
     }
+  }
+  /**
+   * Milky Way band (4次 Task 2, D018): a diffuse particle band layered onto
+   * the same sky sphere as the stars, kept as a separate Points/shader (not
+   * starVisualAttributes) since it has no twinkle/halo tiers of its own.
+   * Values here are placeholders for the Task 2 foundation; Task 3 tunes
+   * them against the Visual Target/Human Check.
+   */
+  milkyWay: {
+    /** Number of particles making up the band. */
+    particleCount: number
+    /**
+     * Approximate angular half-width, in degrees, of the galactic-latitude
+     * scatter used to place particles around the galactic plane (b=0) — see
+     * src/stars/milkyWay.ts. Larger values make a wider, more diffuse band.
+     */
+    bandWidthDegrees: number
+    /** Rendered point size, in CSS pixels, for every particle. */
+    pointSizePixels: number
+    /** Max per-particle alpha at the band's brightest (center) point. */
+    baseOpacity: number
+    /** Particle color; kept desaturated/cool so the band reads as a soft glow, not colorful. */
+    color: string
+  }
+  /**
+   * Horizon/ground dome (4次 Task 4, D018): a simple silhouette + glow layer
+   * covering the sky sphere from the horizon down to straight-down, built
+   * once (not per date/location, see src/stars/horizon.ts) since the ground
+   * doesn't move as the sky rotates. Values here are placeholders for the
+   * Task 4 foundation; Task 5 tunes them against the Visual Target/Human Check.
+   */
+  horizon: {
+    /** Divisions around the full 360° azimuth for the ground mesh; higher = smoother curve. */
+    azimuthSegments: number
+    /** Divisions from the horizon down to straight-down (nadir). */
+    altitudeSegments: number
+    /** How far above the horizon (0° altitude), in degrees, the glow fades out into the sky. */
+    glowSpanDegrees: number
+    /** Very thin brightness ridge centered on the horizon itself, to make the boundary readable without drawing a hard line. */
+    rimSpanDegrees: number
+    /** Solid ground silhouette color, once fully below the horizon. */
+    groundColor: string
+    /** Horizon glow color, blended near the horizon line. */
+    glowColor: string
+    /** Extra opacity for the thin horizon ridge. Kept separate so it can be reverted independently from the broader glow. */
+    rimOpacity: number
+    /** Max opacity of the horizon glow, right at the horizon line. */
+    glowOpacity: number
+    /** Opacity of the solid ground silhouette once fully below the horizon. */
+    groundOpacity: number
+  }
+  presets: Record<StarfieldVisualPresetKey, StarfieldVisualPreset>
+  projector: {
+    render: {
+      backgroundColor: string
+      pointSizeScale: number
+      haloIntensityMultiplier: number
+      milkyWayOpacityMultiplier: number
+      horizonGlowColor: string
+      horizonGlowOpacityMultiplier: number
+      horizonRimOpacityMultiplier: number
+      constellationLineOpacityMultiplier: number
+    }
+    overlay: {
+      border: string
+      controlBackground: string
+      panelBackground: string
+      text: string
+    }
+  }
+}
+
+export type StarfieldVisualPresetKey = 'planetarium-like' | 'gentle-contrast'
+
+export interface StarfieldVisualPreset {
+  label: string
+  pointSizeScale: number
+  render: {
+    backgroundColor: string
+    halo: {
+      brightnessThreshold: number
+      power: number
+      radiusMultiplier: number
+      intensity: number
+    }
+    constellationLines: {
+      color: string
+      opacity: number
+    }
+  }
+  milkyWay: {
+    baseOpacity: number
+    color: string
+  }
+  horizon: {
+    glowColor: string
+    glowOpacity: number
+    rimOpacity: number
   }
 }
 
@@ -141,6 +245,12 @@ export const starfieldConfig: StarfieldConfig = {
       blueWhite: '#cfe0ff',
       paleOrange: '#ffdcb0',
     },
+    celestialBodyColor: {
+      moon: '#eee8d6',
+      neutral: '#f3ead2',
+      warm: '#f2cfac',
+      cool: '#d3def6',
+    },
     halo: {
       brightnessThreshold: 0.75,
       power: 1.8,
@@ -152,4 +262,100 @@ export const starfieldConfig: StarfieldConfig = {
       opacity: 0.35,
     },
   },
+  milkyWay: {
+    particleCount: 14000,
+    bandWidthDegrees: 9,
+    pointSizePixels: 5,
+    baseOpacity: 0.18,
+    color: '#9fb3d9',
+  },
+  horizon: {
+    azimuthSegments: 96,
+    altitudeSegments: 24,
+    glowSpanDegrees: 7,
+    rimSpanDegrees: 1.6,
+    groundColor: '#02050d',
+    glowColor: '#23365e',
+    rimOpacity: 0.18,
+    glowOpacity: 0.16,
+    groundOpacity: 0.72,
+  },
+  presets: {
+    'planetarium-like': {
+      label: 'Planetarium-like',
+      pointSizeScale: 1,
+      render: {
+        backgroundColor: '#05070f',
+        halo: {
+          brightnessThreshold: 0.75,
+          power: 1.8,
+          radiusMultiplier: 3.5,
+          intensity: 0.55,
+        },
+        constellationLines: {
+          color: '#8fa8d9',
+          opacity: 0.35,
+        },
+      },
+      milkyWay: {
+        baseOpacity: 0.18,
+        color: '#9fb3d9',
+      },
+      horizon: {
+        glowColor: '#23365e',
+        glowOpacity: 0.16,
+        rimOpacity: 0.18,
+      },
+    },
+    'gentle-contrast': {
+      label: 'Gentle Contrast',
+      pointSizeScale: 0.94,
+      render: {
+        backgroundColor: '#04060d',
+        halo: {
+          brightnessThreshold: 0.79,
+          power: 2.1,
+          radiusMultiplier: 3.1,
+          intensity: 0.44,
+        },
+        constellationLines: {
+          color: '#8198c7',
+          opacity: 0.24,
+        },
+      },
+      milkyWay: {
+        baseOpacity: 0.14,
+        color: '#8fa5cd',
+      },
+      horizon: {
+        glowColor: '#1d2d4f',
+        glowOpacity: 0.13,
+        rimOpacity: 0.14,
+      },
+    },
+  },
+  projector: {
+    render: {
+      backgroundColor: '#0a0d16',
+      pointSizeScale: 1.08,
+      haloIntensityMultiplier: 0.92,
+      milkyWayOpacityMultiplier: 1.18,
+      horizonGlowColor: '#314a7a',
+      horizonGlowOpacityMultiplier: 1.35,
+      horizonRimOpacityMultiplier: 1.2,
+      constellationLineOpacityMultiplier: 0.82,
+    },
+    overlay: {
+      border: 'rgba(255, 255, 255, 0.2)',
+      controlBackground: 'rgba(3, 5, 10, 0.38)',
+      panelBackground: 'rgba(3, 5, 10, 0.68)',
+      text: '#f5f7ff',
+    },
+  },
+}
+
+export function resolveStarfieldVisualPreset(
+  preset: StarfieldVisualPresetKey,
+): StarfieldVisualPreset {
+  return starfieldConfig.presets[preset]
 }

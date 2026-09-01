@@ -16,12 +16,16 @@ import { findStarTrivia } from './starTrivia'
  */
 export interface SelectedStarInfo {
   displayName: string
+  /** Optional object category, e.g. star / constellation / planet / moon. */
+  categoryLabel?: string | null
   /** Null for a constellation-only selection (buildSelectedConstellationInfo). */
   brightnessLabel: string | null
   /** Null for a constellation-only selection (buildSelectedConstellationInfo). */
   colorLabel: string | null
   /** "英名 (和名)" of the constellation this star belongs to, or null if it isn't part of any constellation's line figure. */
   constellationLabel: string | null
+  /** Optional calm extra detail such as illumination state for celestial bodies. */
+  detailLabel?: string | null
   /** Short trivia text (Task 7), or null when nothing is curated for this star/constellation. */
   trivia: string | null
 }
@@ -78,11 +82,13 @@ export function buildSelectedStarInfo(
     displayName: star.properName
       ? toDisplayStarName(star.properName)
       : '名前のない星',
+    categoryLabel: '恒星',
     brightnessLabel: describeBrightness(star.magnitude),
     colorLabel: describeColor(colorIndexToCategory(star.colorIndex)),
     constellationLabel: constellation
       ? `${constellation.name} (${constellation.nameJa})`
       : null,
+    detailLabel: null,
     trivia: findTriviaForStar(star, constellation),
   }
 }
@@ -98,9 +104,11 @@ export function buildSelectedConstellationInfo(
 ): SelectedStarInfo {
   return {
     displayName: `${constellation.name} (${constellation.nameJa})`,
+    categoryLabel: '星座',
     brightnessLabel: null,
     colorLabel: null,
     constellationLabel: null,
+    detailLabel: null,
     trivia: findConstellationTrivia(constellation.name),
   }
 }

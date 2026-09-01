@@ -17,6 +17,9 @@ playwright-report
 test-results
 coverage
 
+# Human Check screenshots / scratch output
+tmp
+
 # Raw star catalog download (see scripts/build-hyg-catalog.mjs); the filtered
 # output committed under src/stars/data/ is what the app actually ships.
 data/raw

@@ -1,7 +1,12 @@
 import { Starfield } from './Starfield'
+import { AuthSessionProvider } from './sync/AuthSessionProvider'
 
 function App() {
-  return <Starfield />
+  return (
+    <AuthSessionProvider>
+      <Starfield />
+    </AuthSessionProvider>
+  )
 }
 
 export default App

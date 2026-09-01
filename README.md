@@ -10,11 +10,28 @@ Veluna は、就寝前などに本格感のある夜空を静かに眺めてリ�
 
 ## Current Phase
 
-**4次開発 — 癒し体験の強化(Small Spec 作成済み、実装未着手)**
+**8次開発 — アカウント基盤の再整理**
 
-星空を自分好みのリラックス空間にできるようにする。音・映像アセット・タイマー系など技術領域の異なる候補群を含むため、Task 1(スコープ確定)を人間確認のうえ完了させてから実装に着手する。
+現時点では、8次の前提を **Better Auth + ローカル PostgreSQL** へ見直している。直近の目的は `サインイン / サインアウト / セッション復元` と、将来の DB 保存に繋がる認証基盤の整理であり、`クラウド同期` は必須要件から外して再検討中。共有リンク・課金・公開向けプロフィールはこの段階では扱わない。
 
-詳細は `docs/features/phase-4-relaxation.md`、進め方は `docs/features/phase-4-implementation-tasks.md` を参照。
+詳細は `docs/features/phase-8-account-sync.md`、進め方は `docs/features/phase-8-implementation-tasks.md` を参照。
+
+### 7次(完了)で達成した内容
+
+- 月・水星・金星・火星・木星・土星の位置表示(`src/celestialBodies/`)
+- 主要天体の見え方調整と恒星とは別の描画レイヤー化(`src/render/StarfieldRenderer.ts`)
+- 主要天体の検索・選択・軽い情報表示の統合(`src/search/`, `src/Starfield.tsx`, `src/StarInfoOverlay.tsx`)
+- 主要天体系の責務分離(runtime state / render input / search input)
+- 自動検証(typecheck / lint / unit test 180 件 / production build / e2e 8 件)完了
+
+### 5次(完了)で達成した内容
+
+- 鑑賞モード追加(`src/ImmersiveModeToggle.tsx`, `src/displayState.ts`, `src/Starfield.tsx`)
+- 標準モードでの UI 自動非表示と再表示
+- `Planetarium-like` / `Gentle Contrast` の 2 種の表現プリセット
+- 独立トグルのプロジェクター向け表示補正
+- 表示状態の整理と回帰テスト
+- 自動検証(typecheck / lint / unit test 136 件 / production build / e2e 8 件)完了
 
 ### 3次(完了済み)で達成した内容
 
@@ -163,7 +180,15 @@ npm run test:e2e      # playwright test（dist の build が必須。初回は `
 - `docs/features/phase-3-star-knowledge.md` — 3次開発の Small Spec(Done)
 - `docs/features/phase-3-implementation-tasks.md` — 3次開発のタスク分割
 - `docs/features/phase-4-relaxation.md` — 4次開発の Small Spec
-- `docs/features/phase-4-implementation-tasks.md` — 4次開発のタスク分割(実装未着手)
+- `docs/features/phase-4-implementation-tasks.md` — 4次開発のタスク分割
+- `docs/features/phase-5-display-experience.md` — 5次開発の Small Spec(Done)
+- `docs/features/phase-5-implementation-tasks.md` — 5次開発のタスク分割(Done)
+- `docs/features/phase-6-save-and-resume.md` — 6次開発の Small Spec
+- `docs/features/phase-6-implementation-tasks.md` — 6次開発のタスク分割
+- `docs/features/phase-7-celestial-bodies.md` — 7次開発の Small Spec(Done)
+- `docs/features/phase-7-implementation-tasks.md` — 7次開発のタスク分割(Done)
+- `docs/features/phase-8-account-sync.md` — 8次開発の Small Spec
+- `docs/features/phase-8-implementation-tasks.md` — 8次開発のタスク分割
 
 ## Git Policy
 

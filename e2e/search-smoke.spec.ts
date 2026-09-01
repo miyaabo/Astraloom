@@ -26,7 +26,7 @@ test('searching for a star and a constellation selects each, with no console err
   await page.waitForTimeout(300)
 
   const searchToggle = page.getByLabel('星・星座を検索')
-  const searchInput = page.getByLabel('星座名・星名で検索')
+  const searchInput = page.getByLabel('星座名・星名・主要天体で検索')
   const closeButton = page.getByLabel('選択情報を閉じる')
 
   // Searching a star selects it (same info panel Task 5's tap selection shows).
@@ -45,6 +45,7 @@ test('searching for a star and a constellation selects each, with no console err
   // ~72° dec) is circumpolar from the default Tokyo location (lat ~35.7°,
   // so anything above ~54° dec never sets) — always above the horizon
   // regardless of when this test runs, unlike most constellations.
+  await page.keyboard.press('Shift')
   await searchToggle.click()
   await searchInput.fill('Ursa Minor')
   await page.getByRole('button', { name: /Ursa Minor/ }).click()

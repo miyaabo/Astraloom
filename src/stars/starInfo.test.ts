@@ -61,6 +61,10 @@ describe('buildSelectedStarInfo', () => {
     ).toBe('Aquila (わし座)')
   })
 
+  it('marks a selected star as a star category', () => {
+    expect(buildSelectedStarInfo(BASE_STAR, null).categoryLabel).toBe('恒星')
+  })
+
   it("prefers the star's own trivia over its constellation's", () => {
     const info = buildSelectedStarInfo(
       { ...BASE_STAR, properName: 'Altair' },
@@ -84,6 +88,7 @@ describe('buildSelectedConstellationInfo', () => {
   it('builds a name + trivia only, with no star-specific fields', () => {
     const info = buildSelectedConstellationInfo(CONSTELLATION)
     expect(info.displayName).toBe('Aquila (わし座)')
+    expect(info.categoryLabel).toBe('星座')
     expect(info.brightnessLabel).toBeNull()
     expect(info.colorLabel).toBeNull()
     expect(info.trivia).toMatch(/ゼウスの使い/)

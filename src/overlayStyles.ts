@@ -1,3 +1,4 @@
+import { starfieldConfig } from './stars/starfieldConfig'
 import type { CSSProperties } from 'react'
 
 /**
@@ -9,10 +10,30 @@ import type { CSSProperties } from 'react'
  * consistent low-contrast look keeps them from competing with it).
  */
 export const overlayColors = {
-  border: 'rgba(255, 255, 255, 0.25)',
-  controlBackground: 'rgba(5, 7, 15, 0.55)',
-  panelBackground: 'rgba(5, 7, 15, 0.85)',
-  text: '#ffffff',
+  border: `var(--overlay-border, rgba(255, 255, 255, 0.25))`,
+  controlBackground: `var(--overlay-control-background, rgba(5, 7, 15, 0.55))`,
+  panelBackground: `var(--overlay-panel-background, rgba(5, 7, 15, 0.85))`,
+  text: `var(--overlay-text, #ffffff)`,
+}
+
+export function applyOverlayAppearance(isProjectorMode: boolean): void {
+  const rootStyle = document.documentElement.style
+  const appearance = isProjectorMode
+    ? starfieldConfig.projector.overlay
+    : {
+        border: 'rgba(255, 255, 255, 0.25)',
+        controlBackground: 'rgba(5, 7, 15, 0.55)',
+        panelBackground: 'rgba(5, 7, 15, 0.85)',
+        text: '#ffffff',
+      }
+
+  rootStyle.setProperty('--overlay-border', appearance.border)
+  rootStyle.setProperty(
+    '--overlay-control-background',
+    appearance.controlBackground,
+  )
+  rootStyle.setProperty('--overlay-panel-background', appearance.panelBackground)
+  rootStyle.setProperty('--overlay-text', appearance.text)
 }
 
 /** Size (px) and gap of the circular toggle buttons anchored to the corners. */
@@ -20,6 +41,10 @@ export const overlayButtonSizePx = 36
 export const overlayButtonGapPx = 8
 /** Distance (px) from the viewport edge for the top-right button row (DateTimeOverlay, LocationOverlay). */
 export const overlayCornerMarginPx = 12
+/** Shared bottom inset for persistent overlay controls. */
+export const overlayBottomMarginPx = 12
+/** Gap between stacked bottom overlay rows. */
+export const overlayBottomStackGapPx = 8
 
 export const overlayButtonStyle: CSSProperties = {
   width: overlayButtonSizePx,
@@ -29,6 +54,17 @@ export const overlayButtonStyle: CSSProperties = {
   background: overlayColors.controlBackground,
   color: overlayColors.text,
   fontSize: 16,
+  cursor: 'pointer',
+}
+
+export const overlayPillButtonStyle: CSSProperties = {
+  minHeight: overlayButtonSizePx,
+  padding: '0 12px',
+  borderRadius: 999,
+  border: `1px solid ${overlayColors.border}`,
+  background: overlayColors.controlBackground,
+  color: overlayColors.text,
+  fontSize: 13,
   cursor: 'pointer',
 }
 

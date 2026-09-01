@@ -3,7 +3,10 @@ import { overlayButtonSizePx, overlayColors } from './overlayStyles'
 
 interface StarInfoOverlayProps {
   info: SelectedStarInfo | null
+  isOpen: boolean
   onClose: () => void
+  onReopen: () => void
+  onClearSelection: () => void
 }
 
 // PlaybackOverlay (src/PlaybackOverlay.tsx) sits at bottom: 16px + safe-area,
@@ -17,12 +20,75 @@ const INFO_PANEL_BOTTOM_PX = 16 + overlayButtonSizePx + 12 + 8
  * a tapped/searched star's name, brightness, color, and constellation
  * membership, or (Task 7) a constellation-only selection's name alone —
  * brightnessLabel/colorLabel are null in that case, so that line is omitted.
- * Renders nothing when nothing is selected, and closing it returns to the
- * plain starfield (D017 / Product Principle 5 — nothing about the selection
- * stays on screen once deselected).
+ * A selection can now outlive the descriptive panel itself: closing hides
+ * only the text, while a separate explicit action clears the selection and
+ * its constellation line/labels. When collapsed, this renders a compact
+ * control strip so the user can reopen the description or clear the
+ * selection without having to tap the same star again.
  */
-export function StarInfoOverlay({ info, onClose }: StarInfoOverlayProps) {
+export function StarInfoOverlay({
+  info,
+  isOpen,
+  onClose,
+  onReopen,
+  onClearSelection,
+}: StarInfoOverlayProps) {
   if (!info) return null
+
+  if (!isOpen) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          left: '50%',
+          bottom: `calc(${INFO_PANEL_BOTTOM_PX}px + env(safe-area-inset-bottom, 0px))`,
+          transform: 'translateX(-50%)',
+          zIndex: 2,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 10px',
+          borderRadius: 999,
+          border: `1px solid ${overlayColors.border}`,
+          background: overlayColors.panelBackground,
+          color: overlayColors.text,
+        }}
+      >
+        <button
+          type="button"
+          onClick={onReopen}
+          aria-label="選択情報を開く"
+          style={{
+            border: 'none',
+            background: 'transparent',
+            color: overlayColors.text,
+            cursor: 'pointer',
+            padding: '2px 4px',
+            fontSize: 13,
+          }}
+        >
+          説明を開く
+        </button>
+        <button
+          type="button"
+          onClick={onClearSelection}
+          aria-label="選択を解除する"
+          style={{
+            border: 'none',
+            borderLeft: `1px solid ${overlayColors.border}`,
+            background: 'transparent',
+            color: overlayColors.text,
+            cursor: 'pointer',
+            padding: '2px 0 2px 8px',
+            fontSize: 13,
+            opacity: 0.8,
+          }}
+        >
+          線を消す
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -68,6 +134,11 @@ export function StarInfoOverlay({ info, onClose }: StarInfoOverlayProps) {
           ×
         </button>
       </div>
+      {info.categoryLabel && (
+        <div style={{ marginTop: 6, fontSize: 12.5, opacity: 0.72 }}>
+          種別: {info.categoryLabel}
+        </div>
+      )}
       {info.brightnessLabel && info.colorLabel && (
         <div style={{ marginTop: 6, fontSize: 13, opacity: 0.85 }}>
           明るさ: {info.brightnessLabel} / 色: {info.colorLabel}
@@ -79,11 +150,34 @@ export function StarInfoOverlay({ info, onClose }: StarInfoOverlayProps) {
           )}
         </div>
       )}
+      {info.detailLabel && (
+        <div style={{ marginTop: 6, fontSize: 12.5, opacity: 0.75 }}>
+          見え方: {info.detailLabel}
+        </div>
+      )}
       {info.trivia && (
         <div style={{ marginTop: 6, fontSize: 12.5, opacity: 0.75, lineHeight: 1.5 }}>
           {info.trivia}
         </div>
       )}
+      <button
+        type="button"
+        onClick={onClearSelection}
+        aria-label="選択を解除する"
+        style={{
+          marginTop: 10,
+          padding: '6px 8px',
+          borderRadius: 6,
+          border: `1px solid ${overlayColors.border}`,
+          background: 'transparent',
+          color: overlayColors.text,
+          cursor: 'pointer',
+          fontSize: 12.5,
+          opacity: 0.85,
+        }}
+      >
+        線を消す
+      </button>
     </div>
   )
 }

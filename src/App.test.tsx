@@ -11,6 +11,14 @@ vi.mock('./render/StarfieldRenderer', () => ({
     start = vi.fn()
     dispose = vi.fn()
     updateStars = vi.fn()
+    updateMilkyWay = vi.fn()
+    applyVisualPreset = vi.fn()
+    applyProjectorMode = vi.fn()
+    lookAt = vi.fn()
+    hideConstellationLines = vi.fn()
+    setLabelTargets = vi.fn()
+    showConstellationLines = vi.fn()
+    hitTestStar = vi.fn(() => null)
   },
 }))
 
