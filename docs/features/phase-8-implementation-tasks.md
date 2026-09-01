@@ -7,14 +7,18 @@
 
 `DECISIONS.md` の D026 により、今後の forward plan は **Better Auth + ローカル PostgreSQL 優先** へ変更した。D025 の旧案は現在の主計画ではない。
 
-したがって、このファイルの既存 Task 2 / 5 / 6 / 8 は「当時の前提に基づく実装記録」として保持しつつ、次の作業はそれらを前提に追加実装することではなく、8次の要件をローカル認証基盤中心に整理し直すこととする。
+さらに `DECISIONS.md` の D027(2026-09-01)により、Next Task の4項目を実施済み。
 
-### Next Task (After D026)
+- 8次 Small Spec(`docs/features/phase-8-account-sync.md`)をクラウド同期必須から外す形に見直した(反映済み)
+- 認証の初手方式を **email + password** に確定した(D027)。`magic link` / `OTP` は将来の UX 改善候補
+- 開発段階はローカル PostgreSQL、公開段階で Neon を含む外部配置を再検討する前提を Small Spec に明記した
+- 旧クラウド同期実装(D025 前提の Supabase コード)は **削除** した。「保持」「実験扱い」は採らず、判断の経緯は D027 とこのファイルの記録に残す
 
-- 8次 Small Spec を見直し、クラウド同期を必須から外すか将来候補へ戻す
-- 認証の初手を `email + password` / `magic link` / `OTP` から選定する
-- 開発段階ではローカル PostgreSQL、公開段階では Neon を含む外部配置を再検討する前提を明記する
-- 既存の旧クラウド同期実装を保持するか、実験扱いにするか、後で削除するかを決める
+したがって、以下の Task 2-8 は「当時の実装記録」として文面は残すが、コード自体は削除済みであり、次に着手する際は Better Auth + ローカル PostgreSQL + email/password を前提に Task 3 以降を再実装する。
+
+### Next Task
+
+- Task 3(同期用 state model / repository 境界)から、Better Auth + ローカル PostgreSQL + email/password を前提に再着手する
 
 ## 新しいセッションで最初に読むもの
 
@@ -81,7 +85,7 @@ Status: Done
 
 ### Task 3 — 同期用 state model / repository 境界の整理
 
-Status: Done
+Status: Done(実装は D027 により削除。Better Auth 前提で再実装が必要)
 
 実装内容: `src/sync/` を新設し、`authState.ts` で provider 非依存の `AuthState` / `AuthenticatedUser` と初期・signed-in・signed-out・error の基本状態を定義した。`syncState.ts` では `SyncState` を `auth state` や描画 state と分離し、`idle` / `pending-upload` / `syncing` / `migrating` / `error` の最小状態遷移と、`sourceOfTruth` / `lastSyncedAtIso` / `hasPendingLocalChange` を保持する構造にした。
 
@@ -100,7 +104,7 @@ repository 境界は `src/sync/sceneRepository.ts` に集約し、`SceneStore` i
 
 ### Task 4 — 認証 session 管理の最小実装
 
-Status: Done
+Status: Done(実装は D027 により削除。Better Auth 前提で再実装が必要)
 
 実装内容: `src/sync/authClient.ts` に旧認証 provider を包む provider 非依存の `AuthClient` port を追加し、`getSession()` / `signInWithOtp()` / `signOut()` / `onAuthStateChange()` を最小面積で定義した。現時点の主計画では、この port を Better Auth 前提へ置き換える想定。
 
@@ -119,7 +123,7 @@ Status: Done
 
 ### Task 5 — 旧クラウド保存 adapter の実装
 
-Status: Done
+Status: Done(実装は D027 により削除。複数端末同期は将来候補へ戻したため当面再実装しない)
 
 実装内容: 旧クラウド保存 adapter を追加し、Task 2/3 で定義した `SceneStore` port の cloud 実装として扱っていた。現在の主計画では採用しない。
 
@@ -138,7 +142,7 @@ Status: Done
 
 ### Task 6 — 旧ローカル保存からクラウド保存への移行
 
-Status: Done
+Status: Done(実装は D027 により削除。複数端末同期は将来候補へ戻したため当面再実装しない)
 
 実装内容: `src/sync/sceneMigration.ts` を追加し、旧クラウド保存前提での local/cloud 移行ロジックを実装した。現在の主計画では forward path ではないが、将来の DB 保存移行を考える際の参考としては残る。
 
@@ -157,7 +161,7 @@ Status: Done
 
 ### Task 7 — 最小のアカウント / 同期 UI
 
-Status: Done
+Status: Done(実装は D027 により削除。Better Auth + email/password 前提で作り直しが必要)
 
 実装内容: `src/AccountSyncOverlay.tsx` を追加し、既存の top-right overlay row と同じ密度で `アカウント・同期` パネルを差し込んだ。閉じた状態では `ローカル保存` / `認証確認中` / `同期準備OK` などの最小ラベルだけを見せ、開いたときだけ詳細状態と操作を表示する。これにより星空鑑賞を常時邪魔せずに、現在がローカル利用か、サインイン済みで同期準備可能かを把握できる。
 

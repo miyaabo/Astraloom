@@ -1,6 +1,6 @@
 import type { StarfieldVisualPresetKey } from './stars/starfieldConfig'
 
-export type OverlayPanel = 'date' | 'location' | 'search' | 'account'
+export type OverlayPanel = 'date' | 'location' | 'search'
 
 export type DisplayMode = 'standard' | 'immersive'
 

@@ -766,3 +766,30 @@ Status: Accepted
 - 8次の Small Spec / 実装タスクは、クラウド同期前提から **ローカル PostgreSQL 上での認証基盤整理** を中心に見直す
 - 複数端末同期は「将来候補」へ戻し、公開段階に入る時点で外部配置(Neon を含む)と合わせて再検討する
 - 次の作業は、認証の初手スコープを `email+password` / `magic link` / `OTP` のどれで始めるかを含めて要件再整理すること
+
+---
+
+## D027 — 8次初手の認証方式は email + password とし、D025 時点の Supabase 実装は削除する
+
+Status: Accepted
+
+### Decision
+
+8次の認証の初手方式は **email + password** とする。`magic link` / `OTP` は、メール送信基盤を導入した後の UX 改善候補として将来検討する。
+
+D025 前提で実装していた Supabase ベースの認証・同期コード(`src/sync/`, `src/save/localSceneStore.ts`, `src/AccountSyncOverlay.tsx`, および `App.tsx` / `Starfield.tsx` からの配線、依存 `@supabase/supabase-js`)は削除する。「実験扱いで残す」「歴史的記録として残す」のいずれも取らない。
+
+### Reasons
+
+- D026 は「開発段階では外部 DB / 外部 Auth 前提で進めず、ローカル PostgreSQL を優先する」方針であり、`magic link` / `OTP` はメール送信基盤が動いていないとローカルでのサインインを一切テストできず、この方針と相性が悪い。`email + password` なら開発中はメール送信なしでサインアップ・サインイン・セッション復元を検証できる
+- 削除した Supabase 実装のうち、実際にアプリへ配線されていたのは認証(`authClient.ts` / `AuthSessionProvider.tsx` / `AccountSyncOverlay.tsx`)のみで、`signInWithOtp` という OTP 前提の interface を持っていた。認証方式を `email + password` に変えるなら、この interface 自体を作り直す必要があり、実装を保持する再利用価値がない
+- クラウド同期(`sceneRepository.ts` / `syncState.ts` / `sceneMigration.ts` / `supabaseSceneStore.ts` / `localSceneStore.ts`)は、当時から一度もアプリへ配線されておらず(各モジュール自身のテストからのみ参照)、D026 で複数端末同期そのものが「将来候補」へ戻ったため、動作対象のない speculative なコードとして残る理由がない
+- Coding Rules の「不要な抽象化を作らない」「将来機能を先回りしない」に照らすと、Better Auth 実装時にどのみち作り直す認証 UI・型を保持し続けるより、削除して次回 Better Auth 前提で作り直す方が一貫している
+- 判断の経緯自体は本 Decision と `docs/features/phase-8-implementation-tasks.md` の記録で追跡できるため、コードを残さなくても失われる情報はない
+
+### Consequences
+
+- `src/sync/` ディレクトリ、`src/save/localSceneStore.ts`、`src/AccountSyncOverlay.tsx` を削除し、`App.tsx` / `Starfield.tsx` / `displayState.ts`(`OverlayPanel` から `'account'` を除去)の配線を戻した
+- `package.json` から `@supabase/supabase-js` を削除し、`package-lock.json` を更新した
+- `docs/features/phase-8-implementation-tasks.md` の Task 3-8 は「実装したが削除済み」として記録を残し、Status は作業のやり直しが必要なことが分かる表記に更新する
+- 次に 8次へ着手する際は、Better Auth + ローカル PostgreSQL + `email + password` を前提に Task 3 以降を再実装する

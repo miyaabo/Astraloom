@@ -18,7 +18,6 @@
     "build:constellation-catalog": "node scripts/build-constellation-catalog.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.4",
     "astronomy-engine": "^2.1.19",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

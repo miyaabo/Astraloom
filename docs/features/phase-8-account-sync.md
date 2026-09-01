@@ -4,6 +4,8 @@
 
 Task 1(スコープ確定・Small Spec 作成)完了後に進めていたが、2026-09-01 時点で D026 により前提を見直し中。8次は当面、共有や課金より先に **認証基盤の整理** を優先し、クラウド同期は必須から外した。
 
+D027(2026-09-01)により、D025 前提で実装していた Supabase ベースの認証・同期コードは削除し、初手の認証方式は **email + password** に確定した。Task 3 以降は Better Auth + ローカル PostgreSQL + email/password を前提に再実装する。
+
 前フェーズ: `docs/features/phase-7-celestial-bodies.md`(Done)。7次で主要天体まで含む表示体験が整ったため、次はその星空体験を複数端末でも継続できるようにする。
 
 ## Goal
@@ -72,8 +74,8 @@ Note: この Small Spec は D025 前提の内容を含んでおり、D026 採択
 - database: PostgreSQL
 - 開発段階の DB 配置: ローカル PostgreSQL
 - 本番段階の候補: 自前運用または Neon 上の PostgreSQL
-- メール送信: 自前で選ぶメール送信基盤
-- 初手の認証方式: 未確定。`email + password` / `magic link` / `OTP` を比較して決める
+- メール送信: 自前で選ぶメール送信基盤(初手の email + password では必須ではない)
+- 初手の認証方式: **email + password**(D027)。`magic link` / `OTP` はメール送信基盤導入後の UX 改善候補として将来検討する
 
 ### 保存 contract の方向
 
@@ -120,8 +122,8 @@ Note: この Small Spec は D025 前提の内容を含んでおり、D026 採択
 - 共有リンクや課金を同時に進めるか → 進めない
 - 大規模なアカウント管理 UI を先に作るか → 作らない
 
-現時点では以下を決め直す必要がある。
+現時点では以下を決め直す必要がある(D027 で一部確定済み)。
 
 - 8次の初手は何か → 認証基盤だけで十分か
-- 認証方式は何か → `email + password` / `magic link` / `OTP`
+- 認証方式は何か → `email + password`(D027 で確定)
 - DB 保存はこのフェーズに含めるか → 含めるならどこまでか

@@ -1,6 +1,5 @@
 import { buildSelectedCelestialBodyInfo } from './celestialBodies/celestialBodyInfo'
 import { useEffect, useRef, useState } from 'react'
-import { AccountSyncOverlay } from './AccountSyncOverlay'
 import type { ObserverLocation } from './astronomy/coordinates'
 import {
   calculateMoonState,
@@ -81,7 +80,6 @@ import type { HygStarRecord } from './stars/starTypes'
 import { StarInfoOverlay } from './StarInfoOverlay'
 import { VisualPresetOverlay } from './VisualPresetOverlay'
 import { applyOverlayAppearance } from './overlayStyles'
-import { useAuthSession } from './sync/AuthSessionProvider'
 
 /** Bridges the Three.js renderer's imperative lifecycle into React mount/unmount. */
 function loadInitialSavedScene() {
@@ -123,7 +121,6 @@ function findCelestialBodyState(
 }
 
 export function Starfield() {
-  const { authState, isConfigured, signInWithOtp, signOut } = useAuthSession()
   const [initialSavedScene] = useState(() => loadInitialSavedScene())
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rendererRef = useRef<StarfieldRenderer | null>(null)
@@ -776,16 +773,6 @@ export function Starfield() {
             onToggleOpen={() =>
               setDisplayState((current) => toggleOverlayPanel(current, 'location'))
             }
-          />
-          <AccountSyncOverlay
-            authState={authState}
-            isConfigured={isConfigured}
-            isOpen={displayState.activePanel === 'account'}
-            onToggleOpen={() =>
-              setDisplayState((current) => toggleOverlayPanel(current, 'account'))
-            }
-            onSignInWithOtp={signInWithOtp}
-            onSignOut={signOut}
           />
           <PlaybackOverlay
             isPlaying={isPlaying}

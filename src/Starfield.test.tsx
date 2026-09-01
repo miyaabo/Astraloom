@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildSelectionOptions } from './search/selectionCatalog'
 import { Starfield } from './Starfield'
 import { loadSceneFromStorage } from './save/sceneStorage'
-import { AuthSessionProvider } from './sync/AuthSessionProvider'
-import type { AuthClient } from './sync/authClient'
 
 // jsdom has no WebGL context, so the real Three.js renderer can't run here;
 // browser rendering is covered by the Task 8 Playwright smoke test instead.
@@ -133,67 +131,6 @@ describe('Starfield', () => {
 
     expect(updateStars).toHaveBeenCalledTimes(1)
     expect(updateCelestialBodies).toHaveBeenCalledTimes(1)
-  })
-
-  it('shows the account overlay as local-only when cloud auth is not configured', () => {
-    render(<Starfield />)
-
-    expect(screen.getByText('ローカル保存')).toBeTruthy()
-    fireEvent.click(screen.getByLabelText('アカウント・同期'))
-
-    expect(screen.getByText('同期設定が未投入のため、この端末ではローカル保存のみ使えます。')).toBeTruthy()
-    expect(
-      (screen.getByRole('button', { name: 'サインインメール送信' }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(true)
-  })
-
-  it('lets the user request sign-in mail and later sign out from the account overlay', async () => {
-    const signInWithOtp = vi.fn(async () => ({ ok: true, error: null }))
-    const signOut = vi.fn(async () => ({ ok: true, error: null }))
-    let authChangeListener:
-      | ((session: { user: { id: string; email: string | null } } | null) => void)
-      | null = null
-    const client: AuthClient = {
-      getSession: async () => ({ session: null, error: null }),
-      signInWithOtp,
-      signOut,
-      onAuthStateChange(listener) {
-        authChangeListener = listener
-        return () => {
-          authChangeListener = null
-        }
-      },
-    }
-
-    render(
-      <AuthSessionProvider client={client}>
-        <Starfield />
-      </AuthSessionProvider>,
-    )
-
-    fireEvent.click(screen.getByLabelText('アカウント・同期'))
-    fireEvent.change(screen.getByLabelText('メールアドレス'), {
-      target: { value: 'astro@example.com' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'サインインメール送信' }))
-
-    expect(signInWithOtp).toHaveBeenCalledWith('astro@example.com')
-    expect(await screen.findByText('確認メールを送信しました')).toBeTruthy()
-
-    act(() => {
-      authChangeListener?.({
-        user: {
-          id: 'user-1',
-          email: 'astro@example.com',
-        },
-      })
-    })
-
-    expect(await screen.findByText('同期準備OK')).toBeTruthy()
-    expect(screen.getByText('astro@example.com')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'サインアウト' }))
-    expect(signOut).toHaveBeenCalledTimes(1)
   })
 
   it('keeps search navigation above the horizon when a matched star is currently below it', () => {
