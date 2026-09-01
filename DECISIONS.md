@@ -793,3 +793,28 @@ D025 前提で実装していた Supabase ベースの認証・同期コード(`
 - `package.json` から `@supabase/supabase-js` を削除し、`package-lock.json` を更新した
 - `docs/features/phase-8-implementation-tasks.md` の Task 3-8 は「実装したが削除済み」として記録を残し、Status は作業のやり直しが必要なことが分かる表記に更新する
 - 次に 8次へ着手する際は、Better Auth + ローカル PostgreSQL + `email + password` を前提に Task 3 以降を再実装する
+
+---
+
+## D028 — 10次のスコープを確定する
+
+Status: Accepted
+
+### Decision
+
+10次(`docs/features/phase-10-atmosphere-presets.md`)では、**雰囲気プリセットの方向性整理・設定可能な表示項目の棚卸し・他アプリにある表示切替系機能の振り分け・最小の設定 UI 方針・保存対象との接続整理** を扱う。認証・同期・課金(8次 / 9次 / 12次)、新規データ導入、大規模な設定画面の新規設計は 10次に含めない。
+
+雰囲気プリセットの具体的な種類・数、他アプリ機能の振り分け表、設定 UI の最小構成は本 Decision では確定せず、`docs/features/phase-10-implementation-tasks.md` の Task 2 以降で個別に決める。
+
+### Reasons
+
+- `PRODUCT.md` の Current Phase と `DEVELOPMENT.md` の Phase Roadmap で、10次は既にこの内容として設定されている。Task 1 の主目的はこれを Small Spec として文書化し、Out of Scope を明確にすることだった
+- 8次 / 9次 / 12次を後回しにする理由は「見た目・体験など目に見えてアプリの評価が決まる部分を先に実施し、認証・同期などのシステム面は後回しにする」という開発方針であり(`docs/features/phase-10-implementation-tasks.md` Notes)、10次はこの方針の実行そのものにあたる
+- 5次で確立した鑑賞モード・UI 自動非表示・表現プリセット(`Planetarium-like` / `Gentle Contrast`)・プロジェクター向け表示補正を土台に、雰囲気の選択肢を増やすことは、新しい描画パスやデータソースを追加するより小さく進められ、既存の静けさを保ちやすい
+- プリセットの具体的な種類・数や UI 構成は見た目・UX の結果が大きく変わる複数案があり、Task 1 の時点で先に固定するより、Task 2(棚卸し)を経てから Task 3 以降で個別に判断・確認した方がリスクが低い
+
+### Consequences
+
+- `docs/features/phase-10-atmosphere-presets.md` を Small Spec として新規作成した
+- `docs/TASKS.md` / `DEVELOPMENT.md` / `PRODUCT.md` から新しい Small Spec への参照を追加した
+- Task 2 以降は、まず既存実装(`starfieldConfig.ts` / `displayState.ts`)の設定可能項目の棚卸しから着手する

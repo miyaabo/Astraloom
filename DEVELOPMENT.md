@@ -294,7 +294,7 @@ Small Spec: `docs/features/phase-4-relaxation.md` / タスク分割: `docs/featu
 
 ### 10次 — 雰囲気プリセット / 表現設定(Current)
 
-タスク分割: `docs/features/phase-10-implementation-tasks.md`
+Small Spec: `docs/features/phase-10-atmosphere-presets.md` / タスク分割: `docs/features/phase-10-implementation-tasks.md`
 
 目的:
 

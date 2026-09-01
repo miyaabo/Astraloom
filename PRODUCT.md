@@ -224,7 +224,7 @@ Human Check で以下を満たすこと。
 - 最小の設定 UI 方針
 - 保存対象に含める表示設定の整理
 
-10次でも巨大な設定画面は優先しない。既存の静かな表示体験を維持し、まずは「どんな雰囲気を提供したいか」と「どの設定を見せるべきか」を先に固める。詳細タスクは `docs/features/phase-10-implementation-tasks.md` で管理する。
+10次でも巨大な設定画面は優先しない。既存の静かな表示体験を維持し、まずは「どんな雰囲気を提供したいか」と「どの設定を見せるべきか」を先に固める。Small Spec は `docs/features/phase-10-atmosphere-presets.md`、詳細タスクは `docs/features/phase-10-implementation-tasks.md` で管理する。
 
 ## Future Capability Inventory
 

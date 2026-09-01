@@ -6,8 +6,9 @@
 ## Current Status
 
 - Current phase: Phase 10
-- Next task: Task 1 — 10次スコープ確定 + Small Spec 作成
+- Next task: Task 2 — 設定可能項目の棚卸し
 - Detail file: [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md)
+- Small Spec: [`phase-10-atmosphere-presets.md`](features/phase-10-atmosphere-presets.md)
 
 作業を開始するときは、対象フェーズの詳細ファイルを開き、上から最初に
 `Status` が `Done` でないタスクだけを実施する。
