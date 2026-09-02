@@ -6,10 +6,7 @@ import {
 } from '../displayState'
 import { clamp, normalizeDegrees } from '../mathUtils'
 import type { PlaybackDirection } from '../playback/playbackTime'
-import {
-  starfieldConfig,
-  type StarfieldVisualPresetKey,
-} from '../stars/starfieldConfig'
+import { starfieldConfig } from '../stars/starfieldConfig'
 
 export const PERSISTED_SCENE_STATE_VERSION = 1
 
@@ -33,8 +30,13 @@ export interface SavedSceneView {
 
 export interface SavedSceneDisplay {
   mode: DisplayMode
-  visualPreset: StarfieldVisualPresetKey
   isProjectorMode: boolean
+  /**
+   * Night Mode UI (10次 Task 6): added after version 1 shipped, so parsing
+   * treats it as additive — missing/invalid values fall back to `false`
+   * instead of rejecting the whole payload (see parseSavedSceneDisplay).
+   */
+  isNightModeUi: boolean
 }
 
 export interface SavedSceneState {
@@ -58,7 +60,10 @@ export interface SceneSnapshotInput {
   locationLabel: string | null
   speedMagnitude: number
   direction: PlaybackDirection
-  displayState: Pick<DisplayState, 'mode' | 'visualPreset' | 'isProjectorMode'>
+  displayState: Pick<
+    DisplayState,
+    'mode' | 'isProjectorMode' | 'isNightModeUi'
+  >
   view: SavedSceneView
 }
 
@@ -80,8 +85,8 @@ export function createSavedSceneSnapshot(
     view: input.view,
     display: {
       mode: input.displayState.mode,
-      visualPreset: input.displayState.visualPreset,
       isProjectorMode: input.displayState.isProjectorMode,
+      isNightModeUi: input.displayState.isNightModeUi,
     },
   })
 }
@@ -135,8 +140,8 @@ export function createDisplayStateFromSavedScene(
   return {
     ...initial,
     mode: scene.display.mode,
-    visualPreset: scene.display.visualPreset,
     isProjectorMode: scene.display.isProjectorMode,
+    isNightModeUi: scene.display.isNightModeUi,
   }
 }
 
@@ -210,13 +215,18 @@ function parseSavedSceneView(raw: unknown): SavedSceneView | null {
 function parseSavedSceneDisplay(raw: unknown): SavedSceneDisplay | null {
   if (!isRecord(raw)) return null
   if (!isDisplayMode(raw.mode)) return null
-  if (!isVisualPresetKey(raw.visualPreset)) return null
   if (typeof raw.isProjectorMode !== 'boolean') return null
 
   return {
     mode: raw.mode,
-    visualPreset: raw.visualPreset,
     isProjectorMode: raw.isProjectorMode,
+    // Additive field (10次 Task 6): absent in data saved before Night Mode
+    // UI shipped, so a missing/invalid value falls back to false instead of
+    // rejecting the whole payload.
+    isNightModeUi: raw.isNightModeUi === true,
+    // visualPreset removed (D030): a stray visualPreset key from data saved
+    // before the preset feature was abolished is simply not read here, not
+    // rejected — the payload still parses successfully.
   }
 }
 
@@ -236,8 +246,8 @@ function normalizeSavedSceneState(scene: SavedSceneState): SavedSceneState {
     view: normalizeView(scene.view),
     display: {
       mode: scene.display.mode,
-      visualPreset: scene.display.visualPreset,
       isProjectorMode: scene.display.isProjectorMode,
+      isNightModeUi: scene.display.isNightModeUi,
     },
   }
 }
@@ -268,8 +278,4 @@ function isIsoDateString(value: string): boolean {
 
 function isDisplayMode(value: unknown): value is DisplayMode {
   return value === 'standard' || value === 'immersive'
-}
-
-function isVisualPresetKey(value: unknown): value is StarfieldVisualPresetKey {
-  return typeof value === 'string' && value in starfieldConfig.presets
 }

@@ -16,16 +16,29 @@ export const overlayColors = {
   text: `var(--overlay-text, #ffffff)`,
 }
 
-export function applyOverlayAppearance(isProjectorMode: boolean): void {
+/**
+ * Projector correction and Night Mode UI (10次, D029) are independent
+ * toggles that both only recolor overlay chrome. When both are on,
+ * projector correction wins — it targets legibility in a fixed dark-room
+ * projection setup, a more specific constraint than Night Mode UI's general
+ * pre-sleep dimming.
+ */
+export function applyOverlayAppearance(
+  isProjectorMode: boolean,
+  isNightModeUi: boolean,
+): void {
   const rootStyle = document.documentElement.style
-  const appearance = isProjectorMode
-    ? starfieldConfig.projector.overlay
-    : {
-        border: 'rgba(255, 255, 255, 0.25)',
-        controlBackground: 'rgba(5, 7, 15, 0.55)',
-        panelBackground: 'rgba(5, 7, 15, 0.85)',
-        text: '#ffffff',
-      }
+  let appearance = {
+    border: 'rgba(255, 255, 255, 0.25)',
+    controlBackground: 'rgba(5, 7, 15, 0.55)',
+    panelBackground: 'rgba(5, 7, 15, 0.85)',
+    text: '#ffffff',
+  }
+  if (isProjectorMode) {
+    appearance = starfieldConfig.projector.overlay
+  } else if (isNightModeUi) {
+    appearance = starfieldConfig.nightModeUi.overlay
+  }
 
   rootStyle.setProperty('--overlay-border', appearance.border)
   rootStyle.setProperty(
@@ -69,16 +82,21 @@ export const overlayPillButtonStyle: CSSProperties = {
 }
 
 /**
- * Dropdown panel anchored below a toggle button, on whichever side that
- * button sits (DateTimeOverlay/LocationOverlay on the right, SearchOverlay on
- * the left — Task 6).
+ * Dropdown panel anchored to a toggle button, on whichever side that button
+ * sits (DateTimeOverlay/LocationOverlay on the right, SearchOverlay on the
+ * left — Task 6) and in whichever direction it should open (down by default;
+ * up for a trigger anchored to the bottom of the screen, e.g. SettingsOverlay
+ * — 10次 D030).
  */
-export function overlayPanelStyle(anchor: 'left' | 'right'): CSSProperties {
+export function overlayPanelStyle(
+  anchor: 'left' | 'right',
+  direction: 'down' | 'up' = 'down',
+): CSSProperties {
   return {
     position: 'absolute',
-    top: '100%',
+    ...(direction === 'up' ? { bottom: '100%' } : { top: '100%' }),
     [anchor]: 0,
-    marginTop: 8,
+    ...(direction === 'up' ? { marginBottom: 8 } : { marginTop: 8 }),
     padding: 12,
     borderRadius: 8,
     border: `1px solid ${overlayColors.border}`,

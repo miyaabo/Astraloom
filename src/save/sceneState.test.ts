@@ -26,8 +26,8 @@ describe('sceneState', () => {
       direction: -1,
       displayState: {
         mode: hiddenOpenPanel.mode,
-        visualPreset: hiddenOpenPanel.visualPreset,
         isProjectorMode: hiddenOpenPanel.isProjectorMode,
+        isNightModeUi: hiddenOpenPanel.isNightModeUi,
       },
       view: {
         azimuthDegrees: 361,
@@ -55,8 +55,8 @@ describe('sceneState', () => {
       },
       display: {
         mode: 'standard',
-        visualPreset: 'planetarium-like',
         isProjectorMode: false,
+        isNightModeUi: false,
       },
     })
   })
@@ -82,8 +82,8 @@ describe('sceneState', () => {
         },
         display: {
           mode: 'immersive',
-          visualPreset: 'gentle-contrast',
           isProjectorMode: true,
+          isNightModeUi: true,
         },
       },
       new Date('2026-08-31T13:00:00.000Z'),
@@ -144,8 +144,8 @@ describe('sceneState', () => {
           },
           display: {
             mode: 'standard',
-            visualPreset: 'planetarium-like',
             isProjectorMode: false,
+            isNightModeUi: true,
           },
         },
       }),
@@ -170,9 +170,86 @@ describe('sceneState', () => {
       },
       display: {
         mode: 'standard',
-        visualPreset: 'planetarium-like',
         isProjectorMode: false,
+        isNightModeUi: true,
       },
+    })
+  })
+
+  it('defaults isNightModeUi to false when parsing a pre-Night-Mode-UI saved scene', () => {
+    const parsed = parsePersistedSceneState(
+      JSON.stringify({
+        version: PERSISTED_SCENE_STATE_VERSION,
+        savedAtIso: '2026-08-31T13:00:00.000Z',
+        scene: {
+          dateIso: '2026-08-31T12:34:56.000Z',
+          location: {
+            latitudeDegrees: 35.6762,
+            longitudeDegrees: 139.6503,
+            timeZoneId: 'Asia/Tokyo',
+            label: '東京',
+          },
+          playback: {
+            speedMagnitude: 50,
+            direction: 1,
+          },
+          view: {
+            azimuthDegrees: 180,
+            altitudeDegrees: 25,
+            fovDegrees: 70,
+          },
+          display: {
+            mode: 'standard',
+            isProjectorMode: false,
+            // isNightModeUi intentionally absent — matches data saved before
+            // 10次 Task 6 added the field.
+          },
+        },
+      }),
+    )
+
+    expect(parsed?.scene.display.isNightModeUi).toBe(false)
+  })
+
+  it('ignores a stray visualPreset field from a pre-D030 saved scene', () => {
+    const parsed = parsePersistedSceneState(
+      JSON.stringify({
+        version: PERSISTED_SCENE_STATE_VERSION,
+        savedAtIso: '2026-08-31T13:00:00.000Z',
+        scene: {
+          dateIso: '2026-08-31T12:34:56.000Z',
+          location: {
+            latitudeDegrees: 35.6762,
+            longitudeDegrees: 139.6503,
+            timeZoneId: 'Asia/Tokyo',
+            label: '東京',
+          },
+          playback: {
+            speedMagnitude: 50,
+            direction: 1,
+          },
+          view: {
+            azimuthDegrees: 180,
+            altitudeDegrees: 25,
+            fovDegrees: 70,
+          },
+          display: {
+            mode: 'standard',
+            // visualPreset intentionally present — matches data saved before
+            // D030 abolished the preset feature. Should be ignored, not
+            // rejected.
+            visualPreset: 'gentle-contrast',
+            isProjectorMode: false,
+            isNightModeUi: false,
+          },
+        },
+      }),
+    )
+
+    expect(parsed?.scene.display).toEqual({
+      mode: 'standard',
+      isProjectorMode: false,
+      isNightModeUi: false,
     })
   })
 
@@ -196,8 +273,8 @@ describe('sceneState', () => {
       },
       display: {
         mode: 'immersive',
-        visualPreset: 'gentle-contrast',
         isProjectorMode: true,
+        isNightModeUi: true,
       },
     })
 
@@ -206,8 +283,8 @@ describe('sceneState', () => {
       isSelectionInfoOpen: false,
       mode: 'immersive',
       chromeVisibility: 'visible',
-      visualPreset: 'gentle-contrast',
       isProjectorMode: true,
+      isNightModeUi: true,
     })
   })
 })

@@ -27,8 +27,8 @@ function createScene() {
       },
       display: {
         mode: 'standard',
-        visualPreset: 'planetarium-like',
         isProjectorMode: false,
+        isNightModeUi: false,
       },
     },
     new Date('2026-08-31T13:00:00.000Z'),

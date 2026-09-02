@@ -1,6 +1,4 @@
-import type { StarfieldVisualPresetKey } from './stars/starfieldConfig'
-
-export type OverlayPanel = 'date' | 'location' | 'search'
+export type OverlayPanel = 'date' | 'location' | 'search' | 'settings'
 
 export type DisplayMode = 'standard' | 'immersive'
 
@@ -11,8 +9,8 @@ export interface DisplayState {
   isSelectionInfoOpen: boolean
   mode: DisplayMode
   chromeVisibility: ChromeVisibility
-  visualPreset: StarfieldVisualPresetKey
   isProjectorMode: boolean
+  isNightModeUi: boolean
 }
 
 export function createInitialDisplayState(): DisplayState {
@@ -21,8 +19,8 @@ export function createInitialDisplayState(): DisplayState {
     isSelectionInfoOpen: false,
     mode: 'standard',
     chromeVisibility: 'visible',
-    visualPreset: 'planetarium-like',
     isProjectorMode: false,
+    isNightModeUi: false,
   }
 }
 
@@ -83,22 +81,18 @@ export function exitImmersiveMode(state: DisplayState): DisplayState {
   }
 }
 
-export function setVisualPreset(
-  state: DisplayState,
-  visualPreset: StarfieldVisualPresetKey,
-): DisplayState {
-  if (state.visualPreset === visualPreset) return state
-  return {
-    ...state,
-    visualPreset,
-    chromeVisibility: 'visible',
-  }
-}
-
 export function toggleProjectorMode(state: DisplayState): DisplayState {
   return {
     ...state,
     isProjectorMode: !state.isProjectorMode,
+    chromeVisibility: 'visible',
+  }
+}
+
+export function toggleNightModeUi(state: DisplayState): DisplayState {
+  return {
+    ...state,
+    isNightModeUi: !state.isNightModeUi,
     chromeVisibility: 'visible',
   }
 }

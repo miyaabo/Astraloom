@@ -8,11 +8,7 @@ import { generateHorizonMeshData } from '../stars/horizon'
 import { DEG_TO_RAD, clamp, normalizeDegrees } from '../mathUtils'
 import type { MilkyWayPoint } from '../stars/milkyWay'
 import { SKY_SPHERE_RADIUS } from '../stars/skyProjection'
-import {
-  resolveStarfieldVisualPreset,
-  starfieldConfig,
-  type StarfieldVisualPresetKey,
-} from '../stars/starfieldConfig'
+import { starfieldConfig } from '../stars/starfieldConfig'
 import type { StarData, StarPosition } from '../stars/starTypes'
 import { watchReducedMotion } from './reducedMotion'
 import { findNearestScreenPoint, projectToScreen } from './screenProjection'
@@ -428,7 +424,6 @@ export class StarfieldRenderer {
   private stars: StarData[]
   private celestialBodies: CelestialBodyRenderData[]
   private highlightedCelestialBodyId: SupportedCelestialBodyId | null = null
-  private visualPreset: StarfieldVisualPresetKey = 'planetarium-like'
   private isProjectorMode = false
 
   constructor(
@@ -444,8 +439,7 @@ export class StarfieldRenderer {
     this.onLabelPositionsChange = onLabelPositionsChange
     this.onZoomChange = onZoomChange
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
-    const initialPreset = resolveStarfieldVisualPreset(this.visualPreset)
-    this.renderer.setClearColor(initialPreset.render.backgroundColor, 1)
+    this.renderer.setClearColor(starfieldConfig.render.backgroundColor, 1)
 
     this.scene = new THREE.Scene()
     // Aspect is a placeholder; the ResizeObserver in Starfield.tsx calls
@@ -471,11 +465,11 @@ export class StarfieldRenderer {
       side: THREE.BackSide,
       uniforms: {
         uGroundColor: { value: new THREE.Color(horizon.groundColor) },
-        uGlowColor: { value: new THREE.Color(initialPreset.horizon.glowColor) },
-        uGlowOpacity: { value: initialPreset.horizon.glowOpacity },
+        uGlowColor: { value: new THREE.Color(horizon.glowColor) },
+        uGlowOpacity: { value: horizon.glowOpacity },
         uGroundOpacity: { value: horizon.groundOpacity },
         uGlowSpan: { value: horizon.glowSpanDegrees / 90 },
-        uRimOpacity: { value: initialPreset.horizon.rimOpacity },
+        uRimOpacity: { value: horizon.rimOpacity },
         uRimSpan: { value: horizon.rimSpanDegrees / 90 },
       },
     })
@@ -494,8 +488,8 @@ export class StarfieldRenderer {
       blending: THREE.AdditiveBlending,
       uniforms: {
         uSizePixels: { value: milkyWay.pointSizePixels },
-        uBaseOpacity: { value: initialPreset.milkyWay.baseOpacity },
-        uColor: { value: new THREE.Color(initialPreset.milkyWay.color) },
+        uBaseOpacity: { value: milkyWay.baseOpacity },
+        uColor: { value: new THREE.Color(milkyWay.color) },
       },
     })
     this.milkyWay = new THREE.Points(
@@ -507,7 +501,7 @@ export class StarfieldRenderer {
 
     this.stars = stars
     const geometry = buildStarGeometry(stars)
-    const { halo } = initialPreset.render
+    const { halo } = starfieldConfig.render
     const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
@@ -518,7 +512,7 @@ export class StarfieldRenderer {
         uHaloPower: { value: halo.power },
         uHaloRadiusMultiplier: { value: halo.radiusMultiplier },
         uHaloIntensity: { value: halo.intensity },
-        uPointSizeScale: { value: initialPreset.pointSizeScale },
+        uPointSizeScale: { value: starfieldConfig.render.pointSizeScale },
         uTime: { value: 0 },
         uTwinkleSpeed: { value: starfieldConfig.twinkle.speed },
         uReducedMotionScale: { value: 1 },
@@ -542,7 +536,7 @@ export class StarfieldRenderer {
         uHaloPower: { value: halo.power },
         uHaloRadiusMultiplier: { value: halo.radiusMultiplier },
         uHaloIntensity: { value: halo.intensity },
-        uPointSizeScale: { value: initialPreset.pointSizeScale },
+        uPointSizeScale: { value: starfieldConfig.render.pointSizeScale },
         uTime: { value: 0 },
         uTwinkleSpeed: { value: starfieldConfig.twinkle.speed },
         uReducedMotionScale: { value: 1 },
@@ -562,12 +556,12 @@ export class StarfieldRenderer {
       new THREE.LineBasicMaterial({
         color: starfieldConfig.render.constellationLines.color,
         transparent: true,
-        opacity: initialPreset.render.constellationLines.opacity,
+        opacity: starfieldConfig.render.constellationLines.opacity,
         depthWrite: false,
       }),
     )
     this.constellationLines.material.color.set(
-      initialPreset.render.constellationLines.color,
+      starfieldConfig.render.constellationLines.color,
     )
     this.constellationLines.visible = false
     this.scene.add(this.constellationLines)
@@ -756,11 +750,6 @@ export class StarfieldRenderer {
     this.milkyWay.geometry.dispose()
     this.milkyWay.geometry = newGeometry
     this.render()
-  }
-
-  applyVisualPreset(preset: StarfieldVisualPresetKey): void {
-    this.visualPreset = preset
-    this.applyDisplayAdjustments()
   }
 
   applyProjectorMode(isProjectorMode: boolean): void {
@@ -960,67 +949,61 @@ export class StarfieldRenderer {
   }
 
   private applyDisplayAdjustments(): void {
-    const resolved = resolveStarfieldVisualPreset(this.visualPreset)
+    const base = starfieldConfig.render
+    const milkyWay = starfieldConfig.milkyWay
+    const horizon = starfieldConfig.horizon
     const projector = starfieldConfig.projector.render
 
     this.renderer.setClearColor(
-      this.isProjectorMode
-        ? projector.backgroundColor
-        : resolved.render.backgroundColor,
+      this.isProjectorMode ? projector.backgroundColor : base.backgroundColor,
       1,
     )
 
     const starUniforms = this.points.material.uniforms
-    starUniforms.uHaloThreshold.value = resolved.render.halo.brightnessThreshold
-    starUniforms.uHaloPower.value = resolved.render.halo.power
-    starUniforms.uHaloRadiusMultiplier.value =
-      resolved.render.halo.radiusMultiplier
+    starUniforms.uHaloThreshold.value = base.halo.brightnessThreshold
+    starUniforms.uHaloPower.value = base.halo.power
+    starUniforms.uHaloRadiusMultiplier.value = base.halo.radiusMultiplier
     starUniforms.uHaloIntensity.value = this.isProjectorMode
-      ? resolved.render.halo.intensity * projector.haloIntensityMultiplier
-      : resolved.render.halo.intensity
+      ? base.halo.intensity * projector.haloIntensityMultiplier
+      : base.halo.intensity
     starUniforms.uPointSizeScale.value = this.isProjectorMode
-      ? resolved.pointSizeScale * projector.pointSizeScale
-      : resolved.pointSizeScale
+      ? base.pointSizeScale * projector.pointSizeScale
+      : base.pointSizeScale
 
     const celestialBodyUniforms = this.celestialBodyPoints.material.uniforms
-    celestialBodyUniforms.uHaloThreshold.value =
-      resolved.render.halo.brightnessThreshold
-    celestialBodyUniforms.uHaloPower.value = resolved.render.halo.power
+    celestialBodyUniforms.uHaloThreshold.value = base.halo.brightnessThreshold
+    celestialBodyUniforms.uHaloPower.value = base.halo.power
     celestialBodyUniforms.uHaloRadiusMultiplier.value =
-      resolved.render.halo.radiusMultiplier
+      base.halo.radiusMultiplier
     celestialBodyUniforms.uHaloIntensity.value = this.isProjectorMode
-      ? resolved.render.halo.intensity * projector.haloIntensityMultiplier
-      : resolved.render.halo.intensity
+      ? base.halo.intensity * projector.haloIntensityMultiplier
+      : base.halo.intensity
     celestialBodyUniforms.uPointSizeScale.value = this.isProjectorMode
-      ? resolved.pointSizeScale * projector.pointSizeScale
-      : resolved.pointSizeScale
+      ? base.pointSizeScale * projector.pointSizeScale
+      : base.pointSizeScale
 
     const milkyWayUniforms = this.milkyWay.material.uniforms
     milkyWayUniforms.uBaseOpacity.value = this.isProjectorMode
-      ? resolved.milkyWay.baseOpacity * projector.milkyWayOpacityMultiplier
-      : resolved.milkyWay.baseOpacity
-    ;(milkyWayUniforms.uColor.value as THREE.Color).set(resolved.milkyWay.color)
+      ? milkyWay.baseOpacity * projector.milkyWayOpacityMultiplier
+      : milkyWay.baseOpacity
+    ;(milkyWayUniforms.uColor.value as THREE.Color).set(milkyWay.color)
 
     const horizonUniforms = this.horizon.material.uniforms
     ;(horizonUniforms.uGlowColor.value as THREE.Color).set(
-      this.isProjectorMode
-        ? projector.horizonGlowColor
-        : resolved.horizon.glowColor,
+      this.isProjectorMode ? projector.horizonGlowColor : horizon.glowColor,
     )
     horizonUniforms.uGlowOpacity.value = this.isProjectorMode
-      ? resolved.horizon.glowOpacity * projector.horizonGlowOpacityMultiplier
-      : resolved.horizon.glowOpacity
+      ? horizon.glowOpacity * projector.horizonGlowOpacityMultiplier
+      : horizon.glowOpacity
     horizonUniforms.uRimOpacity.value = this.isProjectorMode
-      ? resolved.horizon.rimOpacity * projector.horizonRimOpacityMultiplier
-      : resolved.horizon.rimOpacity
+      ? horizon.rimOpacity * projector.horizonRimOpacityMultiplier
+      : horizon.rimOpacity
 
-    this.constellationLines.material.color.set(
-      resolved.render.constellationLines.color,
-    )
+    this.constellationLines.material.color.set(base.constellationLines.color)
     this.constellationLines.material.opacity = this.isProjectorMode
-      ? resolved.render.constellationLines.opacity *
+      ? base.constellationLines.opacity *
         projector.constellationLineOpacityMultiplier
-      : resolved.render.constellationLines.opacity
+      : base.constellationLines.opacity
 
     this.render()
   }

@@ -14,7 +14,6 @@ const hideConstellationLines = vi.fn()
 const setLabelTargets = vi.fn()
 const showConstellationLines = vi.fn()
 const hitTestStar = vi.fn(() => null)
-const applyVisualPreset = vi.fn()
 const applyProjectorMode = vi.fn()
 const restoreViewState = vi.fn()
 vi.mock('./render/StarfieldRenderer', () => ({
@@ -32,7 +31,6 @@ vi.mock('./render/StarfieldRenderer', () => ({
     setLabelTargets = setLabelTargets
     showConstellationLines = showConstellationLines
     hitTestStar = hitTestStar
-    applyVisualPreset = applyVisualPreset
     applyProjectorMode = applyProjectorMode
     restoreViewState = restoreViewState
     getViewStateSnapshot = vi.fn(() => ({
@@ -53,6 +51,10 @@ vi.stubGlobal(
   },
 )
 
+// jsdom doesn't implement scrollTo either; Starfield.tsx calls it on mount to
+// nudge mobile browsers into collapsing their address-bar chrome.
+window.scrollTo = vi.fn()
+
 describe('Starfield', () => {
   beforeEach(() => {
     window.localStorage.clear()
@@ -64,7 +66,6 @@ describe('Starfield', () => {
     showConstellationLines.mockClear()
     hitTestStar.mockReset()
     hitTestStar.mockReturnValue(null)
-    applyVisualPreset.mockClear()
     applyProjectorMode.mockClear()
     restoreViewState.mockClear()
   })
@@ -244,7 +245,6 @@ describe('Starfield', () => {
 
     expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('表現プリセット')).toBeTruthy()
 
     act(() => {
       vi.advanceTimersByTime(3000)
@@ -252,44 +252,112 @@ describe('Starfield', () => {
 
     expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('表現プリセット')).toBeTruthy()
     vi.useRealTimers()
   })
 
-  it('switches the visual preset through the overlay selector', () => {
+  it('opens and closes the settings panel via the gear button', () => {
     render(<Starfield />)
-    const presetSelect = screen.getByLabelText('表現プリセット') as HTMLSelectElement
 
-    expect(presetSelect.value).toBe('planetarium-like')
+    expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
+    expect(screen.getByLabelText('設定を開く')).toBeTruthy()
 
-    fireEvent.change(presetSelect, {
-      target: { value: 'gentle-contrast' },
-    })
+    fireEvent.click(screen.getByLabelText('設定を開く'))
 
-    expect(presetSelect.value).toBe('gentle-contrast')
-    expect(applyVisualPreset).toHaveBeenLastCalledWith('gentle-contrast')
+    expect(screen.getByLabelText('設定を閉じる')).toBeTruthy()
+    expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
+    expect(screen.getByLabelText('夜間モードを有効化')).toBeTruthy()
+
+    fireEvent.click(screen.getByLabelText('設定を閉じる'))
+
+    expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
+    expect(screen.getByLabelText('設定を開く')).toBeTruthy()
   })
 
-  it('toggles projector adjustments independently from the visual preset', () => {
+  it('closes the settings panel when another overlay panel is opened', () => {
     render(<Starfield />)
+
+    fireEvent.click(screen.getByLabelText('設定を開く'))
+    expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
+
+    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+
+    expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
+  })
+
+  it('toggles projector adjustments through the settings panel', () => {
+    render(<Starfield />)
+    fireEvent.click(screen.getByLabelText('設定を開く'))
 
     expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
     fireEvent.click(screen.getByLabelText('プロジェクター補正を有効化'))
 
     expect(applyProjectorMode).toHaveBeenLastCalledWith(true)
     expect(screen.getByLabelText('プロジェクター補正を解除')).toBeTruthy()
-    expect(screen.getByLabelText('表現プリセット')).toBeTruthy()
 
     fireEvent.click(screen.getByLabelText('プロジェクター補正を解除'))
     expect(applyProjectorMode).toHaveBeenLastCalledWith(false)
   })
 
+  it('toggles night mode UI through the settings panel', () => {
+    render(<Starfield />)
+    fireEvent.click(screen.getByLabelText('設定を開く'))
+    applyProjectorMode.mockClear()
+
+    expect(screen.getByLabelText('夜間モードを有効化')).toBeTruthy()
+    fireEvent.click(screen.getByLabelText('夜間モードを有効化'))
+
+    expect(screen.getByLabelText('夜間モードを解除')).toBeTruthy()
+    expect(applyProjectorMode).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByLabelText('夜間モードを解除'))
+    expect(screen.getByLabelText('夜間モードを有効化')).toBeTruthy()
+  })
+
+  it('does not show a fullscreen control when the Fullscreen API is unsupported', () => {
+    render(<Starfield />)
+    fireEvent.click(screen.getByLabelText('設定を開く'))
+
+    expect(screen.queryByLabelText('フルスクリーン表示にする')).toBeNull()
+  })
+
+  it('toggles fullscreen through the settings panel when the Fullscreen API is available', () => {
+    const requestFullscreen = vi.fn(() => Promise.resolve())
+    const exitFullscreen = vi.fn(() => Promise.resolve())
+    document.documentElement.requestFullscreen = requestFullscreen
+    document.exitFullscreen = exitFullscreen
+
+    try {
+      render(<Starfield />)
+      fireEvent.click(screen.getByLabelText('設定を開く'))
+
+      expect(screen.getByLabelText('フルスクリーン表示にする')).toBeTruthy()
+      fireEvent.click(screen.getByLabelText('フルスクリーン表示にする'))
+      expect(requestFullscreen).toHaveBeenCalledTimes(1)
+
+      Object.defineProperty(document, 'fullscreenElement', {
+        value: document.documentElement,
+        configurable: true,
+      })
+      fireEvent(document, new Event('fullscreenchange'))
+
+      expect(screen.getByLabelText('フルスクリーン表示を終了')).toBeTruthy()
+      fireEvent.click(screen.getByLabelText('フルスクリーン表示を終了'))
+      expect(exitFullscreen).toHaveBeenCalledTimes(1)
+    } finally {
+      Object.defineProperty(document, 'fullscreenElement', {
+        value: null,
+        configurable: true,
+      })
+      delete (document.documentElement as { requestFullscreen?: unknown })
+        .requestFullscreen
+      delete (document as { exitFullscreen?: unknown }).exitFullscreen
+    }
+  })
+
   it('saves the current scene into local storage from the save button', () => {
     render(<Starfield />)
 
-    fireEvent.change(screen.getByLabelText('表現プリセット'), {
-      target: { value: 'gentle-contrast' },
-    })
+    fireEvent.click(screen.getByLabelText('設定を開く'))
     fireEvent.click(screen.getByLabelText('プロジェクター補正を有効化'))
     fireEvent.click(screen.getByLabelText('現在のシーンを保存'))
 
@@ -310,7 +378,6 @@ describe('Starfield', () => {
       },
       display: {
         mode: 'standard',
-        visualPreset: 'gentle-contrast',
         isProjectorMode: true,
       },
     })
@@ -411,7 +478,6 @@ describe('Starfield', () => {
           },
           display: {
             mode: 'immersive',
-            visualPreset: 'gentle-contrast',
             isProjectorMode: true,
           },
         },
@@ -421,7 +487,6 @@ describe('Starfield', () => {
     render(<Starfield />)
 
     expect(restoreViewState).toHaveBeenCalledWith(210, 12, 55)
-    expect(applyVisualPreset).toHaveBeenCalledWith('gentle-contrast')
     expect(applyProjectorMode).toHaveBeenCalledWith(true)
     expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
     expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
@@ -452,7 +517,6 @@ describe('Starfield', () => {
           },
           display: {
             mode: 'standard',
-            visualPreset: 'gentle-contrast',
             isProjectorMode: false,
           },
         },

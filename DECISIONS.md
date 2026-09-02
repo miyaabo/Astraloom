@@ -818,3 +818,90 @@ Status: Accepted
 - `docs/features/phase-10-atmosphere-presets.md` を Small Spec として新規作成した
 - `docs/TASKS.md` / `DEVELOPMENT.md` / `PRODUCT.md` から新しい Small Spec への参照を追加した
 - Task 2 以降は、まず既存実装(`starfieldConfig.ts` / `displayState.ts`)の設定可能項目の棚卸しから着手する
+
+## D029 — 10次の雰囲気プリセットは表現プリセットを増やさず、夜間向け表示は独立の Night Mode UI とする
+
+Status: Accepted
+
+### Decision
+
+10次(`docs/features/phase-10-atmosphere-presets.md` Task 3)では、以下で確定する。
+
+- 表現プリセット(shader 側, `StarfieldVisualPreset`)は既存の `Planetarium-like` / `Gentle Contrast` の 2 種を維持し、新規追加しない。D019 で定めた「表現プリセットは最大 2 種」の上限は 10次でも据え置く
+- 「夜間向け表示」は表現プリセットとは別の独立機能 `Night Mode UI` として 10次に追加する。対象は星の描画(shader・`starVisualAttributes`)ではなく、UI オーバーレイ(ボタン・パネルの配色・明るさ)のみとする
+- `Night Mode UI` は既存の `applyOverlayAppearance(isProjectorMode)` / `overlayStyles.ts` の CSS 変数差し替えの仕組みを拡張して実現する方向とし、新しい描画パスは作らない
+- 表現プリセットと `Night Mode UI` は独立した軸として扱い、併用可能とする
+
+### Reasons
+
+- D019 の「表現プリセット最大 2 種」は Product Principle 1(Planetarium-like First)を壊さないためのガードレールであり、10次時点でこれを緩める必要性(具体的な UX 上の不足)が確認されていない
+- 「夜間向け表示」で解決したい課題は、就寝前などの利用で白っぽい UI が目に刺激的・没入感を妨げるという UI chrome 側の問題であり、星の見た目(shader)を変える必要はない。UI 側だけで完結させることで Principle 1 のリスクをそもそも発生させない
+- プロジェクターモードで確立済みの「CSS 変数差し替えでオーバーレイ配色を切り替える」仕組みがそのまま流用でき、新しい描画パスやシェーダー変更を避けられる(Technical Direction: 新しい描画パスの再設計は行わない)
+
+### Consequences
+
+- `docs/features/phase-10-atmosphere-presets.md` に Task 3 の決定内容(各プリセットの UX intent、Principle 1 を壊さない範囲)を追記した
+- `docs/features/phase-10-implementation-tasks.md` の Task 4(他アプリ機能の振り分け)では、「夜間モード」候補は本 Decision により 10次で扱うことが確定済みとして扱う
+- `Night Mode UI` の具体的な配色値・適用範囲・UI 配置は Task 5(設定 UI の最小構成)で、保存対象への追加要否は Task 6 で扱う
+
+## D030 — 表現プリセットを廃止し、設定パネルを新設する
+
+Status: Accepted
+
+### Decision
+
+Task 9(`Night Mode UI` 実装)の Human Check を受け、表現プリセット(`Planetarium-like` / `Gentle Contrast`)を実際に見比べた結果、見た目の差が UI として選ぶ価値に見合わないと判断し、表現プリセット機能を廃止する。今後の描画基準は `Planetarium-like` の値(D011「プラネタリウム基準」)に固定した単一のベースラインとし、ユーザーが切り替えられる「表現プリセット」という概念自体を持たない。
+
+D019 の「表現プリセットは最大 2 種」、D029 の「表現プリセットは既存 2 種を維持し新規追加しない」は本 Decision により前提が失効する(プリセット自体が存在しなくなるため)。両 Decision は撤回ではなく、それぞれの時点での判断記録として残す。
+
+あわせて、D009(将来の設定 UI はオーバーレイ方向)の実装として初めての本格的な設定パネル(`src/SettingsOverlay.tsx`)を新設する。対象はプロジェクター補正・夜間モード UI の 2 項目に限定する。鑑賞モード(`ImmersiveModeToggle`)は使用頻度が高く一回タップで完結すべき独立操作という判断から、意図的にパネルの外に残し、これまでどおり単独の常時表示トグルボタンとする。
+
+### Reasons
+
+- 表現プリセットは 2 種の差分が小さく(背景色・halo・milkyWay・horizon・constellationLines の軽微な調整のみ)、Human Check で「違いが分かりにくく UI として選ぶ価値が薄い」と判断された
+- D011 のプラネタリウム基準は単一の確立済みルック(Human Check 承認済み)であり、複数プリセットを維持するコストに見合う UX 価値が実証されなかった
+- D009 は「設定 UI はオーバーレイ方向」という方向性のみを定め、詳細は将来決めるとしていた(D009 Not Decided)。プロジェクター補正・夜間モード UI という具体的な 2 項目が揃った時点で、最小の設定パネルとして初めて具体化する
+- 鑑賞モードは D019 で「通常利用でも使う」高頻度機能と位置付けられており、パネルに格納すると一回タップで済んでいた操作が二段階操作になり体験が悪化するため、意図的にパネル外へ残す
+
+### Consequences
+
+- `src/stars/starfieldConfig.ts` から `StarfieldVisualPresetKey` / `StarfieldVisualPreset` / `presets` / `resolveStarfieldVisualPreset` を削除した。トップレベルの `render`/`milkyWay`/`horizon` の値は既存の `planetarium-like` 相当のまま変更していない(削除のみで数値変更なし)
+- `src/VisualPresetOverlay.tsx` を削除した
+- `src/displayState.ts` から `visualPreset` / `setVisualPreset` を削除し、`OverlayPanel` に `'settings'` を追加した
+- `src/ProjectorModeToggle.tsx` / `src/NightModeUiToggle.tsx` を削除し、`src/SettingsOverlay.tsx` に統合した
+- `src/save/sceneState.ts` から `visualPreset` 関連のフィールド・検証を削除した。`PERSISTED_SCENE_STATE_VERSION` は 1 のまま(既存の保存データに `visualPreset` キーが残っていても無視されるだけで読み込みは成功する)
+- D019 の「表現プリセット」実装フェーズ、D029 の「表現プリセット維持」判断は本 Decision で上書きされる過去の記録として残る
+
+## D031 — プロジェクター投影時のブラウザ chrome 対策として、フルスクリーン表示と iOS 向け PWA ホーム画面起動を追加する
+
+Status: Accepted
+
+### Decision
+
+D030 で新設した設定パネルに、フルスクリーン表示トグルを追加した(`document.requestFullscreen()` / `exitFullscreen()`)。Fullscreen API 非対応環境(iOS Safari が該当)ではボタンごと非表示にする。
+
+iOS Safari は `<video>` 以外の要素で Fullscreen API 自体をサポートしないため、フルスクリーントグルだけでは iPhone でのミラーリング投影時にブラウザの chrome(アドレスバー等)を消せない。対策として `index.html` に `manifest.json` / `apple-touch-icon` / `apple-mobile-web-app-capable` 等の PWA メタタグを追加し、ユーザーがホーム画面に追加して起動した場合は chrome なしの standalone 表示になるようにした。
+
+### Reasons
+
+- ユーザーからプロジェクターへのミラーリング投影時にブラウザ chrome が投影像を圧迫するという実利用上のフィードバックがあり、確認したところ利用環境は iPhone の Safari だった
+- iOS Safari の Fullscreen API 非対応は OS 側の制約であり、Web 技術側で回避できるのは「ホーム画面に追加して起動する」という PWA の standalone 表示のみ
+- ホーム画面追加はユーザーの手動操作が必要(iOS に自動プロンプト API はない)だが、一度行えば以降はアイコンタップのみで chrome なし起動になり、恒久的な解決になる
+
+### Consequences
+
+- `public/manifest.json` を新設(`display: standalone`)
+- `scripts/generate-app-icons.mjs` を新設。`public/favicon.svg` を元に headless Chromium(Playwright、既存の e2e 依存を流用)でホーム画面アイコン(180/192/512px PNG)を `public/icons/` に生成する
+- `index.html` に PWA 関連メタタグと `apple-touch-icon` を追加
+- フルスクリーン状態はブラウザ主導(Esc 等)で変わりうるため `displayState.ts` の純粋トグル群には含めず、`Starfield.tsx` のローカル state + `fullscreenchange` イベント購読で管理する。`SavedSceneState` にも含めない(D020 の一時 UI 状態除外方針を踏襲)
+- 追加対応として、モバイルブラウザ共通の「スクロールでアドレスバーが自動収縮する」挙動を起動時に自動発火させる実装を加えた(`src/index.css` の `body { min-height: calc(100% + 1px) }` で1px分の余白を作り、`Starfield.tsx` のマウント時 `window.scrollTo(0, 1)` で発火。`orientationchange` でも再発火)。ブラウザの種類を問わず自動で効く、操作不要のベースライン対策
+
+### Known Limitation(重要・未解決)
+
+**iOS 上で Safari 以外のブラウザ(Chrome for iOS, Yahoo!ブラウザ等)からアクセスした場合、chrome を完全に消す手段が存在しない。** iOS では全ブラウザが WebKit エンジンを使う規約上の制約があり、かつ「ホーム画面に追加してもchromeなしで起動する」standalone 機能は Safari のみが提供する OS 連携であるため、Web 技術側での代替手段はない(Web 公開後、実際に使われるブラウザは Safari に限定できない)。
+
+- Android / PC: フルスクリーンボタンで完全に解決する(対応済み)
+- iPhone + Safari: ホーム画面追加で完全に解決する(対応済み、ユーザーの手動操作が必要)
+- iPhone + Safari 以外のブラウザ: 上記のアドレスバー自動収縮のみが効き、chrome を完全には消せない(未解決)
+
+この制約は Product の「プロジェクター投影での利用」という利用シーンに直接影響するため、後で「もっと良い対策はないか」を再検討する際は、まずこの記録を確認すること。既知の代替案(canvasを`<video>`化してネイティブ動画フルスクリーンを流用する等)はインタラクティブ操作(ドラッグ視点操作・タップでの星選択)を破壊するため不採用と判断済み。

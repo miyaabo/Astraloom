@@ -36,7 +36,7 @@ import {
   isChromeSuppressed,
   openSelectionInfo,
   revealChrome,
-  setVisualPreset,
+  toggleNightModeUi,
   toggleProjectorMode,
   toggleOverlayPanel,
 } from './displayState'
@@ -45,7 +45,7 @@ import { LocationOverlay } from './LocationOverlay'
 import { findLocationPreset, locationPresets } from './locationPresets'
 import { NextConstellationButton } from './NextConstellationButton'
 import { PlaybackOverlay } from './PlaybackOverlay'
-import { ProjectorModeToggle } from './ProjectorModeToggle'
+import { SettingsOverlay } from './SettingsOverlay'
 import type { PlaybackDirection } from './playback/playbackTime'
 import {
   accumulatePlaybackTick,
@@ -78,13 +78,20 @@ import {
 import { toDisplayStarName } from './stars/starNameJa'
 import type { HygStarRecord } from './stars/starTypes'
 import { StarInfoOverlay } from './StarInfoOverlay'
-import { VisualPresetOverlay } from './VisualPresetOverlay'
 import { applyOverlayAppearance } from './overlayStyles'
 
 /** Bridges the Three.js renderer's imperative lifecycle into React mount/unmount. */
 function loadInitialSavedScene() {
   if (typeof window === 'undefined') return null
   return loadSceneFromStorage(window.localStorage)?.scene ?? null
+}
+
+/** Some mobile browsers (notably iOS Safari) don't support the Fullscreen API on arbitrary elements — hide the control there rather than show a button that silently does nothing. */
+function isFullscreenSupported(): boolean {
+  return (
+    typeof document !== 'undefined' &&
+    typeof document.documentElement.requestFullscreen === 'function'
+  )
 }
 
 function createInitialLocationMetadata(
@@ -173,6 +180,12 @@ export function Starfield() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>(
     'idle',
   )
+  // Not part of displayState: fullscreen is a browser-owned mode that can
+  // change outside our own toggle (Esc key, OS gesture), so it's tracked via
+  // the fullscreenchange event below rather than the pure toggle-state
+  // conventions in displayState.ts. Also excluded from SavedSceneState (D020)
+  // — it's a transient, device-local UI mode, not part of the scene itself.
+  const [isFullscreen, setIsFullscreen] = useState(false)
   // Accumulates real time between throttled recomputes (Task 5); see
   // accumulatePlaybackTick for why recompute is capped below the rAF rate.
   const pendingPlaybackRealMsRef = useRef(0)
@@ -193,9 +206,34 @@ export function Starfield() {
   }, [displayState])
 
   useEffect(() => {
-    applyOverlayAppearance(displayState.isProjectorMode)
-    return () => applyOverlayAppearance(false)
-  }, [displayState.isProjectorMode])
+    applyOverlayAppearance(displayState.isProjectorMode, displayState.isNightModeUi)
+    return () => applyOverlayAppearance(false, false)
+  }, [displayState.isProjectorMode, displayState.isNightModeUi])
+
+  useEffect(() => {
+    function handleFullscreenChange(): void {
+      setIsFullscreen(document.fullscreenElement !== null)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  useEffect(() => {
+    // Nudges the page by the 1px of scroll room index.css sets aside, which
+    // makes mobile browsers (Safari/Chrome/etc.) collapse their address-bar
+    // chrome — a broad, no-action-required baseline for the projector-chrome
+    // problem, on top of the Fullscreen API button and iOS home-screen route
+    // (see DECISIONS.md D031). Some browsers reset scroll on rotation, so
+    // this re-runs on orientation change too.
+    function collapseBrowserChrome(): void {
+      window.scrollTo(0, 1)
+    }
+    collapseBrowserChrome()
+    window.addEventListener('orientationchange', collapseBrowserChrome)
+    return () =>
+      window.removeEventListener('orientationchange', collapseBrowserChrome)
+  }, [])
 
   useEffect(() => {
     function clearAutoHideTimeout(): void {
@@ -306,7 +344,6 @@ export function Starfield() {
       () => labelsOverlayRef.current?.resetDeclutter(),
     )
     rendererRef.current = renderer
-    renderer.applyVisualPreset(displayStateRef.current.visualPreset)
     renderer.applyProjectorMode(displayStateRef.current.isProjectorMode)
     if (initialSavedScene) {
       renderer.restoreViewState(
@@ -520,15 +557,22 @@ export function Starfield() {
     setDisplayState((current) => enterImmersiveMode(current))
   }
 
-  function handleVisualPresetChange(preset: typeof displayState.visualPreset): void {
-    setDisplayState((current) => setVisualPreset(current, preset))
-    rendererRef.current?.applyVisualPreset(preset)
-  }
-
   function handleToggleProjectorMode(): void {
     const nextProjectorMode = !displayState.isProjectorMode
     setDisplayState((current) => toggleProjectorMode(current))
     rendererRef.current?.applyProjectorMode(nextProjectorMode)
+  }
+
+  function handleToggleNightModeUi(): void {
+    setDisplayState((current) => toggleNightModeUi(current))
+  }
+
+  function handleToggleFullscreen(): void {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {})
+      return
+    }
+    document.documentElement.requestFullscreen().catch(() => {})
   }
 
   function handleSaveScene(): void {
@@ -548,8 +592,8 @@ export function Starfield() {
         direction,
         displayState: {
           mode: displayState.mode,
-          visualPreset: displayState.visualPreset,
           isProjectorMode: displayState.isProjectorMode,
+          isNightModeUi: displayState.isNightModeUi,
         },
         view: renderer.getViewStateSnapshot(),
       }),
@@ -784,14 +828,21 @@ export function Starfield() {
               setDirection((current) => (current === 1 ? -1 : 1))
             }
           />
-          <VisualPresetOverlay
-            preset={displayState.visualPreset}
-            onChange={handleVisualPresetChange}
-          />
           <SaveSceneButton status={saveStatus} onSave={handleSaveScene} />
-          <ProjectorModeToggle
-            isEnabled={displayState.isProjectorMode}
-            onToggle={handleToggleProjectorMode}
+          <SettingsOverlay
+            isOpen={displayState.activePanel === 'settings'}
+            onToggleOpen={() =>
+              setDisplayState((current) =>
+                toggleOverlayPanel(current, 'settings'),
+              )
+            }
+            isProjectorMode={displayState.isProjectorMode}
+            onToggleProjectorMode={handleToggleProjectorMode}
+            isNightModeUi={displayState.isNightModeUi}
+            onToggleNightModeUi={handleToggleNightModeUi}
+            isFullscreenSupported={isFullscreenSupported()}
+            isFullscreen={isFullscreen}
+            onToggleFullscreen={handleToggleFullscreen}
           />
           <StarInfoOverlay
             info={selectedStarInfo}

@@ -63,6 +63,8 @@ export interface StarfieldConfig {
       min: number
       max: number
     }
+    /** Base star point-size multiplier (projector.render.pointSizeScale is the projector-mode override on top of this). */
+    pointSizeScale: number
     colorCategoryColor: {
       white: string
       blueWhite: string
@@ -144,7 +146,6 @@ export interface StarfieldConfig {
     /** Opacity of the solid ground silhouette once fully below the horizon. */
     groundOpacity: number
   }
-  presets: Record<StarfieldVisualPresetKey, StarfieldVisualPreset>
   projector: {
     render: {
       backgroundColor: string
@@ -163,34 +164,19 @@ export interface StarfieldConfig {
       text: string
     }
   }
-}
-
-export type StarfieldVisualPresetKey = 'planetarium-like' | 'gentle-contrast'
-
-export interface StarfieldVisualPreset {
-  label: string
-  pointSizeScale: number
-  render: {
-    backgroundColor: string
-    halo: {
-      brightnessThreshold: number
-      power: number
-      radiusMultiplier: number
-      intensity: number
+  /**
+   * Night Mode UI (10次 Task 3, D029): overlay-chrome-only colors for
+   * pre-sleep use, independent of projector mode (never touches star
+   * rendering). Muted/warm relative to the default overlay palette so it
+   * reads as dimmer without introducing a distracting hue.
+   */
+  nightModeUi: {
+    overlay: {
+      border: string
+      controlBackground: string
+      panelBackground: string
+      text: string
     }
-    constellationLines: {
-      color: string
-      opacity: number
-    }
-  }
-  milkyWay: {
-    baseOpacity: number
-    color: string
-  }
-  horizon: {
-    glowColor: string
-    glowOpacity: number
-    rimOpacity: number
   }
 }
 
@@ -240,6 +226,7 @@ export const starfieldConfig: StarfieldConfig = {
       min: 1.1,
       max: 3.2,
     },
+    pointSizeScale: 1,
     colorCategoryColor: {
       white: '#ffffff',
       blueWhite: '#cfe0ff',
@@ -280,60 +267,6 @@ export const starfieldConfig: StarfieldConfig = {
     glowOpacity: 0.16,
     groundOpacity: 0.72,
   },
-  presets: {
-    'planetarium-like': {
-      label: 'Planetarium-like',
-      pointSizeScale: 1,
-      render: {
-        backgroundColor: '#05070f',
-        halo: {
-          brightnessThreshold: 0.75,
-          power: 1.8,
-          radiusMultiplier: 3.5,
-          intensity: 0.55,
-        },
-        constellationLines: {
-          color: '#8fa8d9',
-          opacity: 0.35,
-        },
-      },
-      milkyWay: {
-        baseOpacity: 0.18,
-        color: '#9fb3d9',
-      },
-      horizon: {
-        glowColor: '#23365e',
-        glowOpacity: 0.16,
-        rimOpacity: 0.18,
-      },
-    },
-    'gentle-contrast': {
-      label: 'Gentle Contrast',
-      pointSizeScale: 0.94,
-      render: {
-        backgroundColor: '#04060d',
-        halo: {
-          brightnessThreshold: 0.79,
-          power: 2.1,
-          radiusMultiplier: 3.1,
-          intensity: 0.44,
-        },
-        constellationLines: {
-          color: '#8198c7',
-          opacity: 0.24,
-        },
-      },
-      milkyWay: {
-        baseOpacity: 0.14,
-        color: '#8fa5cd',
-      },
-      horizon: {
-        glowColor: '#1d2d4f',
-        glowOpacity: 0.13,
-        rimOpacity: 0.14,
-      },
-    },
-  },
   projector: {
     render: {
       backgroundColor: '#0a0d16',
@@ -352,10 +285,12 @@ export const starfieldConfig: StarfieldConfig = {
       text: '#f5f7ff',
     },
   },
-}
-
-export function resolveStarfieldVisualPreset(
-  preset: StarfieldVisualPresetKey,
-): StarfieldVisualPreset {
-  return starfieldConfig.presets[preset]
+  nightModeUi: {
+    overlay: {
+      border: 'rgba(255, 214, 173, 0.15)',
+      controlBackground: 'rgba(10, 6, 4, 0.6)',
+      panelBackground: 'rgba(10, 6, 4, 0.88)',
+      text: '#d9b98f',
+    },
+  },
 }

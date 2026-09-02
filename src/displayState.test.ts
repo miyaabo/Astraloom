@@ -10,7 +10,7 @@ import {
   openSelectionInfo,
   requestChromeAutoHide,
   revealChrome,
-  setVisualPreset,
+  toggleNightModeUi,
   toggleProjectorMode,
   toggleOverlayPanel,
 } from './displayState'
@@ -22,8 +22,8 @@ describe('displayState', () => {
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
-      visualPreset: 'planetarium-like',
       isProjectorMode: false,
+      isNightModeUi: false,
     })
   })
 
@@ -34,7 +34,10 @@ describe('displayState', () => {
     const withLocation = toggleOverlayPanel(withDate, 'location')
     expect(withLocation.activePanel).toBe('location')
 
-    const closed = toggleOverlayPanel(withLocation, 'location')
+    const withSettings = toggleOverlayPanel(withLocation, 'settings')
+    expect(withSettings.activePanel).toBe('settings')
+
+    const closed = toggleOverlayPanel(withSettings, 'settings')
     expect(closed.activePanel).toBeNull()
   })
 
@@ -48,8 +51,8 @@ describe('displayState', () => {
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
-      visualPreset: 'planetarium-like',
       isProjectorMode: false,
+      isNightModeUi: false,
     })
   })
 
@@ -63,8 +66,8 @@ describe('displayState', () => {
       isSelectionInfoOpen: false,
       mode: 'immersive',
       chromeVisibility: 'visible',
-      visualPreset: 'planetarium-like',
       isProjectorMode: false,
+      isNightModeUi: false,
     })
   })
 
@@ -98,27 +101,8 @@ describe('displayState', () => {
     expect(closeOverlayPanel(withPanel).activePanel).toBeNull()
   })
 
-  it('switches visual presets without affecting other display state', () => {
-    const hiddenWithSelection = requestChromeAutoHide(
-      openSelectionInfo(createInitialDisplayState()),
-    )
-    const updated = setVisualPreset(hiddenWithSelection, 'gentle-contrast')
-
-    expect(updated).toEqual({
-      activePanel: null,
-      isSelectionInfoOpen: true,
-      mode: 'standard',
-      chromeVisibility: 'visible',
-      visualPreset: 'gentle-contrast',
-      isProjectorMode: false,
-    })
-  })
-
-  it('toggles projector mode without affecting panel or preset selection', () => {
-    const state = setVisualPreset(
-      toggleOverlayPanel(createInitialDisplayState(), 'date'),
-      'gentle-contrast',
-    )
+  it('toggles projector mode without affecting panel selection', () => {
+    const state = toggleOverlayPanel(createInitialDisplayState(), 'date')
     const enabled = toggleProjectorMode(state)
 
     expect(enabled).toEqual({
@@ -126,10 +110,27 @@ describe('displayState', () => {
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
-      visualPreset: 'gentle-contrast',
       isProjectorMode: true,
+      isNightModeUi: false,
     })
 
     expect(toggleProjectorMode(enabled).isProjectorMode).toBe(false)
+  })
+
+  it('toggles night mode UI independently from projector mode', () => {
+    const state = toggleProjectorMode(createInitialDisplayState())
+    const enabled = toggleNightModeUi(state)
+
+    expect(enabled).toEqual({
+      activePanel: null,
+      isSelectionInfoOpen: false,
+      mode: 'standard',
+      chromeVisibility: 'visible',
+      isProjectorMode: true,
+      isNightModeUi: true,
+    })
+
+    expect(toggleNightModeUi(enabled).isNightModeUi).toBe(false)
+    expect(toggleNightModeUi(enabled).isProjectorMode).toBe(true)
   })
 })

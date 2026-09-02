@@ -12,7 +12,6 @@ vi.mock('./render/StarfieldRenderer', () => ({
     dispose = vi.fn()
     updateStars = vi.fn()
     updateMilkyWay = vi.fn()
-    applyVisualPreset = vi.fn()
     applyProjectorMode = vi.fn()
     lookAt = vi.fn()
     hideConstellationLines = vi.fn()
@@ -31,6 +30,10 @@ vi.stubGlobal(
     disconnect = vi.fn()
   },
 )
+
+// jsdom doesn't implement scrollTo either; Starfield.tsx calls it on mount to
+// nudge mobile browsers into collapsing their address-bar chrome.
+window.scrollTo = vi.fn()
 
 describe('App', () => {
   it('renders a starfield canvas without crashing', () => {

@@ -6,7 +6,7 @@
 ## Current Status
 
 - Current phase: Phase 10
-- Next task: Task 2 — 設定可能項目の棚卸し
+- Next task: Task 1〜10 は Done。プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っており、着手するなら別タスクとして起票してから(`DECISIONS.md` D031 参照)
 - Detail file: [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md)
 - Small Spec: [`phase-10-atmosphere-presets.md`](features/phase-10-atmosphere-presets.md)
 

@@ -11,6 +11,12 @@ body,
 
 body {
   background: #000;
+  /* 1px taller than the viewport so there's something to scroll — mobile
+     browsers (Safari/Chrome/etc.) collapse their address-bar chrome on
+     scroll, and Starfield.tsx nudges the page by that 1px on load to
+     trigger it automatically (D031 follow-up: no per-browser action needed,
+     unlike the Fullscreen API / iOS home-screen routes). */
+  min-height: calc(100% + 1px);
 }
 
 .starfield-canvas {
