@@ -171,7 +171,7 @@ Status: Done
 
 - `displayState.ts`: `isNightModeUi` を追加し、`toggleNightModeUi` を `toggleProjectorMode` と同じ形で実装(Task 5)
 - `stars/starfieldConfig.ts`: `nightModeUi.overlay` に warm/muted な配色(border/controlBackground/panelBackground/text)を追加
-- `overlayStyles.ts`: `applyOverlayAppearance(isProjectorMode, isNightModeUi)` に拡張。両方 ON の場合はプロジェクター補正を優先する仕様とした(投影環境の可読性という、より具体的な制約を優先)
+- `overlayStyles.ts`: `applyOverlayAppearance(isProjectorMode, isNightModeUi)` に拡張。両方 ON の場合はプロジェクター補正を優先する仕様とした(投影環境の可読性という、より具体的な制約を優先)。※この「優先(片方の色で上書き)」仕様は、実機確認で「プロジェクター補正を押すと夜間モードが ON/OFF しているように見える」という誤解を招く挙動だったため、後日修正した。詳細は Task 10 の追記を参照
 - `NightModeUiToggle.tsx`: `ProjectorModeToggle` と同じ独立トグルボタンとして新規作成し、bottom-left の 3 段目に配置
 - `Starfield.tsx`: トグル配線、`applyOverlayAppearance` 呼び出しの引数拡張、シーン保存時の snapshot に `isNightModeUi` を含める配線
 - `save/sceneState.ts`: `SavedSceneDisplay.isNightModeUi` を追加。`PERSISTED_SCENE_STATE_VERSION` は 1 のまま、`parseSavedSceneDisplay` で欠落/不正時は `false` にフォールバック(Task 6 の互換性方針どおり)
@@ -196,11 +196,14 @@ Status: Done(プロジェクター投影の完全対応は Out of Scope とし�
 - 独立トグル群(プロジェクター補正・夜間モード)を新規 `SettingsOverlay.tsx` の設定パネルへ統合。鑑賞モードは高頻度操作のため意図的にパネル外へ残置(D030)
 - プロジェクターへのミラーリング投影時にブラウザ chrome が投影像を圧迫する問題への対応として、フルスクリーン切替(Fullscreen API)・iOS向け PWA ホーム画面起動・アドレスバー自動収縮の3段構えを追加(D031)
 
+追加修正: 実機確認前の動作確認で「プロジェクター補正を ON/OFF すると夜間モードが ON/OFF しているように見える」という報告を受けた。調査の結果、`isNightModeUi` の状態自体は変わっておらず、両方 ON のとき `applyOverlayAppearance` がプロジェクター補正の色で夜間モードの色を完全に上書きしていたため、そう見えていただけと判明(実際のトグル状態は Playwright で確認済み)。人間の期待は「両方 ON なら両方の効果が乗る」だったため、`starfieldConfig.projectorNightModeUi.overlay` を新設し、夜間モードの暖色をベースにプロジェクター補正の不透明度比率を乗せた専用配色に変更した。typecheck / lint / unit test(186 件)/ build 成功、Playwright での状態遷移確認済み。
+
 完了確認:
 
 - [x] typecheck / lint / unit test(186 件)/ production build が成功
 - [x] Human Check(設定パネルの見た目、鑑賞モードとのバランス)— 問題なしを確認
-- [ ] プロジェクター投影対策の実機確認(iPhone Safari のホーム画面追加、アドレスバー自動収縮)— 未実施
+- [x] プロジェクター補正 + 夜間モード併用時、夜間モードの状態表示が上書きされて消えて見える不具合を修正
+- [x] プロジェクター投影対策の実機確認(iPhone Safari のホーム画面追加、アドレスバー自動収縮)— 実施済み、問題なし
 - [ ] iOS 上の Safari 以外のブラウザ(Chrome for iOS 等)向けの完全な chrome 除去策 — 未解決。`DECISIONS.md` D031 の Known Limitation を参照。次に扱うとしても別タスクとして再度スコープを切ってから着手する
 
 ## Notes

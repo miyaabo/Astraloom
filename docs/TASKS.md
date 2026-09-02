@@ -5,8 +5,8 @@
 
 ## Current Status
 
-- Current phase: Phase 10
-- Next task: Task 1〜10 は Done。プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っており、着手するなら別タスクとして起票してから(`DECISIONS.md` D031 参照)
+- Current phase: Phase 10(Done)
+- Next task: Phase 10 の Task 1〜10 はすべて Done、iPhone 実機確認も完了。次フェーズ着手前に、プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っている点に留意(着手するなら別タスクとして起票してから、`DECISIONS.md` D031 参照)
 - Detail file: [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md)
 - Small Spec: [`phase-10-atmosphere-presets.md`](features/phase-10-atmosphere-presets.md)
 
@@ -27,7 +27,7 @@
 | Phase 7 — 惑星・月・主要天体の表示 | Done | [`phase-7-implementation-tasks.md`](features/phase-7-implementation-tasks.md) |
 | Phase 8 — 認証・DB保存 | Planned | [`phase-8-implementation-tasks.md`](features/phase-8-implementation-tasks.md) |
 | Phase 9 — 保存体験の拡張 | Planned | これから作成 |
-| Phase 10 — 雰囲気プリセット / 表現設定 | In Progress | [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md) |
+| Phase 10 — 雰囲気プリセット / 表現設定 | Done | [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md) |
 | Phase 11 — 音楽 / リラクゼーション拡張 | Planned | これから作成 |
 | Phase 12 — 同期 / 共有 | Candidate | これから作成 |
 | Phase 13 — 天文拡張機能 | Planned | これから作成 |

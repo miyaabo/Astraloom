@@ -18,10 +18,13 @@ export const overlayColors = {
 
 /**
  * Projector correction and Night Mode UI (10次, D029) are independent
- * toggles that both only recolor overlay chrome. When both are on,
- * projector correction wins — it targets legibility in a fixed dark-room
- * projection setup, a more specific constraint than Night Mode UI's general
- * pre-sleep dimming.
+ * toggles that both only recolor overlay chrome. When both are on, both
+ * apply: Night Mode UI's warm hue stays, with projector's lower chrome
+ * opacity layered on top for projection-room legibility (see
+ * starfieldConfig.projectorNightModeUi). An earlier version had projector
+ * correction fully replace Night Mode UI's color while both were on; a
+ * Human Check report showed that read as projector correction silently
+ * toggling Night Mode UI off.
  */
 export function applyOverlayAppearance(
   isProjectorMode: boolean,
@@ -34,7 +37,9 @@ export function applyOverlayAppearance(
     panelBackground: 'rgba(5, 7, 15, 0.85)',
     text: '#ffffff',
   }
-  if (isProjectorMode) {
+  if (isProjectorMode && isNightModeUi) {
+    appearance = starfieldConfig.projectorNightModeUi.overlay
+  } else if (isProjectorMode) {
     appearance = starfieldConfig.projector.overlay
   } else if (isNightModeUi) {
     appearance = starfieldConfig.nightModeUi.overlay

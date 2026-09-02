@@ -178,6 +178,24 @@ export interface StarfieldConfig {
       text: string
     }
   }
+  /**
+   * Projector correction + Night Mode UI, both on at once. Night Mode UI's
+   * warm hue stays (so it still reads as "night mode"), with projector's
+   * lower chrome opacity layered on top (same alpha ratio as
+   * projector.overlay vs. the default palette) for projection-room
+   * legibility. Fixes a Human Check report that toggling projector
+   * correction while Night Mode UI was on looked like it silently turned
+   * Night Mode UI off — it only replaced the visible color, the toggle's
+   * own state never changed.
+   */
+  projectorNightModeUi: {
+    overlay: {
+      border: string
+      controlBackground: string
+      panelBackground: string
+      text: string
+    }
+  }
 }
 
 export const starfieldConfig: StarfieldConfig = {
@@ -291,6 +309,14 @@ export const starfieldConfig: StarfieldConfig = {
       controlBackground: 'rgba(10, 6, 4, 0.6)',
       panelBackground: 'rgba(10, 6, 4, 0.88)',
       text: '#d9b98f',
+    },
+  },
+  projectorNightModeUi: {
+    overlay: {
+      border: 'rgba(255, 214, 173, 0.12)',
+      controlBackground: 'rgba(10, 6, 4, 0.41)',
+      panelBackground: 'rgba(10, 6, 4, 0.7)',
+      text: '#cfb18f',
     },
   },
 }
