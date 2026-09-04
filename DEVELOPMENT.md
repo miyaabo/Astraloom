@@ -292,7 +292,7 @@ Small Spec: `docs/features/phase-4-relaxation.md` / タスク分割: `docs/featu
 - 最近使った場所
 - 最小の保存管理 UI
 
-### 10次 — 雰囲気プリセット / 表現設定(Current)
+### 10次 — 雰囲気プリセット / 表現設定(Done)
 
 Small Spec: `docs/features/phase-10-atmosphere-presets.md` / タスク分割: `docs/features/phase-10-implementation-tasks.md`
 
@@ -300,15 +300,9 @@ Small Spec: `docs/features/phase-10-atmosphere-presets.md` / タスク分割: `d
 
 > 雰囲気の異なる夜空体験を、静けさを保ったまま切り替えて楽しめるようにする。
 
-候補:
+結果: 表現プリセットは差分が小さく廃止し、単一のプラネタリウム基準に固定。夜間向け表示は独立の `Night Mode UI` として追加し、最小の設定パネル(`SettingsOverlay`)にまとめた。プロジェクター投影時のブラウザ chrome 対策も追加(D030, D031)。
 
-- 表現プリセットの拡張
-- 背景 / グロー / 色味 / コントラストの整理
-- 瞬き強度などの見え方調整
-- 夜間モード候補
-- 他アプリにある表示切替系機能の振り分け
-
-### 11次 — 音楽 / リラクゼーション拡張
+### 11次 — 音楽 / リラクゼーション拡張(13次より後回し, D032)
 
 候補:
 
@@ -328,15 +322,15 @@ Small Spec: `docs/features/phase-10-atmosphere-presets.md` / タスク分割: `d
 
 必要になった時点で再検討する。
 
-### 13次 — 天文拡張機能
+### 13次 — 天文拡張機能(Current, D032)
 
-候補:
+Small Spec: `docs/features/phase-13-constellation-art.md` / タスク分割: `docs/features/phase-13-implementation-tasks.md`
 
-- 衛星
-- イベント
-- 観測支援
-- AR / センサー
-- 他アプリにある上級天文機能
+目的:
+
+> 他アプリにある天文拡張機能のうち、Product Principle と矛盾しないものだけを選んで追加する。
+
+D032 により、Phase 10 Task 4 で棚卸しした 6 候補のうち **星座絵表示のみ** をスコープとする。残りは既存 Decision(D014, D017)や Product Principle 2 と矛盾するか独立したスコープ確定が必要なため対象外(衛星・イベント・観測支援・AR/センサー・星座線常時表示化・ラベル量調整・地平線/グリッド/方位表示)。
 
 ## Settings Evolution
 

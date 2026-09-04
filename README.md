@@ -10,11 +10,19 @@ Veluna は、就寝前などに本格感のある夜空を静かに眺めてリ�
 
 ## Current Phase
 
-**8次開発 — アカウント基盤の再整理**
+**13次開発 — 天文拡張機能(星座絵表示)**
 
-現時点では、8次の前提を **Better Auth + ローカル PostgreSQL** へ見直している。直近の目的は `サインイン / サインアウト / セッション復元` と、将来の DB 保存に繋がる認証基盤の整理であり、`クラウド同期` は必須要件から外して再検討中。共有リンク・課金・公開向けプロフィールはこの段階では扱わない。
+11次(音楽/リラクゼーション拡張)より先に着手している(`DECISIONS.md` D032)。他アプリにある表示切替系機能のうち Phase 10 で棚卸しした 6 候補から、既存 Decision・Product Principle と矛盾しない **星座絵表示** のみをスコープとする。8次(認証・DB保存)・9次(保存体験の拡張)・12次(同期/共有)は、見た目・体験に直結する部分を優先する方針のため後回しにしている。
 
-詳細は `docs/features/phase-8-account-sync.md`、進め方は `docs/features/phase-8-implementation-tasks.md` を参照。
+詳細は `docs/features/phase-13-constellation-art.md`、進め方は `docs/features/phase-13-implementation-tasks.md` を参照。
+
+### 10次(完了)で達成した内容
+
+- 表現プリセット(`Planetarium-like` / `Gentle Contrast`)を廃止し、単一のプラネタリウム基準へ固定(`DECISIONS.md` D030)
+- 夜間向け表示を独立の `Night Mode UI` として追加(`src/displayState.ts`, `src/stars/starfieldConfig.ts`)
+- プロジェクター補正・夜間モードをまとめた最小の設定パネル `SettingsOverlay.tsx` を新設
+- プロジェクター投影時のブラウザ chrome 対策(フルスクリーン・iOS PWA ホーム画面起動・アドレスバー自動収縮、`DECISIONS.md` D031)
+- 自動検証(typecheck / lint / unit test 186 件 / production build / e2e 8 件)完了
 
 ### 7次(完了)で達成した内容
 
@@ -164,6 +172,10 @@ npm run test:e2e      # playwright test（dist の build が必須。初回は `
 星座線・星座名データは [d3-celestial](https://github.com/ofrohn/d3-celestial)(Olaf Frohn、BSD-3-Clause)を採用している(`DECISIONS.md` D015)。
 
 `src/constellations/data/constellationCatalog.json` は、星座線の頂点を HYG カタログの星 ID に対応付けた軽量版を `scripts/build-constellation-catalog.mjs` で生成したもの。再生成方法はスクリプト冒頭のコメントを参照。
+
+星座絵(星座選択時に重ねて表示するイラスト)は [Stellarium](https://stellarium.org/) の `western` sky culture 由来の作品(Johan Meuris 作、[Free Art License](https://directory.fsf.org/wiki/License:Free-art-1.3))を採用している(`DECISIONS.md` D033)。
+
+`src/constellations/data/constellationArt.json` と `public/constellation-art/*.webp` は、[stellarium-skycultures](https://github.com/Stellarium/stellarium-skycultures) の `western/index.json` 由来のアンカー(Hipparcos 番号)を HYG カタログの星 ID に対応付けた軽量版を `scripts/build-constellation-art-catalog.mjs` で生成したもの。再生成方法はスクリプト冒頭のコメントを参照。
 
 ## Development Documents
 

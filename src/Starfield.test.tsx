@@ -13,6 +13,8 @@ const lookAt = vi.fn()
 const hideConstellationLines = vi.fn()
 const setLabelTargets = vi.fn()
 const showConstellationLines = vi.fn()
+const showConstellationArtTexturePrototype = vi.fn()
+const hideConstellationArtTexturePrototype = vi.fn()
 const hitTestStar = vi.fn(() => null)
 const applyProjectorMode = vi.fn()
 const restoreViewState = vi.fn()
@@ -30,6 +32,8 @@ vi.mock('./render/StarfieldRenderer', () => ({
     hideConstellationLines = hideConstellationLines
     setLabelTargets = setLabelTargets
     showConstellationLines = showConstellationLines
+    showConstellationArtTexturePrototype = showConstellationArtTexturePrototype
+    hideConstellationArtTexturePrototype = hideConstellationArtTexturePrototype
     hitTestStar = hitTestStar
     applyProjectorMode = applyProjectorMode
     restoreViewState = restoreViewState
@@ -64,6 +68,8 @@ describe('Starfield', () => {
     hideConstellationLines.mockClear()
     setLabelTargets.mockClear()
     showConstellationLines.mockClear()
+    showConstellationArtTexturePrototype.mockClear()
+    hideConstellationArtTexturePrototype.mockClear()
     hitTestStar.mockReset()
     hitTestStar.mockReturnValue(null)
     applyProjectorMode.mockClear()
@@ -91,12 +97,62 @@ describe('Starfield', () => {
     ).toBeTruthy()
 
     const altairOption = buildSelectionOptions().find(
-      (option) => option.type === 'star' && option.label === 'Altair (アルタイル)',
+      (option) =>
+        option.type === 'star' && option.label === 'Altair (アルタイル)',
     )
     expect(altairOption?.type).toBe('star')
     fireEvent.change(select, { target: { value: altairOption!.value } })
     expect(screen.getByText(/Altair/, { selector: 'strong' })).toBeTruthy()
     expect(highlightCelestialBody).toHaveBeenLastCalledWith(null)
+  })
+
+  it('relocates the observer when picking a constellation invisible from Tokyo right now', () => {
+    render(<Starfield />)
+
+    // 2026-09-03 21:00 JST: Leo sits well below Tokyo's horizon (~-35°
+    // altitude — opposite side of the sky from the sun this time of year).
+    fireEvent.click(screen.getByLabelText('日時を変更'))
+    fireEvent.change(screen.getByLabelText(/^日時 \(/), {
+      target: { value: '2026-09-03T21:00' },
+    })
+    updateStars.mockClear()
+    showConstellationLines.mockClear()
+    lookAt.mockClear()
+
+    fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
+      target: { value: 'constellation-Leo' },
+    })
+
+    // A relocation redraws the whole scene at the new location, not just
+    // the constellation itself.
+    expect(updateStars).toHaveBeenCalled()
+    const relocatedTo = updateStars.mock.calls.at(-1)?.[0]
+    expect(relocatedTo.latitudeDegrees).not.toBeCloseTo(35.6762, 1) // no longer Tokyo
+
+    // ...and Leo is now actually shown, not silently dropped for having
+    // nothing above the horizon.
+    const shownSegments = showConstellationLines.mock.calls.at(-1)?.[0]
+    expect(shownSegments.length).toBeGreaterThan(0)
+    const lookedAtAltitude = lookAt.mock.calls.at(-1)?.[1]
+    expect(lookedAtAltitude).toBeGreaterThan(80) // relocated to right under it
+  })
+
+  it('does not relocate when the picked constellation is already visible', () => {
+    render(<Starfield />)
+
+    // Same instant as above, but Aquila is well up over Tokyo then (part of
+    // the Summer Triangle).
+    fireEvent.click(screen.getByLabelText('日時を変更'))
+    fireEvent.change(screen.getByLabelText(/^日時 \(/), {
+      target: { value: '2026-09-03T21:00' },
+    })
+    updateStars.mockClear()
+
+    fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
+      target: { value: 'constellation-Aquila' },
+    })
+
+    expect(updateStars).not.toHaveBeenCalled()
   })
 
   it('recomputes star placement when the date/time is changed via the overlay', () => {
@@ -441,7 +497,9 @@ describe('Starfield', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Moon (月)' }))
 
-    expect(screen.getByText(/ほぼ満ちている|よく見えている|半分前後|細めに見える/)).toBeTruthy()
+    expect(
+      screen.getByText(/ほぼ満ちている|よく見えている|半分前後|細めに見える/),
+    ).toBeTruthy()
 
     fireEvent.click(screen.getByLabelText('日時を変更'))
     fireEvent.change(screen.getByLabelText(/^日時 \(/), {
@@ -526,7 +584,9 @@ describe('Starfield', () => {
     render(<Starfield />)
     fireEvent.click(screen.getByLabelText('現在のシーンを保存'))
 
-    expect(loadSceneFromStorage(window.localStorage)?.scene.location).toMatchObject({
+    expect(
+      loadSceneFromStorage(window.localStorage)?.scene.location,
+    ).toMatchObject({
       latitudeDegrees: 10,
       longitudeDegrees: 20,
       timeZoneId: 'Etc/UTC',

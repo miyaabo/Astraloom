@@ -5,10 +5,11 @@
 
 ## Current Status
 
-- Current phase: Phase 10(Done)
-- Next task: Phase 10 の Task 1〜10 はすべて Done、iPhone 実機確認も完了。次フェーズ着手前に、プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っている点に留意(着手するなら別タスクとして起票してから、`DECISIONS.md` D031 参照)
-- Detail file: [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md)
-- Small Spec: [`phase-10-atmosphere-presets.md`](features/phase-10-atmosphere-presets.md)
+- Current phase: Phase 13(D032: 11次より先に着手。スコープは星座絵表示のみ)
+- Next task: Phase 13 Task 4(星座絵の描画実装)は絵柄が2回却下され、描画コードは撤去済み(型定義・投影ロジックのみ残存)。人間が外部AIで画像を生成し、Claude 側でアンカー配置する方向を検討中。詳細は `phase-13-implementation-tasks.md` の Task 4 を参照
+- Detail file: [`phase-13-implementation-tasks.md`](features/phase-13-implementation-tasks.md)
+- Small Spec: [`phase-13-constellation-art.md`](features/phase-13-constellation-art.md)
+- 参考: プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っている(`DECISIONS.md` D031)。着手するなら別タスクとして起票してから
 
 作業を開始するときは、対象フェーズの詳細ファイルを開き、上から最初に
 `Status` が `Done` でないタスクだけを実施する。
@@ -28,9 +29,9 @@
 | Phase 8 — 認証・DB保存 | Planned | [`phase-8-implementation-tasks.md`](features/phase-8-implementation-tasks.md) |
 | Phase 9 — 保存体験の拡張 | Planned | これから作成 |
 | Phase 10 — 雰囲気プリセット / 表現設定 | Done | [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md) |
-| Phase 11 — 音楽 / リラクゼーション拡張 | Planned | これから作成 |
+| Phase 11 — 音楽 / リラクゼーション拡張 | Planned(13次より後回し, D032) | これから作成 |
 | Phase 12 — 同期 / 共有 | Candidate | これから作成 |
-| Phase 13 — 天文拡張機能 | Planned | これから作成 |
+| Phase 13 — 天文拡張機能(星座絵表示) | In Progress | [`phase-13-implementation-tasks.md`](features/phase-13-implementation-tasks.md) |
 
 ## Status Rules
 

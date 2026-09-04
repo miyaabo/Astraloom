@@ -3,6 +3,7 @@ import {
   equatorialToHorizontal,
   equatorialToHorizontalAtHourAngle,
   greenwichMeanSiderealTimeDegrees,
+  zenithObserverLocation,
 } from './coordinates'
 
 // Real RA/Dec from the HYG catalog (see hygCatalogSource.test.ts), reused
@@ -118,5 +119,30 @@ describe('equatorialToHorizontal', () => {
       1,
     )
     expect(result.azimuthDegrees).toBeCloseTo(180, 1)
+  })
+})
+
+describe('zenithObserverLocation', () => {
+  it('is the inverse of equatorialToHorizontal: puts the object at 90deg altitude', () => {
+    const date = new Date('2026-06-15T03:24:00Z')
+    const location = zenithObserverLocation(VEGA, date)
+
+    expect(location.latitudeDegrees).toBeCloseTo(VEGA.decDegrees, 9)
+
+    const result = equatorialToHorizontal(VEGA, location, date)
+    expect(result.altitudeDegrees).toBeCloseTo(90, 5)
+  })
+
+  it('keeps longitude within (-180, 180]', () => {
+    // RA 23h and an epoch chosen so the naive (unwrapped) longitude would
+    // land past 180deg, exercising the wraparound branch.
+    const date = new Date('2000-01-01T12:00:00Z') // GMST = 280.46...deg
+    const location = zenithObserverLocation(
+      { raHours: 23, decDegrees: 10 },
+      date,
+    )
+
+    expect(location.longitudeDegrees).toBeGreaterThan(-180)
+    expect(location.longitudeDegrees).toBeLessThanOrEqual(180)
   })
 })

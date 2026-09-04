@@ -120,3 +120,30 @@ export function equatorialToHorizontal(
     location.latitudeDegrees,
   )
 }
+
+/**
+ * The observer location at which the given equatorial position sits at
+ * zenith (altitude 90°) at this exact instant — the inverse of
+ * equatorialToHorizontal for the transit case. Latitude is just the
+ * declination; longitude is whatever makes local sidereal time equal the
+ * object's RA (hour angle 0), i.e. `localSiderealTimeDegrees(date, lon) ===
+ * equatorial.raHours * 15`. Used to relocate the observer to see something
+ * that isn't visible from their current location (Starfield.tsx's
+ * constellation list — see constellationProjection.ts's
+ * findConstellationZenithLocation).
+ */
+export function zenithObserverLocation(
+  equatorial: EquatorialCoordinates,
+  date: Date,
+): ObserverLocation {
+  const longitudeDegrees = normalizeDegrees(
+    equatorial.raHours * 15 - greenwichMeanSiderealTimeDegrees(date),
+  )
+  return {
+    latitudeDegrees: equatorial.decDegrees,
+    // normalizeDegrees returns [0, 360); wrap to (-180, 180] to match
+    // ObserverLocation's east-positive convention (see its doc comment).
+    longitudeDegrees:
+      longitudeDegrees > 180 ? longitudeDegrees - 360 : longitudeDegrees,
+  }
+}

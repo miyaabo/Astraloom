@@ -1,9 +1,7 @@
 import { buildSelectedCelestialBodyInfo } from './celestialBodies/celestialBodyInfo'
 import { useEffect, useRef, useState } from 'react'
 import type { ObserverLocation } from './astronomy/coordinates'
-import {
-  calculateMoonState,
-} from './celestialBodies/moonStateSource'
+import { calculateMoonState } from './celestialBodies/moonStateSource'
 import { calculatePlanetStates } from './celestialBodies/planetStateSource'
 import type {
   CelestialBodySearchRecord,
@@ -16,11 +14,18 @@ import type {
   ConstellationLabelsHandle,
 } from './ConstellationLabelsOverlay'
 import { ConstellationLabelsOverlay } from './ConstellationLabelsOverlay'
+import { buildTexturedArtMeshGrid } from './constellations/constellationArtTexturePlacement'
 import {
   computeConstellationLineSegments,
   computeConstellationLookDirection,
   computeConstellationStarLabels,
+  findConstellationZenithLocation,
+  rankConstellationsByAltitude,
 } from './constellations/constellationProjection'
+import {
+  LEO_ART_PROTOTYPE,
+  resolveLeoArtPrototypeAnchors,
+} from './constellations/leoArtPrototype'
 import {
   findConstellationByStarId,
   loadConstellationCatalog,
@@ -120,7 +125,9 @@ function findCelestialBodyState(
     return calculateMoonState(location, date)
   }
 
-  const match = calculatePlanetStates(location, date).find((body) => body.id === id)
+  const match = calculatePlanetStates(location, date).find(
+    (body) => body.id === id,
+  )
   if (!match) {
     throw new Error(`Missing celestial body state for ${id}`)
   }
@@ -141,7 +148,9 @@ export function Starfield() {
   // every date/location change — see refreshConstellationDisplay below. Null
   // when nothing is selected.
   const selectedConstellationRef = useRef<ConstellationRecord | null>(null)
-  const selectedCelestialBodyIdRef = useRef<SupportedCelestialBodyId | null>(null)
+  const selectedCelestialBodyIdRef = useRef<SupportedCelestialBodyId | null>(
+    null,
+  )
   const [selectedStarInfo, setSelectedStarInfo] =
     useState<SelectedStarInfo | null>(null)
   const [displayState, setDisplayState] = useState(() =>
@@ -150,20 +159,15 @@ export function Starfield() {
       : createInitialDisplayState(),
   )
   const [date, setDate] = useState(() =>
-    initialSavedScene
-      ? new Date(initialSavedScene.dateIso)
-      : new Date(),
+    initialSavedScene ? new Date(initialSavedScene.dateIso) : new Date(),
   )
-  const [location, setLocation] = useState<ObserverLocation>(
-    () =>
-      initialSavedScene
-        ? {
-            latitudeDegrees:
-              initialSavedScene.location.latitudeDegrees,
-            longitudeDegrees:
-              initialSavedScene.location.longitudeDegrees,
-          }
-        : locationPresets[0].location,
+  const [location, setLocation] = useState<ObserverLocation>(() =>
+    initialSavedScene
+      ? {
+          latitudeDegrees: initialSavedScene.location.latitudeDegrees,
+          longitudeDegrees: initialSavedScene.location.longitudeDegrees,
+        }
+      : locationPresets[0].location,
   )
   const [locationMetadata, setLocationMetadata] = useState(() =>
     createInitialLocationMetadata(initialSavedScene),
@@ -206,7 +210,10 @@ export function Starfield() {
   }, [displayState])
 
   useEffect(() => {
-    applyOverlayAppearance(displayState.isProjectorMode, displayState.isNightModeUi)
+    applyOverlayAppearance(
+      displayState.isProjectorMode,
+      displayState.isNightModeUi,
+    )
     return () => applyOverlayAppearance(false, false)
   }, [displayState.isProjectorMode, displayState.isNightModeUi])
 
@@ -388,6 +395,41 @@ export function Starfield() {
   // the same recompute on every date/location change or they visibly lag
   // behind the star field during playback — this was reported as
   // lines/labels barely moving compared to the stars while time-lapsing.
+  // Prototype only (Phase 13 Task 4 — see
+  // docs/features/phase-13-implementation-tasks.md for the still-open
+  // direction question this is exploring): shows the one hand-anchored
+  // AI-generated constellation image (leoArtPrototype.ts) when Leo is the
+  // constellation being displayed, hides it otherwise. Deliberately
+  // hardcoded to Leo rather than a general lookup — this is a single-image
+  // test, not the real 88-constellation feature.
+  function updateConstellationArtTexturePrototype(
+    constellation: ConstellationRecord,
+    atLocation: ObserverLocation,
+    atDate: Date,
+  ): void {
+    if (constellation.id !== 'Leo') {
+      rendererRef.current?.hideConstellationArtTexturePrototype()
+      return
+    }
+
+    const anchors = resolveLeoArtPrototypeAnchors(atLocation, atDate)
+    const meshGrid = buildTexturedArtMeshGrid(
+      anchors,
+      LEO_ART_PROTOTYPE.pixelBounds,
+      LEO_ART_PROTOTYPE.imageWidthPx,
+      LEO_ART_PROTOTYPE.imageHeightPx,
+      12,
+    )
+    if (meshGrid === null) {
+      rendererRef.current?.hideConstellationArtTexturePrototype()
+      return
+    }
+    rendererRef.current?.showConstellationArtTexturePrototype(
+      meshGrid,
+      LEO_ART_PROTOTYPE.imageUrl,
+    )
+  }
+
   function refreshConstellationDisplay(
     constellation: ConstellationRecord,
     nextLocation: ObserverLocation,
@@ -399,6 +441,11 @@ export function Starfield() {
       nextDate,
     )
     rendererRef.current?.showConstellationLines(segments)
+    updateConstellationArtTexturePrototype(
+      constellation,
+      nextLocation,
+      nextDate,
+    )
 
     const lookDirection = computeConstellationLookDirection(segments)
     if (!lookDirection) {
@@ -544,6 +591,7 @@ export function Starfield() {
     selectedCelestialBodyIdRef.current = null
     rendererRef.current?.highlightCelestialBody(null)
     rendererRef.current?.hideConstellationLines()
+    rendererRef.current?.hideConstellationArtTexturePrototype()
     rendererRef.current?.setLabelTargets([])
     setConstellationLabels([])
   }
@@ -693,21 +741,23 @@ export function Starfield() {
   // direction. Task 7 added constellation trivia to that same info panel
   // (buildSelectedConstellationInfo leaves brightness/color null, which
   // StarInfoOverlay treats as "no star selected" and skips that line).
+  // `atLocation` defaults to the current observer location; the constellation
+  // list overlay below passes an explicit one when it has just relocated the
+  // observer in the same tick (`location` state wouldn't reflect that yet).
   function handleSelectConstellationResult(
     constellation: ConstellationRecord,
+    atLocation: ObserverLocation = location,
   ): void {
     if (displayState.mode === 'immersive') return
 
     selectedCelestialBodyIdRef.current = null
     rendererRef.current?.highlightCelestialBody(null)
     setSelectedStarInfo(buildSelectedConstellationInfo(constellation))
-    setDisplayState((current) =>
-      openSelectionInfo(closeOverlayPanel(current)),
-    )
+    setDisplayState((current) => openSelectionInfo(closeOverlayPanel(current)))
     selectedConstellationRef.current = constellation
     const lookDirection = refreshConstellationDisplay(
       constellation,
-      location,
+      atLocation,
       date,
     )
     if (lookDirection) {
@@ -718,17 +768,74 @@ export function Starfield() {
     }
   }
 
+  /**
+   * Formats a location produced by findConstellationZenithLocation for
+   * display — it's a computed viewpoint, not a real named place, so unlike
+   * handleLocationChange this doesn't run it through findLocationPreset
+   * (which would silently mislabel it as the nearest preset, Tokyo by
+   * default, since it won't exactly match any preset's coordinates).
+   */
+  function describeComputedLocation(zenithLocation: ObserverLocation): string {
+    const latHemisphere = zenithLocation.latitudeDegrees >= 0 ? '北緯' : '南緯'
+    const lonHemisphere = zenithLocation.longitudeDegrees >= 0 ? '東経' : '西経'
+    return (
+      `${latHemisphere}${Math.abs(zenithLocation.latitudeDegrees).toFixed(1)}° ` +
+      `${lonHemisphere}${Math.abs(zenithLocation.longitudeDegrees).toFixed(1)}°`
+    )
+  }
+
+  // Used by both SearchOverlay and SelectionOverlay's constellation picks
+  // (the latter already lists all 89 catalog records in a plain dropdown —
+  // no separate "browse all" UI needed). Picking one that's already visible
+  // from here just selects it, same as before. Picking one that isn't (e.g.
+  // a summer constellation at a winter date/time) relocates the observer to
+  // wherever it's currently at zenith (findConstellationZenithLocation)
+  // instead of silently selecting nothing, which is what plain
+  // handleSelectConstellationResult would do — refreshConstellationDisplay
+  // returns null and nothing gets pointed at.
+  function handleSelectConstellationFromList(
+    constellation: ConstellationRecord,
+  ): void {
+    if (displayState.mode === 'immersive') return
+
+    const visibleHere =
+      computeConstellationLineSegments(constellation, location, date).length > 0
+    if (visibleHere) {
+      handleSelectConstellationResult(constellation)
+      return
+    }
+
+    const zenithLocation = findConstellationZenithLocation(constellation, date)
+    if (zenithLocation === null) {
+      // No resolvable center (shouldn't happen for real catalog data) —
+      // fall back to the normal (no-op-looking) selection rather than doing
+      // nothing at all.
+      handleSelectConstellationResult(constellation)
+      return
+    }
+
+    setLocation(zenithLocation)
+    setLocationMetadata({
+      label: describeComputedLocation(zenithLocation),
+      timeZoneId: 'UTC',
+    })
+    rendererRef.current?.updateStars(generateRealStarData(zenithLocation, date))
+    rendererRef.current?.updateCelestialBodies(
+      generateCelestialBodyRenderData(zenithLocation, date),
+    )
+    rendererRef.current?.updateMilkyWay(
+      generateMilkyWayBand(zenithLocation, date),
+    )
+    handleSelectConstellationResult(constellation, zenithLocation)
+  }
+
   function handleSelectCelestialBodyResult(
     celestialBody: CelestialBodySearchRecord,
   ): void {
     if (displayState.mode === 'immersive') return
 
     clearSelection()
-    const state = findCelestialBodyState(
-      celestialBody.id,
-      location,
-      date,
-    )
+    const state = findCelestialBodyState(celestialBody.id, location, date)
     selectedCelestialBodyIdRef.current = celestialBody.id
     rendererRef.current?.highlightCelestialBody(celestialBody.id)
     setSelectedStarInfo(buildSelectedCelestialBodyInfo(state))
@@ -741,22 +848,28 @@ export function Starfield() {
     }
   }
 
+  // Constellations whose visible portion sits below this altitude are
+  // treated as "just grazing the horizon", matching
+  // celestialBodyInfo.ts's describeVisibility bar ("地平線近くに見える"
+  // below 5°) rather than a one-off number invented just for this button.
+  const MIN_LOOK_ALTITUDE_DEGREES = 5
+
   // Revives the Task 3/4 dev-only test button as a real feature: jumps to
-  // the next currently-visible constellation each press, cycling through
-  // constellations with at least one line segment above the horizon right
-  // now (reusing computeConstellationLineSegments' own horizon cutoff),
-  // sorted by name for a stable, repeatable cycling order. Wraps around, and
-  // continues from whichever constellation is already selected (including
-  // one picked via search or a tap) rather than always restarting from the
-  // top of the list.
+  // the next well-placed constellation each press, best-placed (highest
+  // current altitude) first — see rankConstellationsByAltitude for why this
+  // replaced an earlier alphabetical ordering. Wraps around, and continues
+  // from whichever constellation is already selected (including one picked
+  // via search or a tap) rather than always restarting from the best-placed
+  // one.
   function handleNextConstellation(): void {
     if (displayState.mode === 'immersive') return
 
-    const visible = loadConstellationCatalog()
-      .filter(
-        (c) => computeConstellationLineSegments(c, location, date).length > 0,
-      )
-      .sort((a, b) => a.name.localeCompare(b.name))
+    const visible = rankConstellationsByAltitude(
+      loadConstellationCatalog(),
+      location,
+      date,
+      MIN_LOOK_ALTITUDE_DEGREES,
+    )
     if (visible.length === 0) return
 
     const currentIndex = selectedConstellationRef.current
@@ -783,15 +896,17 @@ export function Starfield() {
           <SearchOverlay
             isOpen={displayState.activePanel === 'search'}
             onToggleOpen={() =>
-              setDisplayState((current) => toggleOverlayPanel(current, 'search'))
+              setDisplayState((current) =>
+                toggleOverlayPanel(current, 'search'),
+              )
             }
             onSelectCelestialBody={handleSelectCelestialBodyResult}
-            onSelectConstellation={handleSelectConstellationResult}
+            onSelectConstellation={handleSelectConstellationFromList}
             onSelectStar={handleSelectStarResult}
           />
           <SelectionOverlay
             onSelectCelestialBody={handleSelectCelestialBodyResult}
-            onSelectConstellation={handleSelectConstellationResult}
+            onSelectConstellation={handleSelectConstellationFromList}
             onSelectStar={handleSelectStarResult}
           />
           <NextConstellationButton onClick={handleNextConstellation} />
@@ -815,7 +930,9 @@ export function Starfield() {
             }}
             isOpen={displayState.activePanel === 'location'}
             onToggleOpen={() =>
-              setDisplayState((current) => toggleOverlayPanel(current, 'location'))
+              setDisplayState((current) =>
+                toggleOverlayPanel(current, 'location'),
+              )
             }
           />
           <PlaybackOverlay

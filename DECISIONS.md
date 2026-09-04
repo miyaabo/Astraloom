@@ -905,3 +905,63 @@ iOS Safari は `<video>` 以外の要素で Fullscreen API 自体をサポート
 - iPhone + Safari 以外のブラウザ: 上記のアドレスバー自動収縮のみが効き、chrome を完全には消せない(未解決)
 
 この制約は Product の「プロジェクター投影での利用」という利用シーンに直接影響するため、後で「もっと良い対策はないか」を再検討する際は、まずこの記録を確認すること。既知の代替案(canvasを`<video>`化してネイティブ動画フルスクリーンを流用する等)はインタラクティブ操作(ドラッグ視点操作・タップでの星選択)を破壊するため不採用と判断済み。
+
+## D032 — 11次より先に13次へ着手し、スコープを星座絵表示のみに絞る
+
+Status: Accepted
+
+### Decision
+
+Phase 10 完了後、次フェーズの着手順を「11次(音楽/リラクゼーション拡張)→13次(天文拡張機能)」から**13次を先**に変更する。理由は、13次の項目の方が見た目・鑑賞体験に直接関わり、11次(新しいドメインである音楽)より Product Principle 3(Star Rendering Is the Foundation)の延長で評価しやすいため。
+
+13次のスコープは、Phase 10 Task 4(`docs/features/phase-10-atmosphere-presets.md`)で振り分けた 6 候補のうち **星座絵表示(星座の絵柄オーバーレイ)のみ** とする。残り 5 候補は 13次からも外し、対象外とする。
+
+- 星座線の常時表示化: 対象外(D017 の Calm by Default を覆す変更のため、必要になった時点で改めて Small Spec)
+- ラベル量調整: 対象外(独立機能としてスコープ確定が必要なため見送り)
+- 地平線 / グリッド / 方位表示: 対象外(Principle 2 との相性が悪いという Phase 10 の判断を維持)
+- AR / センサー系: 対象外(D014・0次 Out of Scope と矛盾するため見送り)
+- イベント / 衛星 / 観測支援: 対象外(観測支援ドメインで Principle 2 と相性が悪いため見送り)
+
+星座絵表示は新しい画像アセットの導入を伴うため、Product Principle 7(商用利用可否)の確認が実装前の必須ゲートとして残る。アセットの具体的な入手元・ライセンスは本 Decision では決めず、13次の Task の中で改めて人間に確認する。
+
+### Reasons
+
+- ユーザーから「13次の方が見た目に関わるから優先したい」との明確な意思表示があった
+- 6候補のうち星座絵表示以外は、既存 Decision(D014, D017)や Product Principle 2 と正面から矛盾するか、独立したスコープ確定が必要と Phase 10 Task 4 で既に整理済みであり、13次でも同じ判断を維持するのが一貫している
+- 星座絵表示は新規ビジュアル要素の追加ではあるが、既存の「星座線・星座名を選択時のみ表示」という Calm by Default の枠組みの中に収まる拡張であり、他候補ほど原則との衝突が大きくない
+
+### Consequences
+
+- `docs/TASKS.md` の Phase Task Files で 13次を進行中とし、11次より着手順を先にする
+- `PRODUCT.md` の Current Phase を 13次へ更新する
+- `docs/features/phase-13-constellation-art.md`(Small Spec)・`docs/features/phase-13-implementation-tasks.md`(詳細タスク)を新規作成する
+- 星座絵アセットの入手元・ライセンス確認は 13次の実装タスクの中で改めて人間へ確認する(未決定のまま実装に入らない)
+
+## D033 — 星座絵アセットは Stellarium 標準星座絵(Johan Meuris 作)を採用する
+
+Status: Accepted
+
+### Decision
+
+13次(星座絵表示)で使う星座絵アセットとして、[stellarium-skycultures](https://github.com/Stellarium/stellarium-skycultures) リポジトリの `western` スカイカルチャーに含まれる星座絵(Johan Meuris 作、85 ファイルで IAU 88 星座相当をカバー)を採用する。形式は配布されている WebP 画像をそのまま使い、自作 SVG 化は行わない。
+
+### Comparison
+
+| 候補 | ライセンス | 商用利用 | 特徴 |
+|---|---|---|---|
+| **Stellarium 星座絵(Johan Meuris)** | Free Art License(`western/description.md` の License セクションに明記) | 明示的に可(コピーレフト。改変版を配布する場合は同ライセンス継承 + 作者クレジット必須) | グレースケール単色の絵柄(サンプル: Orion を目視確認済み)。画像ごとにピクセル座標⇔Hipparcos 星番号のアンカーデータが付属し、位置合わせに使える |
+| パブリックドメイン古典星図(Urania's Mirror 等) | パブリックドメイン | 制約なし | 彩色版画で装飾過多。Calm by Default から外れるリスクが高く、位置合わせ用メタデータも無いため星座ごとの手作業が必要 |
+| 自作ミニマル SVG | 自社著作物 | 制約なし | ライセンスリスクはゼロだが、89 レコード分を新規に描き起こす工数が大きい |
+
+### Reasons
+
+- Free Art License は `western/description.md` に正式なライセンス表記があり、D015(d3-celestial 採用)と同じ「商用利用可否が明確な情報源を優先する」基準(Product Principle 7)を満たす
+- IAU 88 星座相当を実質カバーしており、Astraloom の 89 レコード(Serpens 分割・Argo Navis 分割込み)との対応も、Stellarium 側が同じ理由で画像を共有していることを確認済み(1星座絵が複数レコードにまたがるケースがある点は Task 3 の統合設計で扱う)
+- 画像ごとのアンカーデータ(ピクセル座標⇔Hipparcos 星番号)により、d3-celestial の星座線を HYG id へマッチングした前例(D015)と同様、座標近傍マッチングで Astraloom の星カタログへ位置合わせできる見込みが立った
+- サンプル画像(Orion)を実際に目視し、グレースケール単色・透過背景で、低不透明度オーバーレイに向く絵柄であることを確認した
+
+### Consequences
+
+- 星座絵を配布物に含める場合、Johan Meuris のクレジット表記が必要(Free Art License の要件)。クレジット表示箇所は Task 3(表示条件・統合設計)で決める
+- 画像は Hipparcos 星番号ベースのアンカーを持つが、Astraloom の `HygStarRecord` は現状 Hipparcos 番号を保持していないため、Task 4(描画実装)で座標近傍マッチングによる変換が必要になる
+- 1つの星座絵が複数の IAU 星座レコードにまたがるケース(旧 Argo Navis → Carina/Puppis/Vela/Pyxis 等)があるため、Task 3 で `ConstellationRecord` との対応関係を設計する

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type { ArtMeshGrid } from '../constellations/constellationArtTexturePlacement'
 import type {
   CelestialBodyRenderData,
   SupportedCelestialBodyId,
@@ -302,7 +303,10 @@ function buildStarGeometry(stars: StarData[]): THREE.BufferGeometry {
     'aTwinkleAmplitude',
     new THREE.BufferAttribute(twinkleAmplitudes, 1),
   )
-  geometry.setAttribute('aSelected', new THREE.BufferAttribute(selectedFlags, 1))
+  geometry.setAttribute(
+    'aSelected',
+    new THREE.BufferAttribute(selectedFlags, 1),
+  )
   return geometry
 }
 
@@ -363,7 +367,10 @@ function buildCelestialBodyGeometry(
     'aTwinkleAmplitude',
     new THREE.BufferAttribute(twinkleAmplitudes, 1),
   )
-  geometry.setAttribute('aSelected', new THREE.BufferAttribute(selectedFlags, 1))
+  geometry.setAttribute(
+    'aSelected',
+    new THREE.BufferAttribute(selectedFlags, 1),
+  )
   return geometry
 }
 
@@ -397,6 +404,21 @@ export class StarfieldRenderer {
     THREE.BufferGeometry,
     THREE.ShaderMaterial
   >
+  /**
+   * Prototype only (Phase 13 Task 4, still undecided — see
+   * docs/features/phase-13-implementation-tasks.md). Not part of the usual
+   * fixed set of scene objects above (created in the constructor, disposed
+   * in dispose()) because it's created/destroyed on the fly by
+   * showConstellationArtTexturePrototype/hideConstellationArtTexturePrototype
+   * rather than existing for the renderer's whole lifetime with an
+   * always-present-but-hidden geometry, unlike constellationLines.
+   */
+  private constellationArtTexturePrototype: THREE.Mesh<
+    THREE.BufferGeometry,
+    THREE.MeshBasicMaterial
+  > | null = null
+  private readonly textureLoader = new THREE.TextureLoader()
+
   private readonly unwatchReducedMotion: () => void
   private readonly unwatchVisibility: () => void
   private readonly onHeadingChange?: (headingDegrees: number) => void
@@ -648,7 +670,9 @@ export class StarfieldRenderer {
     fovDegrees: number
   } {
     return {
-      azimuthDegrees: normalizeDegrees(-THREE.MathUtils.radToDeg(this.userYawRadians)),
+      azimuthDegrees: normalizeDegrees(
+        -THREE.MathUtils.radToDeg(this.userYawRadians),
+      ),
       altitudeDegrees: THREE.MathUtils.radToDeg(this.userPitchRadians),
       fovDegrees: this.camera.fov,
     }
@@ -816,6 +840,73 @@ export class StarfieldRenderer {
   /** Hides whatever constellation lines are currently shown (D017 default state). */
   hideConstellationLines(): void {
     this.constellationLines.visible = false
+    this.render()
+  }
+
+  /**
+   * Prototype only (Phase 13 Task 4 — see
+   * docs/features/phase-13-implementation-tasks.md for the still-open
+   * direction question this is exploring): shows an externally-generated
+   * constellation image warped onto the sky sphere via a pre-built mesh grid
+   * (constellationArtTexturePlacement.ts's buildTexturedArtMeshGrid). Unlike
+   * showConstellationLines this isn't part of the usual selection lifecycle
+   * — Starfield.tsx calls this directly, gated to the one constellation
+   * being prototyped. The mesh renders immediately (untextured/transparent)
+   * while the image loads asynchronously, then gets its texture once loaded.
+   */
+  showConstellationArtTexturePrototype(
+    meshGrid: ArtMeshGrid,
+    imageUrl: string,
+  ): void {
+    this.hideConstellationArtTexturePrototype()
+
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(meshGrid.positions, 3),
+    )
+    geometry.setAttribute('uv', new THREE.BufferAttribute(meshGrid.uvs, 2))
+    geometry.setIndex(new THREE.BufferAttribute(meshGrid.indices, 1))
+
+    const material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
+    const mesh = new THREE.Mesh(geometry, material)
+    // A hand-built BufferGeometry has no bounding sphere until computed —
+    // frustum culling silently drops the mesh without one rather than
+    // erroring, so this either needs an explicit computeBoundingSphere() or
+    // (simpler, and fine for one decorative mesh) skipping culling entirely.
+    mesh.frustumCulled = false
+    this.constellationArtTexturePrototype = mesh
+    this.scene.add(mesh)
+    this.render()
+
+    this.textureLoader.load(imageUrl, (texture) => {
+      // A stale load resolving after a newer show/hide call would otherwise
+      // clobber whatever's showing now.
+      if (this.constellationArtTexturePrototype !== mesh) {
+        texture.dispose()
+        return
+      }
+      texture.colorSpace = THREE.SRGBColorSpace
+      material.map = texture
+      material.needsUpdate = true
+      this.render()
+    })
+  }
+
+  /** Hides/disposes the prototype constellation art texture mesh, if one is shown. */
+  hideConstellationArtTexturePrototype(): void {
+    const mesh = this.constellationArtTexturePrototype
+    if (mesh === null) return
+    this.scene.remove(mesh)
+    mesh.geometry.dispose()
+    mesh.material.map?.dispose()
+    mesh.material.dispose()
+    this.constellationArtTexturePrototype = null
     this.render()
   }
 
@@ -1012,6 +1103,7 @@ export class StarfieldRenderer {
     this.stop()
     this.unwatchReducedMotion()
     this.unwatchVisibility()
+    this.hideConstellationArtTexturePrototype()
     this.points.geometry.dispose()
     this.points.material.dispose()
     this.celestialBodyPoints.geometry.dispose()
