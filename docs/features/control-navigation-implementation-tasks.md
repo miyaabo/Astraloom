@@ -12,7 +12,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 | 1 | 操作 UI の状態モデルを再設計する | Done |
 | 2 | ハンバーガーと左サイドパネルを実装する | Done |
 | 3 | 「空を選ぶ」を統合する | Done |
-| 4 | 「時間を動かす」を統合する | Not Started |
+| 4 | 「時間を動かす」を統合する | Done |
 | 5 | 「空を探す」を統合する | Not Started |
 | 6 | 「表示・投影」と保存を統合する | Not Started |
 | 7 | 旧 UI を撤去し、保存互換性を確保する | Not Started |
@@ -86,7 +86,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 4 — 「時間を動かす」を統合する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -100,9 +100,9 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] 既存と同じ再生・停止・速度・逆再生が panel 内で使える
-- [ ] 操作後もサイドパネルは開いたままになる
-- [ ] 画面下に常時表示される再生 UI が残らない
+- [x] 既存と同じ再生・停止・速度・逆再生が panel 内で使える
+- [x] 操作後もサイドパネルは開いたままになる
+- [x] 画面下に常時表示される再生 UI が残らない
 
 ## Task 5 — 「空を探す」を統合する
 

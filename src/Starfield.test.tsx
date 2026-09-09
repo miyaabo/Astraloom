@@ -64,6 +64,11 @@ function openSkySelection(): void {
   fireEvent.click(screen.getByRole('button', { name: '空を選ぶ' }))
 }
 
+function openTimeControls(): void {
+  fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+  fireEvent.click(screen.getByRole('button', { name: '時間を動かす' }))
+}
+
 describe('Starfield', () => {
   beforeEach(() => {
     window.localStorage.clear()
@@ -284,19 +289,18 @@ describe('Starfield', () => {
 
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
     expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
-    expect(screen.getByLabelText('再生を開始')).toBeTruthy()
+    expect(screen.queryByLabelText('再生を開始')).toBeNull()
 
     fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
 
     expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
     expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
-    expect(screen.queryByLabelText('再生を開始')).toBeNull()
 
     fireEvent.click(screen.getByLabelText('通常表示に戻る'))
 
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
     expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
-    expect(screen.getByLabelText('再生を開始')).toBeTruthy()
+    expect(screen.queryByLabelText('再生を開始')).toBeNull()
   })
 
   it('keeps the active selection when entering immersive mode, while hiding its UI', () => {
@@ -663,6 +667,7 @@ describe('Starfield', () => {
 
     it('recomputes star placement on each frame while playing', () => {
       render(<Starfield />)
+      openTimeControls()
       fireEvent.click(screen.getByLabelText('再生を開始'))
       updateStars.mockClear()
 
@@ -676,6 +681,7 @@ describe('Starfield', () => {
 
     it('stops advancing once paused', () => {
       render(<Starfield />)
+      openTimeControls()
       fireEvent.click(screen.getByLabelText('再生を開始'))
       flushFrame(1000)
       fireEvent.click(screen.getByLabelText('再生を停止'))
@@ -685,10 +691,29 @@ describe('Starfield', () => {
 
     it('toggles between forward and reverse playback direction', () => {
       render(<Starfield />)
+      openTimeControls()
       expect(screen.getByLabelText('巻き戻し再生に切替')).toBeTruthy()
 
       fireEvent.click(screen.getByLabelText('巻き戻し再生に切替'))
       expect(screen.getByLabelText('順方向再生に切替')).toBeTruthy()
+      expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
+    })
+
+    it('updates the playback speed and returns to the current time in the open section', () => {
+      render(<Starfield />)
+      updateStars.mockClear()
+      openTimeControls()
+
+      fireEvent.change(screen.getByLabelText('再生速度'), {
+        target: { value: '100' },
+      })
+      expect(
+        (screen.getByLabelText('再生速度') as HTMLSelectElement).value,
+      ).toBe('100')
+
+      fireEvent.click(screen.getByRole('button', { name: '現在時刻へ戻す' }))
+      expect(updateStars).toHaveBeenCalledTimes(1)
+      expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
     })
   })
 })

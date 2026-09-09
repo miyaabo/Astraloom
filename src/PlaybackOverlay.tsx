@@ -26,41 +26,33 @@ const SPEED_PRESET_MAGNITUDES = [
   20000, 30000, 50000, 86400,
 ]
 
-interface PlaybackOverlayProps {
+interface PlaybackControlsProps {
   isPlaying: boolean
   onTogglePlaying: () => void
   speedMagnitude: number
   onSpeedChange: (speedMagnitude: number) => void
   direction: PlaybackDirection
   onToggleDirection: () => void
+  onReturnToCurrentTime: () => void
 }
 
-export function PlaybackOverlay({
+/** Reusable controls for the unified "時間を動かす" section. */
+export function PlaybackControls({
   isPlaying,
   onTogglePlaying,
   speedMagnitude,
   onSpeedChange,
   direction,
   onToggleDirection,
-}: PlaybackOverlayProps) {
+  onReturnToCurrentTime,
+}: PlaybackControlsProps) {
   return (
     <div
       style={{
-        position: 'fixed',
-        // Clears the home-indicator/gesture-nav area on notched phones
-        // (falls back to plain 16px where env() isn't supported).
-        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
-        left: '50%',
-        transform: 'translateX(-50%)',
         display: 'flex',
+        flexWrap: 'wrap',
         alignItems: 'center',
         gap: 8,
-        padding: '6px 10px',
-        borderRadius: 24,
-        border: `1px solid ${overlayColors.border}`,
-        background: overlayColors.controlBackground,
-        color: overlayColors.text,
-        zIndex: 1,
       }}
     >
       <button
@@ -102,6 +94,48 @@ export function PlaybackOverlay({
           ))}
         </select>
       </label>
+
+      <button
+        type="button"
+        onClick={onReturnToCurrentTime}
+        style={{
+          border: `1px solid ${overlayColors.border}`,
+          borderRadius: 6,
+          padding: '6px 8px',
+          background: overlayColors.controlBackground,
+          color: overlayColors.text,
+          cursor: 'pointer',
+        }}
+      >
+        現在時刻へ戻す
+      </button>
+    </div>
+  )
+}
+
+type PlaybackOverlayProps = PlaybackControlsProps
+
+/**
+ * Legacy floating wrapper. Task 4 moves its controls into the unified menu;
+ * the wrapper remains temporarily for compatibility until Task 7 cleanup.
+ */
+export function PlaybackOverlay(props: PlaybackOverlayProps) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        padding: '6px 10px',
+        borderRadius: 24,
+        border: `1px solid ${overlayColors.border}`,
+        background: overlayColors.controlBackground,
+        color: overlayColors.text,
+        zIndex: 1,
+      }}
+    >
+      <PlaybackControls {...props} />
     </div>
   )
 }

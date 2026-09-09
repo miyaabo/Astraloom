@@ -51,7 +51,6 @@ import { ControlMenuOverlay } from './ControlMenuOverlay'
 import { ImmersiveModeToggle } from './ImmersiveModeToggle'
 import { findLocationPreset, locationPresets } from './locationPresets'
 import { NextConstellationButton } from './NextConstellationButton'
-import { PlaybackOverlay } from './PlaybackOverlay'
 import { SettingsOverlay } from './SettingsOverlay'
 import type { PlaybackDirection } from './playback/playbackTime'
 import {
@@ -66,6 +65,7 @@ import { SearchOverlay } from './SearchOverlay'
 import { SelectionOverlay } from './SelectionOverlay'
 import { SaveSceneButton } from './SaveSceneButton'
 import { SkySelectionSection } from './SkySelectionSection'
+import { TimeControlsSection } from './TimeControlsSection'
 import { equatorialToHorizontal } from './astronomy/coordinates'
 import { generateCelestialBodyRenderData } from './celestialBodies/celestialBodyDataSource'
 import {
@@ -1014,6 +1014,19 @@ export function Starfield() {
                 onLocationChange={handleLocationChange}
               />
             }
+            timeSection={
+              <TimeControlsSection
+                isPlaying={isPlaying}
+                onTogglePlaying={() => setIsPlaying((current) => !current)}
+                speedMagnitude={speedMagnitude}
+                onSpeedChange={setSpeedMagnitude}
+                direction={direction}
+                onToggleDirection={() =>
+                  setDirection((current) => (current === 1 ? -1 : 1))
+                }
+                onReturnToCurrentTime={() => handleDateChange(new Date())}
+              />
+            }
           />
           <SearchOverlay
             isOpen={displayState.activePanel === 'search'}
@@ -1032,16 +1045,6 @@ export function Starfield() {
             onSelectStar={handleSelectStarResult}
           />
           <NextConstellationButton onClick={handleNextConstellation} />
-          <PlaybackOverlay
-            isPlaying={isPlaying}
-            onTogglePlaying={() => setIsPlaying((current) => !current)}
-            speedMagnitude={speedMagnitude}
-            onSpeedChange={setSpeedMagnitude}
-            direction={direction}
-            onToggleDirection={() =>
-              setDirection((current) => (current === 1 ? -1 : 1))
-            }
-          />
           <SaveSceneButton status={saveStatus} onSave={handleSaveScene} />
           <SettingsOverlay
             isOpen={displayState.activePanel === 'settings'}
