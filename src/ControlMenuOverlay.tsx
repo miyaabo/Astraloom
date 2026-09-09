@@ -108,6 +108,17 @@ export function ControlMenuOverlay({
               boxShadow: '0 12px 32px rgba(0, 0, 0, 0.32)',
             }}
           >
+            <div style={menuHeaderStyle}>
+              <span>操作メニュー</span>
+              <button
+                type="button"
+                onClick={onCloseMenu}
+                aria-label="パネルを閉じる"
+                style={closeButtonStyle}
+              >
+                ×
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => onToggleSection('sky')}
@@ -161,6 +172,28 @@ const summaryStyle = {
   background: 'transparent',
   color: overlayColors.text,
   textAlign: 'left' as const,
+  cursor: 'pointer',
+}
+
+const menuHeaderStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 4,
+  paddingLeft: 4,
+  fontSize: 13,
+  fontWeight: 600,
+}
+
+const closeButtonStyle = {
+  width: 32,
+  height: 32,
+  border: 'none',
+  borderRadius: 16,
+  background: 'transparent',
+  color: overlayColors.text,
+  fontSize: 24,
+  lineHeight: 1,
   cursor: 'pointer',
 }
 

@@ -104,6 +104,18 @@ describe('displayState', () => {
     })
   })
 
+  it('keeps the control menu open while showing selection information', () => {
+    const state = openSelectionInfo(
+      toggleControlMenuSection(createInitialDisplayState(), 'search'),
+    )
+
+    expect(state).toMatchObject({
+      isControlMenuOpen: true,
+      activeControlMenuSection: 'search',
+      isSelectionInfoOpen: true,
+    })
+  })
+
   it('enters immersive mode by clearing transient panels and text overlays', () => {
     const state = openSelectionInfo(
       toggleOverlayPanel(createInitialDisplayState(), 'search'),

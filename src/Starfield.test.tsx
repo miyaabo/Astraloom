@@ -242,6 +242,12 @@ describe('Starfield', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sirius (シリウス)' }))
 
     expect(lookAt).toHaveBeenLastCalledWith(0, 90)
+    expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
+    expect(
+      screen.getByRole('button', { name: '空を探す' }).getAttribute(
+        'aria-expanded',
+      ),
+    ).toBe('true')
   })
 
   it('relocates and moves the view to a searched celestial body', () => {
@@ -362,6 +368,15 @@ describe('Starfield', () => {
 
     expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
     expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
+  })
+
+  it('closes the menu through its dedicated close button', () => {
+    render(<Starfield />)
+    fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+
+    fireEvent.click(screen.getByLabelText('パネルを閉じる'))
+
+    expect(screen.queryByLabelText('操作メニュー')).toBeNull()
   })
 
   it('closes display settings when another menu section is opened', () => {
