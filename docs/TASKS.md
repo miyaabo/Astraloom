@@ -6,7 +6,7 @@
 ## Current Status
 
 - Current phase: 操作・設定導線の再設計(#15) — Small Spec 作成済み、実装未着手
-- Next task: [`操作・設定導線の再設計 実装タスク`](features/control-navigation-implementation-tasks.md)の Task 1（操作 UI の状態モデルを再設計する）
+- Next task: [`操作・設定導線の再設計 実装タスク`](features/control-navigation-implementation-tasks.md)の Task 2（ハンバーガーと左サイドパネルを実装する）
 - GitHub Issue 記録: [`ISSUE_DRAFTS.md`](ISSUE_DRAFTS.md)
 - 今後の開発整理: [`FUTURE_DEVELOPMENT.md`](FUTURE_DEVELOPMENT.md)（まだ追加 Issue は作成しない）
 - Issue テンプレート: [`ISSUE_TEMPLATE.md`](ISSUE_TEMPLATE.md)

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   canAutoHideChrome,
+  closeControlMenu,
   closeOverlayPanel,
   closeSelectionInfo,
   createInitialDisplayState,
@@ -10,6 +11,8 @@ import {
   openSelectionInfo,
   requestChromeAutoHide,
   revealChrome,
+  toggleControlMenu,
+  toggleControlMenuSection,
   toggleNightModeUi,
   toggleProjectorMode,
   toggleOverlayPanel,
@@ -19,11 +22,54 @@ describe('displayState', () => {
   it('starts in standard mode with no open panel or selection info', () => {
     expect(createInitialDisplayState()).toEqual({
       activePanel: null,
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
       isProjectorMode: false,
       isNightModeUi: false,
+    })
+  })
+
+  it('opens and closes the control menu without retaining a legacy overlay', () => {
+    const legacyOverlay = toggleOverlayPanel(
+      createInitialDisplayState(),
+      'date',
+    )
+    const opened = toggleControlMenu(legacyOverlay)
+
+    expect(opened).toMatchObject({
+      activePanel: null,
+      isControlMenuOpen: true,
+      activeControlMenuSection: null,
+      chromeVisibility: 'visible',
+    })
+    expect(toggleControlMenu(opened)).toMatchObject({
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
+    })
+    expect(closeControlMenu(createInitialDisplayState())).toEqual(
+      createInitialDisplayState(),
+    )
+  })
+
+  it('keeps at most one control-menu section expanded', () => {
+    const sky = toggleControlMenuSection(createInitialDisplayState(), 'sky')
+    const time = toggleControlMenuSection(sky, 'time')
+    const collapsed = toggleControlMenuSection(time, 'time')
+
+    expect(sky).toMatchObject({
+      isControlMenuOpen: true,
+      activeControlMenuSection: 'sky',
+    })
+    expect(time).toMatchObject({
+      isControlMenuOpen: true,
+      activeControlMenuSection: 'time',
+    })
+    expect(collapsed).toMatchObject({
+      isControlMenuOpen: true,
+      activeControlMenuSection: null,
     })
   })
 
@@ -48,6 +94,8 @@ describe('displayState', () => {
 
     expect(closeSelectionInfo(state)).toEqual({
       activePanel: 'search',
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
@@ -63,6 +111,8 @@ describe('displayState', () => {
 
     expect(enterImmersiveMode(state)).toEqual({
       activePanel: null,
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'immersive',
       chromeVisibility: 'visible',
@@ -89,6 +139,11 @@ describe('displayState', () => {
     expect(canAutoHideChrome(openSelectionInfo(createInitialDisplayState()))).toBe(
       false,
     )
+    expect(
+      canAutoHideChrome(
+        toggleControlMenuSection(createInitialDisplayState(), 'search'),
+      ),
+    ).toBe(false)
     expect(canAutoHideChrome(createInitialDisplayState())).toBe(true)
   })
 
@@ -107,6 +162,8 @@ describe('displayState', () => {
 
     expect(enabled).toEqual({
       activePanel: 'date',
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',
@@ -123,6 +180,8 @@ describe('displayState', () => {
 
     expect(enabled).toEqual({
       activePanel: null,
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'standard',
       chromeVisibility: 'visible',

@@ -9,7 +9,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 | # | Task | Status |
 |---|---|---|
-| 1 | 操作 UI の状態モデルを再設計する | Not Started |
+| 1 | 操作 UI の状態モデルを再設計する | Done |
 | 2 | ハンバーガーと左サイドパネルを実装する | Not Started |
 | 3 | 「空を選ぶ」を統合する | Not Started |
 | 4 | 「時間を動かす」を統合する | Not Started |
@@ -20,7 +20,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 1 — 操作 UI の状態モデルを再設計する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -32,13 +32,13 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 - section は「空を選ぶ」「時間を動かす」「空を探す」「表示・投影」のいずれか 1 つだけを展開できるようにする
 - パネルが閉じており、選択情報・フォーム入力がない場合だけ、5 秒後に UI を隠せる条件を定義する
 - 星空の空白操作で UI を再表示する状態遷移を定義する
-- `displayState.mode` による専用鑑賞モードを廃止する移行経路を用意する
+- `displayState.mode` による専用鑑賞モードは、旧 UI を撤去する Task 7 で安全に削除できるよう、以後の統合 UI が依存しない状態モデルにする
 
 ### Done
 
-- [ ] 状態遷移だけで、パネル開閉・section 排他・自動非表示・再表示を表現できる
-- [ ] unit test で各状態遷移と自動非表示の抑止条件を確認できる
-- [ ] 天体選択と UI 再表示の責務が混ざっていない
+- [x] 状態遷移だけで、パネル開閉・section 排他・自動非表示・再表示を表現できる
+- [x] unit test で各状態遷移と自動非表示の抑止条件を確認できる
+- [x] 天体選択と UI 再表示の責務が混ざっていない
 
 ## Task 2 — ハンバーガーと左サイドパネルを実装する
 

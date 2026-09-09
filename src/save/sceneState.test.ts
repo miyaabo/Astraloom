@@ -280,6 +280,8 @@ describe('sceneState', () => {
 
     expect(restored).toEqual({
       activePanel: null,
+      isControlMenuOpen: false,
+      activeControlMenuSection: null,
       isSelectionInfoOpen: false,
       mode: 'immersive',
       chromeVisibility: 'visible',
