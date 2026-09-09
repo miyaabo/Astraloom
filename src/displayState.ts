@@ -99,7 +99,12 @@ export function closeOverlayPanel(state: DisplayState): DisplayState {
 }
 
 export function openSelectionInfo(state: DisplayState): DisplayState {
-  if (state.isSelectionInfoOpen && state.chromeVisibility === 'visible') {
+  if (
+    state.isSelectionInfoOpen &&
+    state.chromeVisibility === 'visible' &&
+    !state.isControlMenuOpen &&
+    state.activeControlMenuSection === null
+  ) {
     return state
   }
   return {

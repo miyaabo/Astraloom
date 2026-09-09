@@ -17,6 +17,8 @@ interface ControlMenuOverlayProps {
   onToggleSection: (section: ControlMenuSection) => void
   skySection: ReactNode
   timeSection: ReactNode
+  searchSection: ReactNode
+  displaySection: ReactNode
 }
 
 const sectionLabels: Record<ControlMenuSection, string> = {
@@ -52,6 +54,8 @@ export function ControlMenuOverlay({
   onToggleSection,
   skySection,
   timeSection,
+  searchSection,
+  displaySection,
 }: ControlMenuOverlayProps) {
   const summary = `${locationLabel ?? '現在地'} · ${formatCurrentSky(date, timeZoneId)}`
 
@@ -132,7 +136,9 @@ export function ControlMenuOverlay({
                       ? skySection
                       : section === 'time'
                         ? timeSection
-                        : null
+                        : section === 'search'
+                          ? searchSection
+                          : displaySection
                     : null}
                 </div>
               ),

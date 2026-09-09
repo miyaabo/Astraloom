@@ -69,6 +69,16 @@ function openTimeControls(): void {
   fireEvent.click(screen.getByRole('button', { name: '時間を動かす' }))
 }
 
+function openSearch(): void {
+  fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+  fireEvent.click(screen.getByRole('button', { name: '空を探す' }))
+}
+
+function openDisplaySettings(): void {
+  fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+  fireEvent.click(screen.getByRole('button', { name: '表示・投影' }))
+}
+
 describe('Starfield', () => {
   beforeEach(() => {
     window.localStorage.clear()
@@ -223,37 +233,35 @@ describe('Starfield', () => {
     expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
   })
 
-  it('keeps search navigation above the horizon when a matched star is currently below it', () => {
+  it('relocates and moves the view to a searched star', () => {
     render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Sirius' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Sirius (シリウス)' }))
 
-    expect(lookAt).toHaveBeenCalled()
-    expect(lookAt.mock.calls.at(-1)?.[1]).toBeGreaterThanOrEqual(2)
+    expect(lookAt).toHaveBeenLastCalledWith(0, 90)
   })
 
-  it('moves the camera to a searched celestial body and clears prior star selection UI', () => {
+  it('relocates and moves the view to a searched celestial body', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Sirius' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Sirius (シリウス)' }))
     expect(screen.getByLabelText('選択情報を閉じる')).toBeTruthy()
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Moon' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Moon (月)' }))
 
-    expect(lookAt).toHaveBeenCalled()
     expect(highlightCelestialBody).toHaveBeenLastCalledWith('moon')
-    expect(lookAt.mock.calls.at(-1)?.[1]).toBeGreaterThanOrEqual(2)
+    expect(lookAt.mock.calls.at(-1)?.[1]).toBeGreaterThan(80)
     expect(screen.getByLabelText('選択情報を閉じる')).toBeTruthy()
     expect(screen.getByText('種別: 月')).toBeTruthy()
     expect(screen.getByText(/見え方:/)).toBeTruthy()
@@ -262,7 +270,7 @@ describe('Starfield', () => {
   it('keeps the constellation selection after closing the description, until explicitly cleared', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Aquila' },
     })
@@ -288,25 +296,25 @@ describe('Starfield', () => {
     render(<Starfield />)
 
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
     expect(screen.queryByLabelText('再生を開始')).toBeNull()
 
     fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
 
     expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
-    expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
+    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
 
     fireEvent.click(screen.getByLabelText('通常表示に戻る'))
 
     expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
     expect(screen.queryByLabelText('再生を開始')).toBeNull()
   })
 
   it('keeps the active selection when entering immersive mode, while hiding its UI', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Aquila' },
     })
@@ -331,50 +339,45 @@ describe('Starfield', () => {
     vi.useFakeTimers()
     render(<Starfield />)
 
-    expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
     expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
 
     act(() => {
       vi.advanceTimersByTime(5000)
     })
 
-    expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
     expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
     vi.useRealTimers()
   })
 
-  it('opens and closes the settings panel via the gear button', () => {
+  it('shows display settings only in the display section', () => {
     render(<Starfield />)
 
     expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
-    expect(screen.getByLabelText('設定を開く')).toBeTruthy()
+    openDisplaySettings()
 
-    fireEvent.click(screen.getByLabelText('設定を開く'))
-
-    expect(screen.getByLabelText('設定を閉じる')).toBeTruthy()
     expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
     expect(screen.getByLabelText('夜間モードを有効化')).toBeTruthy()
 
-    fireEvent.click(screen.getByLabelText('設定を閉じる'))
+    fireEvent.click(screen.getByRole('button', { name: '表示・投影' }))
 
     expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
-    expect(screen.getByLabelText('設定を開く')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
   })
 
-  it('closes the settings panel when another overlay panel is opened', () => {
+  it('closes display settings when another menu section is opened', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('設定を開く'))
+    openDisplaySettings()
     expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    fireEvent.click(screen.getByRole('button', { name: '空を探す' }))
 
     expect(screen.queryByLabelText('プロジェクター補正を有効化')).toBeNull()
   })
 
-  it('toggles projector adjustments through the settings panel', () => {
+  it('toggles projector adjustments through the display section', () => {
     render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('設定を開く'))
+    openDisplaySettings()
 
     expect(screen.getByLabelText('プロジェクター補正を有効化')).toBeTruthy()
     fireEvent.click(screen.getByLabelText('プロジェクター補正を有効化'))
@@ -386,9 +389,9 @@ describe('Starfield', () => {
     expect(applyProjectorMode).toHaveBeenLastCalledWith(false)
   })
 
-  it('toggles night mode UI through the settings panel', () => {
+  it('toggles night mode UI through the display section', () => {
     render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('設定を開く'))
+    openDisplaySettings()
     applyProjectorMode.mockClear()
 
     expect(screen.getByLabelText('夜間モードを有効化')).toBeTruthy()
@@ -403,12 +406,12 @@ describe('Starfield', () => {
 
   it('does not show a fullscreen control when the Fullscreen API is unsupported', () => {
     render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('設定を開く'))
+    openDisplaySettings()
 
     expect(screen.queryByLabelText('フルスクリーン表示にする')).toBeNull()
   })
 
-  it('toggles fullscreen through the settings panel when the Fullscreen API is available', () => {
+  it('toggles fullscreen through the display section when the Fullscreen API is available', () => {
     const requestFullscreen = vi.fn(() => Promise.resolve())
     const exitFullscreen = vi.fn(() => Promise.resolve())
     document.documentElement.requestFullscreen = requestFullscreen
@@ -416,7 +419,7 @@ describe('Starfield', () => {
 
     try {
       render(<Starfield />)
-      fireEvent.click(screen.getByLabelText('設定を開く'))
+      openDisplaySettings()
 
       expect(screen.getByLabelText('フルスクリーン表示にする')).toBeTruthy()
       fireEvent.click(screen.getByLabelText('フルスクリーン表示にする'))
@@ -442,14 +445,14 @@ describe('Starfield', () => {
     }
   })
 
-  it('saves the current scene into local storage from the save button', () => {
+  it('saves the current scene into local storage from the display section', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('設定を開く'))
+    openDisplaySettings()
     fireEvent.click(screen.getByLabelText('プロジェクター補正を有効化'))
     fireEvent.click(screen.getByLabelText('現在のシーンを保存'))
 
-    expect(screen.getByText('保存済み')).toBeTruthy()
+    expect(screen.getByText('保存しました')).toBeTruthy()
     expect(loadSceneFromStorage(window.localStorage)?.scene).toMatchObject({
       location: {
         label: '東京',
@@ -487,7 +490,7 @@ describe('Starfield', () => {
   it('does not auto-hide standard chrome while an overlay panel is open', () => {
     vi.useFakeTimers()
     render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
 
     act(() => {
       vi.advanceTimersByTime(3000)
@@ -501,7 +504,7 @@ describe('Starfield', () => {
     vi.useFakeTimers()
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Sirius' },
     })
@@ -516,14 +519,14 @@ describe('Starfield', () => {
     act(() => {
       vi.advanceTimersByTime(3000)
     })
-    expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
     vi.useRealTimers()
   })
 
   it('updates celestial body info when the date changes while it stays selected', () => {
     render(<Starfield />)
 
-    fireEvent.click(screen.getByLabelText('星・星座を検索'))
+    openSearch()
     fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
       target: { value: 'Moon' },
     })
@@ -579,7 +582,7 @@ describe('Starfield', () => {
     expect(restoreViewState).toHaveBeenCalledWith(210, 12, 55)
     expect(applyProjectorMode).toHaveBeenCalledWith(true)
     expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
-    expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
+    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
   })
 
   it('preserves restored location metadata when saving again before changing location', () => {
@@ -614,6 +617,7 @@ describe('Starfield', () => {
     )
 
     render(<Starfield />)
+    openDisplaySettings()
     fireEvent.click(screen.getByLabelText('現在のシーンを保存'))
 
     expect(

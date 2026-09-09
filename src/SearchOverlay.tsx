@@ -32,6 +32,43 @@ interface SearchOverlayProps {
   onSelectStar: (star: HygStarRecord) => void
 }
 
+type SearchContentProps = Omit<SearchOverlayProps, 'isOpen' | 'onToggleOpen'>
+
+/** Reusable search content for the unified "空を探す" section. */
+export function SearchContent({
+  onSelectCelestialBody,
+  onSelectConstellation,
+  onSelectStar,
+}: SearchContentProps) {
+  const [query, setQuery] = useState('')
+  const trimmedQuery = query.trim()
+  const results = searchCatalog(query)
+
+  return (
+    <>
+      <input
+        type="text"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="星座名・星名・主要天体で検索"
+        aria-label="星座名・星名・主要天体で検索"
+        style={{ display: 'block', width: '100%', boxSizing: 'border-box', padding: '6px 8px', fontSize: 16, borderRadius: 6, border: `1px solid ${overlayColors.border}`, background: overlayColors.controlBackground, color: overlayColors.text }}
+      />
+      {trimmedQuery.length > 0 && <ul style={{ listStyle: 'none', margin: '8px 0 0', padding: 0, maxHeight: 240, overflowY: 'auto' }}>
+        {results.length === 0 && <li style={{ opacity: 0.6, padding: '4px 2px' }}>該当なし</li>}
+        {results.map((result) => {
+          const key = result.type === 'constellation' ? `constellation-${result.constellation.name}` : result.type === 'celestialBody' ? `celestial-${result.celestialBody.id}` : `star-${result.star.id}`
+          return <li key={key}><button type="button" onClick={() => {
+            if (result.type === 'constellation') return onSelectConstellation(result.constellation)
+            if (result.type === 'celestialBody') return onSelectCelestialBody(result.celestialBody)
+            onSelectStar(result.star)
+          }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 4px', border: 'none', background: 'transparent', color: overlayColors.text, cursor: 'pointer' }}>{searchResultDisplayName(result)}</button></li>
+        })}
+      </ul>}
+    </>
+  )
+}
+
 export function SearchOverlay({
   isOpen,
   onToggleOpen,
@@ -39,10 +76,6 @@ export function SearchOverlay({
   onSelectConstellation,
   onSelectStar,
 }: SearchOverlayProps) {
-  const [query, setQuery] = useState('')
-  const trimmedQuery = query.trim()
-  const results = searchCatalog(query)
-
   return (
     <div
       style={{
@@ -63,86 +96,7 @@ export function SearchOverlay({
       </button>
 
       {isOpen && (
-        <div style={{ ...overlayPanelStyle('left'), minWidth: 200 }}>
-          <input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="星座名・星名・主要天体で検索"
-            aria-label="星座名・星名・主要天体で検索"
-            style={{
-              display: 'block',
-              width: '100%',
-              boxSizing: 'border-box',
-              padding: '6px 8px',
-              borderRadius: 6,
-              border: `1px solid ${overlayColors.border}`,
-              background: overlayColors.controlBackground,
-              color: overlayColors.text,
-            }}
-          />
-
-          {trimmedQuery.length > 0 && (
-            <ul
-              style={{
-                listStyle: 'none',
-                margin: '8px 0 0',
-                padding: 0,
-                maxHeight: 240,
-                overflowY: 'auto',
-              }}
-            >
-              {results.length === 0 && (
-                <li style={{ opacity: 0.6, padding: '4px 2px' }}>該当なし</li>
-              )}
-              {results.map((result) => {
-                const key = (() => {
-                  if (result.type === 'constellation') {
-                    return `constellation-${result.constellation.name}`
-                  }
-
-                  if (result.type === 'celestialBody') {
-                    return `celestial-${result.celestialBody.id}`
-                  }
-
-                  return `star-${result.star.id}`
-                })()
-                return (
-                  <li key={key}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (result.type === 'constellation') {
-                          onSelectConstellation(result.constellation)
-                          return
-                        }
-
-                        if (result.type === 'celestialBody') {
-                          onSelectCelestialBody(result.celestialBody)
-                          return
-                        }
-
-                        onSelectStar(result.star)
-                      }}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '6px 4px',
-                        border: 'none',
-                        background: 'transparent',
-                        color: overlayColors.text,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {searchResultDisplayName(result)}
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
+        <div style={{ ...overlayPanelStyle('left'), minWidth: 200 }}><SearchContent onSelectCelestialBody={onSelectCelestialBody} onSelectConstellation={onSelectConstellation} onSelectStar={onSelectStar} /></div>
       )}
     </div>
   )

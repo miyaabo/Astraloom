@@ -5,8 +5,8 @@
 
 ## Current Status
 
-- Current phase: 操作・設定導線の再設計(#15) — Task 4（時間を動かす）まで実装済み
-- Next task: [`操作・設定導線の再設計 実装タスク`](features/control-navigation-implementation-tasks.md)の Task 5（「空を探す」を統合する）
+- Current phase: 操作・設定導線の再設計(#15) — Task 6（「表示・投影」と保存の統合）まで実装済み
+- Next task: [`操作・設定導線の再設計 実装タスク`](features/control-navigation-implementation-tasks.md)の Task 7（旧 UI を撤去し、保存互換性を確保する）
 - GitHub Issue 記録: [`ISSUE_DRAFTS.md`](ISSUE_DRAFTS.md)
 - 今後の開発整理: [`FUTURE_DEVELOPMENT.md`](FUTURE_DEVELOPMENT.md)（まだ追加 Issue は作成しない）
 - Issue テンプレート: [`ISSUE_TEMPLATE.md`](ISSUE_TEMPLATE.md)

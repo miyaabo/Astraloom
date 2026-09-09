@@ -13,8 +13,8 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 | 2 | ハンバーガーと左サイドパネルを実装する | Done |
 | 3 | 「空を選ぶ」を統合する | Done |
 | 4 | 「時間を動かす」を統合する | Done |
-| 5 | 「空を探す」を統合する | Not Started |
-| 6 | 「表示・投影」と保存を統合する | Not Started |
+| 5 | 「空を探す」を統合する | Done |
+| 6 | 「表示・投影」と保存を統合する | Done |
 | 7 | 旧 UI を撤去し、保存互換性を確保する | Not Started |
 | 8 | 自動検証と Human Check を完了する | Not Started |
 
@@ -106,7 +106,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 5 — 「空を探す」を統合する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -121,13 +121,13 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] 星・星座・主要天体を既存と同じ名前で検索できる
-- [ ] 結果選択後に天体選択・情報表示が壊れない
-- [ ] 検索入力中は UI 自動非表示が発生しない
+- [x] 星・星座・主要天体を既存と同じ名前で検索できる
+- [x] 結果選択後に天体選択・情報表示が壊れない
+- [x] 検索入力中は UI 自動非表示が発生しない
 
 ## Task 6 — 「表示・投影」と保存を統合する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -143,9 +143,9 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] 表示・投影の 3 操作が section 内で機能する
-- [ ] 保存後に成功／失敗を分かる形で表示できる
-- [ ] 保存時に、場所・日時・再生・視点・表示設定の既存保存範囲を維持する
+- [x] 表示・投影の 3 操作が section 内で機能する
+- [x] 保存後に成功／失敗を分かる形で表示できる
+- [x] 保存時に、場所・日時・再生・視点・表示設定の既存保存範囲を維持する
 
 ## Task 7 — 旧 UI を撤去し、保存互換性を確保する
 

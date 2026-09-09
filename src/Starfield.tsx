@@ -45,13 +45,11 @@ import {
   toggleControlMenuSection,
   toggleNightModeUi,
   toggleProjectorMode,
-  toggleOverlayPanel,
 } from './displayState'
 import { ControlMenuOverlay } from './ControlMenuOverlay'
 import { ImmersiveModeToggle } from './ImmersiveModeToggle'
 import { findLocationPreset, locationPresets } from './locationPresets'
 import { NextConstellationButton } from './NextConstellationButton'
-import { SettingsOverlay } from './SettingsOverlay'
 import type { PlaybackDirection } from './playback/playbackTime'
 import {
   accumulatePlaybackTick,
@@ -61,12 +59,12 @@ import { usePlaybackClock } from './playback/usePlaybackClock'
 import { attachCameraControls } from './render/cameraControls'
 import type { LabelTarget } from './render/StarfieldRenderer'
 import { StarfieldRenderer } from './render/StarfieldRenderer'
-import { SearchOverlay } from './SearchOverlay'
+import { SearchSection } from './SearchSection'
 import { SelectionOverlay } from './SelectionOverlay'
-import { SaveSceneButton } from './SaveSceneButton'
 import { SkySelectionSection } from './SkySelectionSection'
 import { TimeControlsSection } from './TimeControlsSection'
-import { equatorialToHorizontal } from './astronomy/coordinates'
+import { DisplaySettingsSection } from './DisplaySettingsSection'
+import { equatorialToHorizontal, zenithObserverLocation } from './astronomy/coordinates'
 import { generateCelestialBodyRenderData } from './celestialBodies/celestialBodyDataSource'
 import {
   createDisplayStateFromSavedScene,
@@ -943,6 +941,30 @@ export function Starfield() {
     }
   }
 
+  // Search is for identifying an object, not changing the current view.
+  function handleSelectCelestialBodyFromSearch(celestialBody: CelestialBodySearchRecord): void {
+    if (displayState.mode === 'immersive') return
+    clearSelection()
+    const currentState = findCelestialBodyState(celestialBody.id, location, date)
+    const searchLocation = zenithObserverLocation(currentState.equatorial, date)
+    handleLocationChange(searchLocation)
+    setLocationMetadata({ label: describeComputedLocation(searchLocation), timeZoneId: 'Etc/UTC' })
+    const state = findCelestialBodyState(celestialBody.id, searchLocation, date)
+    selectedCelestialBodyIdRef.current = celestialBody.id
+    rendererRef.current?.highlightCelestialBody(celestialBody.id)
+    setSelectedStarInfo(buildSelectedCelestialBodyInfo(state))
+    setDisplayState((current) => openSelectionInfo(current))
+    rendererRef.current?.lookAt(state.horizontal.azimuthDegrees, state.horizontal.altitudeDegrees)
+  }
+
+  function handleSelectStarFromSearch(star: HygStarRecord): void {
+    const searchLocation = zenithObserverLocation({ raHours: star.raHours, decDegrees: star.decDegrees }, date)
+    handleLocationChange(searchLocation)
+    setLocationMetadata({ label: describeComputedLocation(searchLocation), timeZoneId: 'Etc/UTC' })
+    selectStar(star, findConstellationByStarId(star.id))
+    rendererRef.current?.lookAt(0, 90)
+  }
+
   // Constellations whose visible portion sits below this altitude are
   // treated as "just grazing the horizon", matching
   // celestialBodyInfo.ts's describeVisibility bar ("地平線近くに見える"
@@ -1027,17 +1049,26 @@ export function Starfield() {
                 onReturnToCurrentTime={() => handleDateChange(new Date())}
               />
             }
-          />
-          <SearchOverlay
-            isOpen={displayState.activePanel === 'search'}
-            onToggleOpen={() =>
-              setDisplayState((current) =>
-                toggleOverlayPanel(current, 'search'),
-              )
+            searchSection={
+              <SearchSection
+                onSelectCelestialBody={handleSelectCelestialBodyFromSearch}
+                onSelectConstellation={handleSelectConstellationFromList}
+                onSelectStar={handleSelectStarFromSearch}
+              />
             }
-            onSelectCelestialBody={handleSelectCelestialBodyResult}
-            onSelectConstellation={handleSelectConstellationFromList}
-            onSelectStar={handleSelectStarResult}
+            displaySection={
+              <DisplaySettingsSection
+                isProjectorMode={displayState.isProjectorMode}
+                onToggleProjectorMode={handleToggleProjectorMode}
+                isNightModeUi={displayState.isNightModeUi}
+                onToggleNightModeUi={handleToggleNightModeUi}
+                isFullscreenSupported={isFullscreenSupported()}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={handleToggleFullscreen}
+                saveStatus={saveStatus}
+                onSave={handleSaveScene}
+              />
+            }
           />
           <SelectionOverlay
             onSelectCelestialBody={handleSelectCelestialBodyResult}
@@ -1045,22 +1076,6 @@ export function Starfield() {
             onSelectStar={handleSelectStarResult}
           />
           <NextConstellationButton onClick={handleNextConstellation} />
-          <SaveSceneButton status={saveStatus} onSave={handleSaveScene} />
-          <SettingsOverlay
-            isOpen={displayState.activePanel === 'settings'}
-            onToggleOpen={() =>
-              setDisplayState((current) =>
-                toggleOverlayPanel(current, 'settings'),
-              )
-            }
-            isProjectorMode={displayState.isProjectorMode}
-            onToggleProjectorMode={handleToggleProjectorMode}
-            isNightModeUi={displayState.isNightModeUi}
-            onToggleNightModeUi={handleToggleNightModeUi}
-            isFullscreenSupported={isFullscreenSupported()}
-            isFullscreen={isFullscreen}
-            onToggleFullscreen={handleToggleFullscreen}
-          />
           <StarInfoOverlay
             info={selectedStarInfo}
             isOpen={displayState.isSelectionInfoOpen}
