@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { ControlMenuSection } from './displayState'
 import {
   overlayButtonStyle,
@@ -14,6 +15,7 @@ interface ControlMenuOverlayProps {
   onToggleMenu: () => void
   onCloseMenu: () => void
   onToggleSection: (section: ControlMenuSection) => void
+  skySection: ReactNode
 }
 
 const sectionLabels: Record<ControlMenuSection, string> = {
@@ -47,6 +49,7 @@ export function ControlMenuOverlay({
   onToggleMenu,
   onCloseMenu,
   onToggleSection,
+  skySection,
 }: ControlMenuOverlayProps) {
   const summary = `${locationLabel ?? '現在地'} · ${formatCurrentSky(date, timeZoneId)}`
 
@@ -110,18 +113,22 @@ export function ControlMenuOverlay({
             </button>
             {(Object.keys(sectionLabels) as ControlMenuSection[]).map(
               (section) => (
-                <button
-                  key={section}
-                  type="button"
-                  onClick={() => onToggleSection(section)}
-                  aria-expanded={activeSection === section}
-                  style={sectionStyle}
-                >
-                  {sectionLabels[section]}
-                  <span aria-hidden="true">
-                    {activeSection === section ? '−' : '+'}
-                  </span>
-                </button>
+                <div key={section}>
+                  <button
+                    type="button"
+                    onClick={() => onToggleSection(section)}
+                    aria-expanded={activeSection === section}
+                    style={sectionStyle}
+                  >
+                    {sectionLabels[section]}
+                    <span aria-hidden="true">
+                      {activeSection === section ? '−' : '+'}
+                    </span>
+                  </button>
+                  {section === 'sky' && activeSection === 'sky'
+                    ? skySection
+                    : null}
+                </div>
               ),
             )}
           </aside>

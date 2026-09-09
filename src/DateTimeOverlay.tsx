@@ -62,6 +62,35 @@ interface DateTimeOverlayProps {
   timeZoneId: string
 }
 
+interface DateTimeFieldProps {
+  date: Date
+  onChange: (date: Date) => void
+  /** IANA time zone of the currently selected observer location. */
+  timeZoneId: string
+}
+
+/** Reusable date field so it can live inside the unified control menu. */
+export function DateTimeField({
+  date,
+  onChange,
+  timeZoneId,
+}: DateTimeFieldProps) {
+  return (
+    <label style={{ display: 'block', marginBottom: 12 }}>
+      日時 <span style={{ opacity: 0.6, fontSize: 12 }}>({timeZoneId})</span>
+      <input
+        type="datetime-local"
+        value={toDateTimeLocalValue(date, timeZoneId)}
+        onChange={(event) => {
+          const parsed = fromDateTimeLocalValue(event.target.value, timeZoneId)
+          if (parsed) onChange(parsed)
+        }}
+        style={{ display: 'block', width: '100%', marginTop: 4 }}
+      />
+    </label>
+  )
+}
+
 export function DateTimeOverlay({
   date,
   onChange,
@@ -90,22 +119,11 @@ export function DateTimeOverlay({
 
       {isOpen && (
         <div style={overlayPanelStyle('right')}>
-          <label style={{ display: 'block', marginBottom: 6 }}>
-            日時{' '}
-            <span style={{ opacity: 0.6, fontSize: 12 }}>({timeZoneId})</span>
-            <input
-              type="datetime-local"
-              value={toDateTimeLocalValue(date, timeZoneId)}
-              onChange={(event) => {
-                const parsed = fromDateTimeLocalValue(
-                  event.target.value,
-                  timeZoneId,
-                )
-                if (parsed) onChange(parsed)
-              }}
-              style={{ display: 'block', marginTop: 4 }}
-            />
-          </label>
+          <DateTimeField
+            date={date}
+            onChange={onChange}
+            timeZoneId={timeZoneId}
+          />
         </div>
       )}
     </div>

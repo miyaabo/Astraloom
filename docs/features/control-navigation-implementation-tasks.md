@@ -11,7 +11,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 |---|---|---|
 | 1 | 操作 UI の状態モデルを再設計する | Done |
 | 2 | ハンバーガーと左サイドパネルを実装する | Done |
-| 3 | 「空を選ぶ」を統合する | Not Started |
+| 3 | 「空を選ぶ」を統合する | Done |
 | 4 | 「時間を動かす」を統合する | Not Started |
 | 5 | 「空を探す」を統合する | Not Started |
 | 6 | 「表示・投影」と保存を統合する | Not Started |
@@ -65,7 +65,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 3 — 「空を選ぶ」を統合する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -80,9 +80,9 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] 日時・場所を変更すると星空と要約が正しく更新される
-- [ ] 遠隔地のタイムゾーンとして日時入力を解釈する既存仕様を維持する
-- [ ] 変更のたびにパネルが閉じない
+- [x] 日時・場所を変更すると星空と要約が正しく更新される
+- [x] 遠隔地のタイムゾーンとして日時入力を解釈する既存仕様を維持する
+- [x] 変更のたびにパネルが閉じない
 
 ## Task 4 — 「時間を動かす」を統合する
 

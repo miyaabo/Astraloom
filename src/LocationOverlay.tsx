@@ -28,6 +28,36 @@ interface LocationOverlayProps {
   onToggleOpen: () => void
 }
 
+interface LocationFieldProps {
+  location: ObserverLocation
+  onChange: (location: ObserverLocation) => void
+}
+
+/** Reusable location field so it can live inside the unified control menu. */
+export function LocationField({ location, onChange }: LocationFieldProps) {
+  return (
+    <label style={{ display: 'block', marginBottom: 12 }}>
+      場所
+      <select
+        value={findLocationPreset(location).name}
+        onChange={(event) => {
+          const preset = locationPresets.find(
+            (item) => item.name === event.target.value,
+          )
+          if (preset) onChange(preset.location)
+        }}
+        style={{ display: 'block', width: '100%', marginTop: 4 }}
+      >
+        {locationPresets.map((preset) => (
+          <option key={preset.name} value={preset.name}>
+            {preset.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
 export function LocationOverlay({
   location,
   onChange,
@@ -55,25 +85,7 @@ export function LocationOverlay({
 
       {isOpen && (
         <div style={overlayPanelStyle('right')}>
-          <label style={{ display: 'block', marginBottom: 6 }}>
-            場所
-            <select
-              value={findLocationPreset(location).name}
-              onChange={(event) => {
-                const preset = locationPresets.find(
-                  (item) => item.name === event.target.value,
-                )
-                if (preset) onChange(preset.location)
-              }}
-              style={{ display: 'block', marginTop: 4 }}
-            >
-              {locationPresets.map((preset) => (
-                <option key={preset.name} value={preset.name}>
-                  {preset.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <LocationField location={location} onChange={onChange} />
         </div>
       )}
     </div>

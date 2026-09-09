@@ -59,6 +59,11 @@ vi.stubGlobal(
 // nudge mobile browsers into collapsing their address-bar chrome.
 window.scrollTo = vi.fn()
 
+function openSkySelection(): void {
+  fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+  fireEvent.click(screen.getByRole('button', { name: '空を選ぶ' }))
+}
+
 describe('Starfield', () => {
   beforeEach(() => {
     window.localStorage.clear()
@@ -76,10 +81,15 @@ describe('Starfield', () => {
     restoreViewState.mockClear()
   })
 
-  it('keeps the date/time overlay collapsed to a toggle button by default', () => {
+  it('shows date and location controls only in the sky selection section', () => {
     render(<Starfield />)
-    expect(screen.getByLabelText('日時を変更')).toBeTruthy()
+    expect(screen.queryByLabelText('日時を変更')).toBeNull()
     expect(screen.queryByLabelText('日時')).toBeNull()
+    expect(screen.queryByLabelText('場所')).toBeNull()
+
+    openSkySelection()
+    expect(screen.getByLabelText(/^日時 \(/)).toBeTruthy()
+    expect(screen.getByLabelText('場所')).toBeTruthy()
   })
 
   it('opens the unified control menu and keeps one section expanded at a time', () => {
@@ -131,7 +141,7 @@ describe('Starfield', () => {
 
     // 2026-09-03 21:00 JST: Leo sits well below Tokyo's horizon (~-35°
     // altitude — opposite side of the sky from the sun this time of year).
-    fireEvent.click(screen.getByLabelText('日時を変更'))
+    openSkySelection()
     fireEvent.change(screen.getByLabelText(/^日時 \(/), {
       target: { value: '2026-09-03T21:00' },
     })
@@ -162,7 +172,7 @@ describe('Starfield', () => {
 
     // Same instant as above, but Aquila is well up over Tokyo then (part of
     // the Summer Triangle).
-    fireEvent.click(screen.getByLabelText('日時を変更'))
+    openSkySelection()
     fireEvent.change(screen.getByLabelText(/^日時 \(/), {
       target: { value: '2026-09-03T21:00' },
     })
@@ -175,11 +185,11 @@ describe('Starfield', () => {
     expect(updateStars).not.toHaveBeenCalled()
   })
 
-  it('recomputes star placement when the date/time is changed via the overlay', () => {
+  it('recomputes star placement when the date/time is changed in sky selection', () => {
     render(<Starfield />)
     updateStars.mockClear()
 
-    fireEvent.click(screen.getByLabelText('日時を変更'))
+    openSkySelection()
     // Regex, not exact match: the label also carries the observer location's
     // time zone (e.g. "日時 (Asia/Tokyo)") since Task 7.
     fireEvent.change(screen.getByLabelText(/^日時 \(/), {
@@ -188,26 +198,24 @@ describe('Starfield', () => {
 
     expect(updateStars).toHaveBeenCalledTimes(1)
     expect(updateCelestialBodies).toHaveBeenCalledTimes(1)
-    expect(screen.queryByLabelText(/^日時 \(/)).toBeNull()
+    expect(screen.getByLabelText(/^日時 \(/)).toBeTruthy()
+    expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
   })
 
-  it('keeps the location overlay collapsed to a toggle button by default', () => {
-    render(<Starfield />)
-    expect(screen.getByLabelText('場所を変更')).toBeTruthy()
-    expect(screen.queryByLabelText('場所')).toBeNull()
-  })
-
-  it('recomputes star placement when the location is changed via the overlay', () => {
+  it('recomputes star placement when the location is changed in sky selection', () => {
     render(<Starfield />)
     updateStars.mockClear()
 
-    fireEvent.click(screen.getByLabelText('場所を変更'))
+    openSkySelection()
     fireEvent.change(screen.getByLabelText('場所'), {
       target: { value: 'ロンドン' },
     })
 
     expect(updateStars).toHaveBeenCalledTimes(1)
     expect(updateCelestialBodies).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(/ロンドン ·/)).toBeTruthy()
+    expect(screen.getByLabelText('日時 (Europe/London)')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
   })
 
   it('keeps search navigation above the horizon when a matched star is currently below it', () => {
@@ -521,7 +529,7 @@ describe('Starfield', () => {
       screen.getByText(/ほぼ満ちている|よく見えている|半分前後|細めに見える/),
     ).toBeTruthy()
 
-    fireEvent.click(screen.getByLabelText('日時を変更'))
+    openSkySelection()
     fireEvent.change(screen.getByLabelText(/^日時 \(/), {
       target: { value: '2026-01-01T00:00' },
     })

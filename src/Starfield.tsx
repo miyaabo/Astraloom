@@ -29,7 +29,6 @@ import {
   loadConstellationCatalog,
 } from './constellations/constellationCatalogSource'
 import type { ConstellationRecord } from './constellations/constellationTypes'
-import { DateTimeOverlay } from './DateTimeOverlay'
 import {
   canAutoHideChrome,
   closeControlMenu,
@@ -50,7 +49,6 @@ import {
 } from './displayState'
 import { ControlMenuOverlay } from './ControlMenuOverlay'
 import { ImmersiveModeToggle } from './ImmersiveModeToggle'
-import { LocationOverlay } from './LocationOverlay'
 import { findLocationPreset, locationPresets } from './locationPresets'
 import { NextConstellationButton } from './NextConstellationButton'
 import { PlaybackOverlay } from './PlaybackOverlay'
@@ -67,6 +65,7 @@ import { StarfieldRenderer } from './render/StarfieldRenderer'
 import { SearchOverlay } from './SearchOverlay'
 import { SelectionOverlay } from './SelectionOverlay'
 import { SaveSceneButton } from './SaveSceneButton'
+import { SkySelectionSection } from './SkySelectionSection'
 import { equatorialToHorizontal } from './astronomy/coordinates'
 import { generateCelestialBodyRenderData } from './celestialBodies/celestialBodyDataSource'
 import {
@@ -1006,6 +1005,15 @@ export function Starfield() {
                 toggleControlMenuSection(current, section),
               )
             }
+            skySection={
+              <SkySelectionSection
+                date={date}
+                location={location}
+                timeZoneId={locationMetadata.timeZoneId}
+                onDateChange={handleDateChange}
+                onLocationChange={handleLocationChange}
+              />
+            }
           />
           <SearchOverlay
             isOpen={displayState.activePanel === 'search'}
@@ -1024,31 +1032,6 @@ export function Starfield() {
             onSelectStar={handleSelectStarResult}
           />
           <NextConstellationButton onClick={handleNextConstellation} />
-          <DateTimeOverlay
-            date={date}
-            onChange={(nextDate) => {
-              handleDateChange(nextDate)
-              setDisplayState((current) => closeOverlayPanel(current))
-            }}
-            isOpen={displayState.activePanel === 'date'}
-            onToggleOpen={() =>
-              setDisplayState((current) => toggleOverlayPanel(current, 'date'))
-            }
-            timeZoneId={locationMetadata.timeZoneId}
-          />
-          <LocationOverlay
-            location={location}
-            onChange={(nextLocation) => {
-              handleLocationChange(nextLocation)
-              setDisplayState((current) => closeOverlayPanel(current))
-            }}
-            isOpen={displayState.activePanel === 'location'}
-            onToggleOpen={() =>
-              setDisplayState((current) =>
-                toggleOverlayPanel(current, 'location'),
-              )
-            }
-          />
           <PlaybackOverlay
             isPlaying={isPlaying}
             onTogglePlaying={() => setIsPlaying((current) => !current)}
