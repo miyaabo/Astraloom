@@ -76,6 +76,7 @@ vi.mock('../stars/hygCatalogSource', () => ({
 
 const {
   computeConstellationEquatorialCenter,
+  computeConstellationIllustrationData,
   computeConstellationLineSegments,
   computeConstellationLookDirection,
   computeConstellationStarLabels,
@@ -370,5 +371,67 @@ describe('findConstellationZenithLocation', () => {
     )
 
     expect(location).toBeNull()
+  })
+})
+
+describe('computeConstellationIllustrationData', () => {
+  it('returns each segment star once with id/position/magnitude, and every line by star id', () => {
+    const data = computeConstellationIllustrationData({
+      id: 'Test',
+      name: 'Test',
+      nameJa: 'テスト',
+      // Star 6 repeated via a self-loop plus the 6-7 pair, matching the
+      // "counted once" fixture in computeConstellationEquatorialCenter above.
+      segments: [
+        [6, 6],
+        [6, 7],
+      ],
+    })
+
+    expect(data).not.toBeNull()
+    expect(data?.constellationId).toBe('Test')
+    expect(data?.nameJa).toBe('テスト')
+    expect(data?.stars).toHaveLength(2)
+    expect(data?.stars.map((star) => star.id).sort()).toEqual([6, 7])
+    expect(data?.stars.find((star) => star.id === 6)?.magnitude).toBe(1)
+    expect(data?.lines).toEqual([
+      { from: 6, to: 6 },
+      { from: 6, to: 7 },
+    ])
+
+    // The center is the midpoint of stars 6 and 7, so each sits at the same
+    // distance from the origin on the tangent plane, on opposite sides.
+    const [star6, star7] = [
+      data!.stars.find((star) => star.id === 6)!,
+      data!.stars.find((star) => star.id === 7)!,
+    ]
+    expect(Math.hypot(star6.x, star6.y)).toBeCloseTo(
+      Math.hypot(star7.x, star7.y),
+      5,
+    )
+  })
+
+  it('drops only the unknown side of a segment: the known star still appears, the line does not', () => {
+    const data = computeConstellationIllustrationData({
+      id: 'Test',
+      name: 'Test',
+      nameJa: 'テスト',
+      segments: [[6, 999]],
+    })
+
+    expect(data).not.toBeNull()
+    expect(data?.stars.map((star) => star.id)).toEqual([6])
+    expect(data?.lines).toEqual([])
+  })
+
+  it('returns null when the constellation has no resolvable center', () => {
+    const data = computeConstellationIllustrationData({
+      id: 'Test',
+      name: 'Test',
+      nameJa: 'テスト',
+      segments: [[999, 998]],
+    })
+
+    expect(data).toBeNull()
   })
 })

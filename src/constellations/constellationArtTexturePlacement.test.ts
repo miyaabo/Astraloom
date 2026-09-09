@@ -40,16 +40,31 @@ const THREE_ANCHORS = [ANCHOR_TOP_LEFT, ANCHOR_TOP_RIGHT, ANCHOR_BOTTOM_LEFT]
 const FULL_BOUNDS = { minX: 0, minY: 0, maxX: 100, maxY: 100 }
 
 describe('buildTexturedArtMeshGrid', () => {
-  it('returns null with fewer than 3 anchors', () => {
+  it('returns null with fewer than 2 anchors', () => {
     expect(
-      buildTexturedArtMeshGrid(
-        [ANCHOR_TOP_LEFT, ANCHOR_TOP_RIGHT],
-        FULL_BOUNDS,
-        100,
-        100,
-        4,
-      ),
+      buildTexturedArtMeshGrid([ANCHOR_TOP_LEFT], FULL_BOUNDS, 100, 100, 4),
     ).toBeNull()
+  })
+
+  it('falls back to a rigid similarity fit with exactly 2 anchors', () => {
+    // Only 2 anchors can't determine an affine (6 DOF) fit, but a rigid
+    // rotate+scale+translate (4 DOF) is still well-defined through them.
+    const grid = buildTexturedArtMeshGrid(
+      [ANCHOR_TOP_LEFT, ANCHOR_TOP_RIGHT],
+      FULL_BOUNDS,
+      100,
+      100,
+      1,
+    )
+    expect(grid).not.toBeNull()
+    const topLeft = grid!.positions.slice(0, 3)
+    const topRight = grid!.positions.slice(3, 6)
+    expect(topLeft[0]).toBeCloseTo(ANCHOR_TOP_LEFT.position.x, 3)
+    expect(topLeft[1]).toBeCloseTo(ANCHOR_TOP_LEFT.position.y, 3)
+    expect(topLeft[2]).toBeCloseTo(ANCHOR_TOP_LEFT.position.z, 3)
+    expect(topRight[0]).toBeCloseTo(ANCHOR_TOP_RIGHT.position.x, 3)
+    expect(topRight[1]).toBeCloseTo(ANCHOR_TOP_RIGHT.position.y, 3)
+    expect(topRight[2]).toBeCloseTo(ANCHOR_TOP_RIGHT.position.z, 3)
   })
 
   it('produces the expected grid size', () => {
@@ -208,7 +223,7 @@ describe('buildTexturedArtMeshGrid', () => {
     })
   })
 
-  it('returns null when the anchors are collinear in pixel space', () => {
+  it('falls back to similarity when the anchors are collinear in pixel space (affine fit unsolvable)', () => {
     const grid = buildTexturedArtMeshGrid(
       [
         { pixelX: 0, pixelY: 0, position: ANCHOR_TOP_LEFT.position },
@@ -220,6 +235,45 @@ describe('buildTexturedArtMeshGrid', () => {
       100,
       4,
     )
-    expect(grid).toBeNull()
+    expect(grid).not.toBeNull()
+  })
+
+  it('falls back to similarity (preserving the image proportions) when real star positions are nearly collinear despite well-spread pixel anchors', () => {
+    // Mirrors Apus (Task 3): three real stars sitting nearly in a line on
+    // the sky, anchored to pixels spread across two dimensions. An affine
+    // fit would be forced to squash the image into a sliver to satisfy
+    // every anchor; the similarity fallback keeps it undistorted instead.
+    const nearlyCollinearSky = [
+      projectHorizontalToSphere({ altitudeDegrees: 40, azimuthDegrees: 100 }),
+      projectHorizontalToSphere({ altitudeDegrees: 40.5, azimuthDegrees: 101 }),
+      projectHorizontalToSphere({ altitudeDegrees: 41, azimuthDegrees: 102 }),
+    ]
+    const anchors = [
+      { pixelX: 100, pixelY: 500, position: nearlyCollinearSky[0] },
+      { pixelX: 500, pixelY: 100, position: nearlyCollinearSky[1] },
+      { pixelX: 900, pixelY: 500, position: nearlyCollinearSky[2] },
+    ]
+
+    // pixelBounds' corners coincide with anchors 0 and 2 — the least-squares
+    // fit (through all 3 anchors, not forced exactly through any pair) should
+    // still land its bottom-left/bottom-right corners close to those anchors'
+    // real positions, unlike the old farthest-pair version's failure mode
+    // (Aquila: the two chosen anchors fit exactly while a third was dragged
+    // far from its actual star).
+    const grid = buildTexturedArtMeshGrid(
+      anchors,
+      { minX: 100, minY: 100, maxX: 900, maxY: 500 },
+      1000,
+      600,
+      1,
+    )
+    expect(grid).not.toBeNull()
+
+    const worldDistance = (a: Float32Array, b: { x: number; y: number; z: number }) =>
+      Math.hypot(a[0] - b.x, a[1] - b.y, a[2] - b.z)
+    const bottomLeft = grid!.positions.slice(6, 9)
+    const bottomRight = grid!.positions.slice(9, 12)
+    expect(worldDistance(bottomLeft, anchors[0].position)).toBeLessThan(5)
+    expect(worldDistance(bottomRight, anchors[2].position)).toBeLessThan(5)
   })
 })

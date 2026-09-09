@@ -15,7 +15,15 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "build:star-catalog": "node scripts/build-hyg-catalog.mjs",
-    "build:constellation-catalog": "node scripts/build-constellation-catalog.mjs"
+    "build:constellation-catalog": "node scripts/build-constellation-catalog.mjs",
+    "export:constellation-illustration": "node scripts/export-constellation-illustration.mjs",
+    "export:all-constellation-illustrations": "node scripts/export-all-constellation-illustrations.mjs",
+    "build:constellation-illustration-manifest": "node scripts/build-constellation-illustration-manifest.mjs",
+    "build:constellation-art-placement": "python3 scripts/build-constellation-art-placement-data.py",
+    "optimize:zodiac-constellation-art-placement": "python3 scripts/optimize-zodiac-constellation-art-placement.py",
+    "render:constellation-guide": "node scripts/render-constellation-guide.mjs",
+    "render:all-constellation-guides": "node scripts/render-all-constellation-guides.mjs",
+    "place:constellation-illustration": "node scripts/place-constellation-illustration.mjs"
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",

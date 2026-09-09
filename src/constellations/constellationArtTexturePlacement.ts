@@ -116,21 +116,134 @@ function solveLeastSquaresPlane(
 }
 
 /**
+ * Ratio of the smaller to the larger singular value of the 2x2 matrix
+ * `[[a, b], [c, d]]` (closed-form 2x2 SVD) — 1 for a pure rotation+uniform
+ * scale, 0 for a matrix that collapses the plane onto a line. Used to detect
+ * when solveLeastSquaresPlane's affine fit, even though not exactly singular
+ * (det !== 0, so it doesn't hit the `return null` above), is close enough to
+ * singular that applying it anyway would squash the source image into a
+ * barely-visible sliver — observed on Apus, whose own three real stars sit
+ * nearly in a line on the sky, so no matter which pixels its anchors are
+ * placed at, the least-squares fit is forced to make pixel-space's two
+ * independent directions map to nearly the same tangent-plane direction.
+ */
+function singularValueRatio(a: number, b: number, c: number, d: number): number {
+  const e = (a + d) / 2
+  const f = (a - d) / 2
+  const g = (c + b) / 2
+  const h = (c - b) / 2
+  const q = Math.hypot(e, h)
+  const r = Math.hypot(f, g)
+  const sigma1 = q + r
+  const sigma2 = Math.abs(q - r)
+  return sigma1 === 0 ? 0 : sigma2 / sigma1
+}
+
+/**
+ * Below this singular-value ratio, buildTexturedArtMeshGrid falls back to
+ * buildSimilarityPixelToSphere instead of trusting the affine fit — chosen
+ * empirically by comparing measured ratios against how the result actually
+ * looked: Apus (0.169), Aquila (0.157), and Orion (0.322, 23 anchors) all
+ * rendered as a thin, barely-recognizable sliver, while Antlia (0.520) and
+ * Andromeda (0.745, still visibly stretched but recognizable) were
+ * acceptable. Not derived from a formal error bound.
+ */
+const DEGENERATE_FIT_RATIO_THRESHOLD = 0.4
+
+/**
+ * Rigid fallback for when the anchors' real sky positions are too close to
+ * collinear for an affine fit to trust (see singularValueRatio): a
+ * least-squares rotation + uniform scale + translation through every anchor
+ * (the standard complex-number solution to orthogonal Procrustes without
+ * reflection — treating each centered pixel offset and tangent offset as a
+ * complex number, the best-fit scale-rotation factor is
+ * `sum(conj(p) * t) / sum(|p|^2)`), so the source image keeps its own
+ * proportions exactly — unlike the affine path, it can't warp the picture
+ * into a sliver.
+ *
+ * An earlier version fit exactly through whichever two anchors were
+ * farthest apart in tangent-plane space and ignored the rest. That let a
+ * single outlier pair dictate the whole image's scale: if that pair
+ * happened to sit close together in the picture but far apart on the sky
+ * (or vice versa), every other anchor could end up dragged far from its own
+ * star even though the two chosen ones fit exactly — observed on Aquila,
+ * whose eagle rendered much larger than its actual star cluster. Fitting
+ * through all anchors at once spreads any such mismatch across every point
+ * instead of letting one pair's ratio dominate.
+ */
+function buildSimilarityPixelToSphere(
+  anchors: TextureAnchor[],
+  tangentPoints: { u: number; v: number }[],
+  center: Vector3,
+  e1: Vector3,
+  e2: Vector3,
+): (pixelX: number, pixelY: number) => StarPosition {
+  const n = anchors.length
+  let meanPixelX = 0
+  let meanPixelY = 0
+  let meanU = 0
+  let meanV = 0
+  for (let i = 0; i < n; i++) {
+    meanPixelX += anchors[i].pixelX
+    meanPixelY += anchors[i].pixelY
+    meanU += tangentPoints[i].u
+    meanV += tangentPoints[i].v
+  }
+  meanPixelX /= n
+  meanPixelY /= n
+  meanU /= n
+  meanV /= n
+
+  // conj(p) * t = (px - i*py) * (tu + i*tv), summed and divided by sum(|p|^2).
+  let numeratorReal = 0
+  let numeratorImag = 0
+  let denominator = 0
+  for (let i = 0; i < n; i++) {
+    const px = anchors[i].pixelX - meanPixelX
+    const py = anchors[i].pixelY - meanPixelY
+    const tu = tangentPoints[i].u - meanU
+    const tv = tangentPoints[i].v - meanV
+    numeratorReal += px * tu + py * tv
+    numeratorImag += px * tv - py * tu
+    denominator += px * px + py * py
+  }
+  // denominator is 0 only if every anchor shares the same pixel position,
+  // which authoring can't produce (each is a distinct star); the fallback
+  // (no scale/rotation) just avoids a NaN mesh in that unreachable case.
+  const scaleRotationReal = denominator === 0 ? 1 : numeratorReal / denominator
+  const scaleRotationImag = denominator === 0 ? 0 : numeratorImag / denominator
+
+  return (pixelX: number, pixelY: number): StarPosition => {
+    const dx = pixelX - meanPixelX
+    const dy = pixelY - meanPixelY
+    const u = meanU + (dx * scaleRotationReal - dy * scaleRotationImag)
+    const v = meanV + (dx * scaleRotationImag + dy * scaleRotationReal)
+    const direction = normalize(add(center, add(scale(e1, u), scale(e2, v))))
+    return scale(direction, SKY_SPHERE_RADIUS)
+  }
+}
+
+/**
  * Builds a curved mesh (a gridResolution x gridResolution grid of quads) that
  * maps an image onto the sky sphere, fit through pixel⇔real-star anchor
- * correspondences. Unlike the removed constellationArtOutline.ts's exact fit
- * through exactly 2 or 3 anchors, this is a least-squares fit across
- * however many anchors are given — appropriate when the source art wasn't
- * drawn to real star proportions to begin with (an AI-generated image, say),
- * so no exact fit through any 3 points would actually be more correct than
- * spreading the unavoidable error across all of them.
+ * correspondences. With 3+ well-conditioned anchors this is a least-squares
+ * affine fit across however many are given — appropriate when the source art
+ * wasn't drawn to real star proportions to begin with (an AI-generated
+ * image, say), so no exact fit through any 3 points would actually be more
+ * correct than spreading the unavoidable error across all of them. With
+ * exactly 2 anchors, or 3+ whose real sky positions are too close to
+ * collinear for the affine fit to trust (singularValueRatio), it falls back
+ * to a rigid rotate+scale+translate through the two farthest-apart anchors
+ * (buildSimilarityPixelToSphere) instead — the source image keeps its own
+ * proportions exactly, at the cost of anchors beyond those two landing
+ * wherever the rigid transform puts them rather than exactly on their real
+ * star.
  *
  * Same overall technique: 1) gnomonic tangent-plane centered on the anchors'
- * mean direction, 2) least-squares affine pixel→tangent fit, 3) apply that
- * fit to a grid spanning `pixelBounds` and project each grid point back onto
- * the sphere. Returns null if fewer than 3 anchors are given, or the anchors
- * are degenerate (collinear in pixel space, or all behind the tangent
- * plane).
+ * mean direction, 2) affine or similarity pixel→tangent fit (see above), 3)
+ * apply that fit to a grid spanning `pixelBounds` and project each grid
+ * point back onto the sphere. Returns null if fewer than 2 anchors are
+ * given, or all of them are behind the tangent plane.
  *
  * `pixelBounds` is deliberately separate from the full image dimensions
  * (used only to normalize UVs against the actual texture) — a fit is only
@@ -156,7 +269,7 @@ export function buildTexturedArtMeshGrid(
   imageHeightPx: number,
   gridResolution: number,
 ): ArtMeshGrid | null {
-  if (anchors.length < 3) return null
+  if (anchors.length < 2) return null
 
   const anchorDirections = anchors.map((anchor) => normalize(anchor.position))
   const center = normalize(
@@ -185,21 +298,47 @@ export function buildTexturedArtMeshGrid(
     x: anchor.pixelX,
     y: anchor.pixelY,
   }))
-  const uFit = solveLeastSquaresPlane(
-    pixelPoints,
-    tangentPoints.map((p) => p.u),
-  )
-  const vFit = solveLeastSquaresPlane(
-    pixelPoints,
-    tangentPoints.map((p) => p.v),
-  )
-  if (uFit === null || vFit === null) return null
 
-  const pixelToSphere = (pixelX: number, pixelY: number): StarPosition => {
-    const u = uFit.a * pixelX + uFit.b * pixelY + uFit.c
-    const v = vFit.a * pixelX + vFit.b * pixelY + vFit.c
-    const direction = normalize(add(center, add(scale(e1, u), scale(e2, v))))
-    return scale(direction, SKY_SPHERE_RADIUS)
+  // Affine (least-squares through every anchor) when there are enough
+  // anchors and the fit isn't nearly-singular; otherwise a rigid
+  // rotate+scale+translate through the two farthest-apart anchors, which
+  // can't warp the source image no matter how degenerate the real stars'
+  // arrangement is (see singularValueRatio / buildSimilarityPixelToSphere).
+  let pixelToSphere: ((pixelX: number, pixelY: number) => StarPosition) | null =
+    null
+  if (anchors.length >= 3) {
+    const uFit = solveLeastSquaresPlane(
+      pixelPoints,
+      tangentPoints.map((p) => p.u),
+    )
+    const vFit = solveLeastSquaresPlane(
+      pixelPoints,
+      tangentPoints.map((p) => p.v),
+    )
+    if (
+      uFit !== null &&
+      vFit !== null &&
+      singularValueRatio(uFit.a, uFit.b, vFit.a, vFit.b) >=
+        DEGENERATE_FIT_RATIO_THRESHOLD
+    ) {
+      pixelToSphere = (pixelX: number, pixelY: number): StarPosition => {
+        const u = uFit.a * pixelX + uFit.b * pixelY + uFit.c
+        const v = vFit.a * pixelX + vFit.b * pixelY + vFit.c
+        const direction = normalize(
+          add(center, add(scale(e1, u), scale(e2, v))),
+        )
+        return scale(direction, SKY_SPHERE_RADIUS)
+      }
+    }
+  }
+  if (pixelToSphere === null) {
+    pixelToSphere = buildSimilarityPixelToSphere(
+      anchors,
+      tangentPoints,
+      center,
+      e1,
+      e2,
+    )
   }
 
   const { minX, minY, maxX, maxY } = pixelBounds

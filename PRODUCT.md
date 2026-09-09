@@ -210,7 +210,7 @@ Human Check で以下を満たすこと。
 
 Veluna らしい見た目の幅を整理した。雰囲気プリセットの方向性を検討した結果、既存の表現プリセット(`Planetarium-like` / `Gentle Contrast`)は差分が小さく見た目の選択肢として弱いと判断して廃止し、単一のプラネタリウム基準(D011)に固定した。代わりに、夜間向け表示を独立の `Night Mode UI` として追加し、プロジェクター補正・夜間モードをまとめた最小の設定パネル(`SettingsOverlay`)を新設した。プロジェクター投影時のブラウザ chrome 対策(フルスクリーン・iOS PWA ホーム画面起動・アドレスバー自動収縮)も追加した。iOS 上の Safari 以外のブラウザでの chrome 完全除去は未解決のまま残っている(D031)。詳細は `docs/features/phase-10-atmosphere-presets.md` を参照。
 
-## Current Phase: 13次開発
+## Phase 13 Foundation(13次開発, Done)
 
 ### Phase Goal
 
@@ -222,7 +222,9 @@ Veluna らしい見た目の幅を整理した。雰囲気プリセットの方�
 
 13次のスコープは **星座絵表示(星座の絵柄オーバーレイ)のみ** とする(D032)。他の 5 候補(星座線常時表示化・ラベル量調整・地平線/グリッド/方位表示・AR/センサー系・イベント/衛星/観測支援)は、既存 Decision(D014, D017)や Product Principle 2 と矛盾するか独立したスコープ確定が必要なため対象外とする。
 
-星座絵表示は新しい画像アセットの導入を伴うため、Product Principle 7(商用利用可否)の確認が実装前の必須ゲートとして残る。Small Spec は `docs/features/phase-13-constellation-art.md`、詳細タスクは `docs/features/phase-13-implementation-tasks.md` で管理する。
+星座絵表示は89エントリの線なしイラストを剛体配置で実装し、Human Check を完了した。Small Spec は `docs/features/phase-13-constellation-art.md`、詳細タスクは `docs/features/phase-13-implementation-tasks.md` を参照。
+
+次フェーズは未選定。候補は `docs/TASKS.md` の Current Status で整理する。
 
 ## Future Capability Inventory
 

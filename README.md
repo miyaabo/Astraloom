@@ -10,9 +10,9 @@ Veluna は、就寝前などに本格感のある夜空を静かに眺めてリ�
 
 ## Current Phase
 
-**13次開発 — 天文拡張機能(星座絵表示)**
+**次フェーズ選定待ち（13次開発 — 天文拡張機能／星座絵表示 — 完了）**
 
-11次(音楽/リラクゼーション拡張)より先に着手している(`DECISIONS.md` D032)。他アプリにある表示切替系機能のうち Phase 10 で棚卸しした 6 候補から、既存 Decision・Product Principle と矛盾しない **星座絵表示** のみをスコープとする。8次(認証・DB保存)・9次(保存体験の拡張)・12次(同期/共有)は、見た目・体験に直結する部分を優先する方針のため後回しにしている。
+13次では、他アプリにある表示切替系機能のうち Phase 10 で棚卸しした6候補から、既存 Decision・Product Principle と矛盾しない**星座絵表示**のみを実装し、Human Check を完了した(`DECISIONS.md` D032)。次に扱う機能は未選定。
 
 詳細は `docs/features/phase-13-constellation-art.md`、進め方は `docs/features/phase-13-implementation-tasks.md` を参照。
 

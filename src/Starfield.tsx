@@ -14,18 +14,16 @@ import type {
   ConstellationLabelsHandle,
 } from './ConstellationLabelsOverlay'
 import { ConstellationLabelsOverlay } from './ConstellationLabelsOverlay'
-import { buildTexturedArtMeshGrid } from './constellations/constellationArtTexturePlacement'
+import { findConstellationArtByConstellationName } from './constellations/constellationArtCatalogSource'
+import { buildRigidConstellationArtMesh } from './constellations/constellationArtRigidPlacement'
 import {
   computeConstellationLineSegments,
+  computeConstellationStarPositions,
   computeConstellationLookDirection,
   computeConstellationStarLabels,
   findConstellationZenithLocation,
   rankConstellationsByAltitude,
 } from './constellations/constellationProjection'
-import {
-  LEO_ART_PROTOTYPE,
-  resolveLeoArtPrototypeAnchors,
-} from './constellations/leoArtPrototype'
 import {
   findConstellationByStarId,
   loadConstellationCatalog,
@@ -395,39 +393,46 @@ export function Starfield() {
   // the same recompute on every date/location change or they visibly lag
   // behind the star field during playback — this was reported as
   // lines/labels barely moving compared to the stars while time-lapsing.
-  // Prototype only (Phase 13 Task 4 — see
-  // docs/features/phase-13-implementation-tasks.md for the still-open
-  // direction question this is exploring): shows the one hand-anchored
-  // AI-generated constellation image (leoArtPrototype.ts) when Leo is the
-  // constellation being displayed, hides it otherwise. Deliberately
-  // hardcoded to Leo rather than a general lookup — this is a single-image
-  // test, not the real 88-constellation feature.
-  function updateConstellationArtTexturePrototype(
+  //
+  // Shows the selected constellation's art (Phase 13 Task 4), alongside its
+  // lines/labels, using the same anchors→sky-sphere pipeline the removed
+  // leoArtPrototype.ts one-off used, generalized to the full catalog
+  // (constellationArtCatalogSource.ts / constellationArtProjection.ts).
+  // Looked up by `constellation.name`, not `.id` — see
+  // constellationArtTypes.ts's ConstellationArtRecord doc comment for why
+  // `.id` can't distinguish Serpens Caput from Serpens Cauda. Async (the art
+  // catalog is lazy-loaded), so this is fired without awaiting from
+  // refreshConstellationDisplay; the `selectedConstellationRef` check after
+  // the await guards against a stale result landing after the user already
+  // selected something else (or cleared the selection) while this was
+  // in flight.
+  async function updateConstellationArt(
     constellation: ConstellationRecord,
     atLocation: ObserverLocation,
     atDate: Date,
-  ): void {
-    if (constellation.id !== 'Leo') {
-      rendererRef.current?.hideConstellationArtTexturePrototype()
+  ): Promise<void> {
+    const record = await findConstellationArtByConstellationName(
+      constellation.name,
+    )
+
+    if (selectedConstellationRef.current?.name !== constellation.name) return
+
+    if (record === null) {
+      rendererRef.current?.hideConstellationArt()
       return
     }
 
-    const anchors = resolveLeoArtPrototypeAnchors(atLocation, atDate)
-    const meshGrid = buildTexturedArtMeshGrid(
-      anchors,
-      LEO_ART_PROTOTYPE.pixelBounds,
-      LEO_ART_PROTOTYPE.imageWidthPx,
-      LEO_ART_PROTOTYPE.imageHeightPx,
-      12,
+    const meshGrid = buildRigidConstellationArtMesh(
+      constellation,
+      record,
+      atLocation,
+      atDate,
     )
     if (meshGrid === null) {
-      rendererRef.current?.hideConstellationArtTexturePrototype()
+      rendererRef.current?.hideConstellationArt()
       return
     }
-    rendererRef.current?.showConstellationArtTexturePrototype(
-      meshGrid,
-      LEO_ART_PROTOTYPE.imageUrl,
-    )
+    rendererRef.current?.showConstellationArt(meshGrid, record.imageUrl)
   }
 
   function refreshConstellationDisplay(
@@ -441,11 +446,7 @@ export function Starfield() {
       nextDate,
     )
     rendererRef.current?.showConstellationLines(segments)
-    updateConstellationArtTexturePrototype(
-      constellation,
-      nextLocation,
-      nextDate,
-    )
+    void updateConstellationArt(constellation, nextLocation, nextDate)
 
     const lookDirection = computeConstellationLookDirection(segments)
     if (!lookDirection) {
@@ -591,7 +592,7 @@ export function Starfield() {
     selectedCelestialBodyIdRef.current = null
     rendererRef.current?.highlightCelestialBody(null)
     rendererRef.current?.hideConstellationLines()
-    rendererRef.current?.hideConstellationArtTexturePrototype()
+    rendererRef.current?.hideConstellationArt()
     rendererRef.current?.setLabelTargets([])
     setConstellationLabels([])
   }
@@ -671,6 +672,7 @@ export function Starfield() {
     } else {
       selectedConstellationRef.current = null
       rendererRef.current?.hideConstellationLines()
+      rendererRef.current?.hideConstellationArt()
       rendererRef.current?.setLabelTargets([])
       setConstellationLabels([])
     }
@@ -765,6 +767,23 @@ export function Starfield() {
         lookDirection.azimuthDegrees,
         lookDirection.altitudeDegrees,
       )
+      requestAnimationFrame(() => {
+        const renderer = rendererRef.current
+        if (!renderer) return
+        ;(
+          window as Window & { __constellationAnchorDebug?: unknown }
+        ).__constellationAnchorDebug = {
+          name: constellation.name,
+          anchors: computeConstellationStarPositions(
+            constellation,
+            atLocation,
+            date,
+          ).map(({ starId, position }) => ({
+            starId,
+            ...renderer.getScreenProjection(position),
+          })),
+        }
+      })
     }
   }
 
@@ -828,6 +847,50 @@ export function Starfield() {
     )
     handleSelectConstellationResult(constellation, zenithLocation)
   }
+
+  // Dev-only capture helper (scripts/capture-all-constellations.mjs): unlike
+  // handleSelectConstellationFromList, always relocates to the
+  // constellation's zenith regardless of whether it's already partially
+  // visible from the current location/date. Partial visibility was silently
+  // producing incomplete reference captures — e.g. Andromeda showing only
+  // 7 of its 17 line-figure stars because a few segments happened to be
+  // above the horizon already, so the "already visible, don't relocate"
+  // branch never ran — see docs/features/phase-13-implementation-tasks.md
+  // Task 4 for why capture completeness matters for anchor authoring.
+  // Exposed on window (like __constellationAnchorDebug) rather than reused
+  // in the normal UI flow, since always relocating would be an unwanted
+  // surprise for a user just browsing constellations that are mostly, but
+  // not entirely, in view.
+  function debugSelectConstellationAtZenith(name: string): void {
+    const constellation = loadConstellationCatalog().find(
+      (record) => record.name === name,
+    )
+    if (!constellation) return
+
+    const zenithLocation =
+      findConstellationZenithLocation(constellation, date) ?? location
+    setLocation(zenithLocation)
+    setLocationMetadata({
+      label: describeComputedLocation(zenithLocation),
+      timeZoneId: 'UTC',
+    })
+    rendererRef.current?.updateStars(generateRealStarData(zenithLocation, date))
+    rendererRef.current?.updateCelestialBodies(
+      generateCelestialBodyRenderData(zenithLocation, date),
+    )
+    rendererRef.current?.updateMilkyWay(
+      generateMilkyWayBand(zenithLocation, date),
+    )
+    handleSelectConstellationResult(constellation, zenithLocation)
+  }
+
+  useEffect(() => {
+    ;(
+      window as Window & {
+        __debugSelectConstellationAtZenith?: (name: string) => void
+      }
+    ).__debugSelectConstellationAtZenith = debugSelectConstellationAtZenith
+  })
 
   function handleSelectCelestialBodyResult(
     celestialBody: CelestialBodySearchRecord,

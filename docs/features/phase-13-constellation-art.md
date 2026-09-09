@@ -2,7 +2,7 @@
 
 ## Status
 
-Task 1(スコープ確定)・Task 2(アセット選定・ライセンス確認)・Task 3(表示条件・統合設計)完了。`DECISIONS.md` D032・D033 を参照。
+Done。星座選択時に89エントリの線なしイラストを剛体配置で表示し、Human Check を完了した。`DECISIONS.md` D032・D033 を参照。
 
 ## Visual Artwork Direction
 

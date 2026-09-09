@@ -9,7 +9,7 @@ import {
 import { DEG_TO_RAD, normalizeDegrees, RAD_TO_DEG } from '../mathUtils'
 import { loadHygStarCatalog } from '../stars/hygCatalogSource'
 import { projectHorizontalToSphere } from '../stars/skyProjection'
-import type { HygStarRecord } from '../stars/starTypes'
+import type { HygStarRecord, StarPosition } from '../stars/starTypes'
 import type {
   ConstellationLineSegment,
   ConstellationRecord,
@@ -72,6 +72,25 @@ export function computeConstellationLineSegments(
   }
 
   return segments
+}
+
+export function computeConstellationStarPositions(
+  constellation: ConstellationRecord,
+  location: ObserverLocation,
+  date: Date,
+): { starId: number; position: StarPosition }[] {
+  const starsById = getStarsById()
+  return [...new Set(constellation.segments.flat())].flatMap((starId) => {
+    const star = starsById.get(starId)
+    if (!star) return []
+    const horizontal = equatorialToHorizontal(
+      { raHours: star.raHours, decDegrees: star.decDegrees },
+      location,
+      date,
+    )
+    if (horizontal.altitudeDegrees < 0) return []
+    return [{ starId, position: projectHorizontalToSphere(horizontal) }]
+  })
 }
 
 /**
@@ -182,6 +201,100 @@ export function computeConstellationEquatorialCenter(
   return {
     raHours: normalizeDegrees(Math.atan2(sumY, sumX) * RAD_TO_DEG) / 15,
     decDegrees: Math.asin(sumZ / length) * RAD_TO_DEG,
+  }
+}
+
+/**
+ * One star of a constellation's line figure, positioned for illustration
+ * generation (not sky rendering) — see computeConstellationIllustrationData.
+ */
+export interface ConstellationIllustrationStar {
+  /** HYG catalog id (src/stars/data/hygCatalog.json). */
+  id: number
+  /** Tangent-plane degrees from the constellation's own equatorial center — see computeConstellationIllustrationData. */
+  x: number
+  y: number
+  magnitude: number
+}
+
+/** One line of a constellation's figure, as the two star ids it connects. */
+export interface ConstellationIllustrationLine {
+  from: number
+  to: number
+}
+
+export interface ConstellationIllustrationData {
+  constellationId: string
+  name: string
+  nameJa: string
+  stars: ConstellationIllustrationStar[]
+  lines: ConstellationIllustrationLine[]
+}
+
+/**
+ * Builds illustration-generation input for a single constellation: its line
+ * figure's stars (id, 2D position, magnitude) and the connections between
+ * them. Unlike computeConstellationLineSegments, positions here come from a
+ * gnomonic (tangent-plane) projection centered on the constellation's own
+ * equatorial center (computeConstellationEquatorialCenter), not the
+ * observer's current sky-sphere view — so the shape is fixed regardless of
+ * observer location, time, or screen/canvas size. Units are degrees on that
+ * tangent plane, not pixels; an illustration tool applies its own
+ * scale/origin. Returns null only when computeConstellationEquatorialCenter
+ * does (no segment references a known star id).
+ */
+export function computeConstellationIllustrationData(
+  constellation: ConstellationRecord,
+): ConstellationIllustrationData | null {
+  const center = computeConstellationEquatorialCenter(constellation)
+  if (center === null) return null
+
+  const starsById = getStarsById()
+  const centerRaRad = center.raHours * 15 * DEG_TO_RAD
+  const centerDecRad = center.decDegrees * DEG_TO_RAD
+
+  function projectToTangentPlane(star: HygStarRecord): {
+    x: number
+    y: number
+  } {
+    const raRad = star.raHours * 15 * DEG_TO_RAD
+    const decRad = star.decDegrees * DEG_TO_RAD
+    const cosc =
+      Math.sin(centerDecRad) * Math.sin(decRad) +
+      Math.cos(centerDecRad) * Math.cos(decRad) * Math.cos(raRad - centerRaRad)
+    return {
+      x:
+        ((Math.cos(decRad) * Math.sin(raRad - centerRaRad)) / cosc) *
+        RAD_TO_DEG,
+      y:
+        ((Math.cos(centerDecRad) * Math.sin(decRad) -
+          Math.sin(centerDecRad) *
+            Math.cos(decRad) *
+            Math.cos(raRad - centerRaRad)) /
+          cosc) *
+        RAD_TO_DEG,
+    }
+  }
+
+  const uniqueStarIds = [...new Set(constellation.segments.flat())]
+  const stars: ConstellationIllustrationStar[] = []
+  for (const starId of uniqueStarIds) {
+    const star = starsById.get(starId)
+    if (!star) continue
+    const { x, y } = projectToTangentPlane(star)
+    stars.push({ id: starId, x, y, magnitude: star.magnitude })
+  }
+
+  const lines: ConstellationIllustrationLine[] = constellation.segments
+    .filter(([from, to]) => starsById.has(from) && starsById.has(to))
+    .map(([from, to]) => ({ from, to }))
+
+  return {
+    constellationId: constellation.id,
+    name: constellation.name,
+    nameJa: constellation.nameJa,
+    stars,
+    lines,
   }
 }
 

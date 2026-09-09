@@ -13,8 +13,8 @@ const lookAt = vi.fn()
 const hideConstellationLines = vi.fn()
 const setLabelTargets = vi.fn()
 const showConstellationLines = vi.fn()
-const showConstellationArtTexturePrototype = vi.fn()
-const hideConstellationArtTexturePrototype = vi.fn()
+const showConstellationArt = vi.fn()
+const hideConstellationArt = vi.fn()
 const hitTestStar = vi.fn(() => null)
 const applyProjectorMode = vi.fn()
 const restoreViewState = vi.fn()
@@ -32,8 +32,8 @@ vi.mock('./render/StarfieldRenderer', () => ({
     hideConstellationLines = hideConstellationLines
     setLabelTargets = setLabelTargets
     showConstellationLines = showConstellationLines
-    showConstellationArtTexturePrototype = showConstellationArtTexturePrototype
-    hideConstellationArtTexturePrototype = hideConstellationArtTexturePrototype
+    showConstellationArt = showConstellationArt
+    hideConstellationArt = hideConstellationArt
     hitTestStar = hitTestStar
     applyProjectorMode = applyProjectorMode
     restoreViewState = restoreViewState
@@ -68,8 +68,8 @@ describe('Starfield', () => {
     hideConstellationLines.mockClear()
     setLabelTargets.mockClear()
     showConstellationLines.mockClear()
-    showConstellationArtTexturePrototype.mockClear()
-    hideConstellationArtTexturePrototype.mockClear()
+    showConstellationArt.mockClear()
+    hideConstellationArt.mockClear()
     hitTestStar.mockReset()
     hitTestStar.mockReturnValue(null)
     applyProjectorMode.mockClear()

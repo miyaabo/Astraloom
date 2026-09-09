@@ -41,12 +41,26 @@ const FIXTURE_STARS: HygStarRecord[] = [
 ]
 
 const FIXTURE_RECORD: ConstellationArtRecord = {
-  constellationIds: ['Test'],
+  constellationId: 'Test',
+  constellationNames: ['Test'],
+  imageUrl: '/no-line/test.png',
+  imageWidthPx: 500,
+  imageHeightPx: 500,
+  pixelBounds: { minX: 0, minY: 0, maxX: 500, maxY: 500 },
   anchors: [
     { starId: 1, pixelX: 100, pixelY: 400 },
     { starId: 2, pixelX: 400, pixelY: 400 },
     { starId: 3, pixelX: 250, pixelY: 100 },
   ],
+  imagePath: 'public/no-line/test.png',
+  guideImagePath: 'tmp/constellation-guides/Test.svg',
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1,
+  rotationDeg: 0,
+  flipX: false,
+  flipY: false,
+  guideBounds: { minX: 0, minY: 0, maxX: 500, maxY: 500 },
 }
 
 vi.mock('../stars/hygCatalogSource', () => ({
@@ -54,9 +68,9 @@ vi.mock('../stars/hygCatalogSource', () => ({
 }))
 
 const mockFindArt =
-  vi.fn<(id: string) => Promise<ConstellationArtRecord | null>>()
+  vi.fn<(name: string) => Promise<ConstellationArtRecord | null>>()
 vi.mock('./constellationArtCatalogSource', () => ({
-  findConstellationArtByConstellationId: (id: string) => mockFindArt(id),
+  findConstellationArtByConstellationName: (name: string) => mockFindArt(name),
 }))
 
 const { computeConstellationArtPlacement } =

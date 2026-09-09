@@ -95,6 +95,13 @@ export interface StarfieldConfig {
       /** Opacity; low so lines never compete with the stars for attention. */
       opacity: number
     }
+    /** Constellation art overlay (Phase 13 Task 4): a mythological figure image warped onto the sky, shown alongside constellationLines. */
+    constellationArt: {
+      /** Opacity; low so the illustration reads as a faint guide, not a bright overlay (Planetarium-like First, D011). */
+      opacity: number
+      /** Resolution (per side) of the mesh grid the image is warped onto (constellationArtTexturePlacement.ts). */
+      gridResolution: number
+    }
   }
   /**
    * Milky Way band (4次 Task 2, D018): a diffuse particle band layered onto
@@ -265,6 +272,10 @@ export const starfieldConfig: StarfieldConfig = {
     constellationLines: {
       color: '#8fa8d9',
       opacity: 0.35,
+    },
+    constellationArt: {
+      opacity: 0.35,
+      gridResolution: 12,
     },
   },
   milkyWay: {

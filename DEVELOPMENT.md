@@ -322,7 +322,7 @@ Small Spec: `docs/features/phase-10-atmosphere-presets.md` / タスク分割: `d
 
 必要になった時点で再検討する。
 
-### 13次 — 天文拡張機能(Current, D032)
+### 13次 — 天文拡張機能(Done, D032)
 
 Small Spec: `docs/features/phase-13-constellation-art.md` / タスク分割: `docs/features/phase-13-implementation-tasks.md`
 

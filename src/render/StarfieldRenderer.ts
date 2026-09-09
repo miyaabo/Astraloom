@@ -405,19 +405,32 @@ export class StarfieldRenderer {
     THREE.ShaderMaterial
   >
   /**
-   * Prototype only (Phase 13 Task 4, still undecided — see
-   * docs/features/phase-13-implementation-tasks.md). Not part of the usual
-   * fixed set of scene objects above (created in the constructor, disposed
-   * in dispose()) because it's created/destroyed on the fly by
-   * showConstellationArtTexturePrototype/hideConstellationArtTexturePrototype
+   * The currently-shown constellation art image, warped onto the sky sphere
+   * (Phase 13 Task 4). Not part of the usual fixed set of scene objects above
+   * (created in the constructor, disposed in dispose()) because it's
+   * created/destroyed on the fly by showConstellationArt/hideConstellationArt
    * rather than existing for the renderer's whole lifetime with an
-   * always-present-but-hidden geometry, unlike constellationLines.
+   * always-present-but-hidden geometry, unlike constellationLines — its
+   * geometry depends on which constellation is selected and its anchors'
+   * current sky positions, unlike the fixed line-segment buffer.
    */
-  private constellationArtTexturePrototype: THREE.Mesh<
+  private constellationArt: THREE.Mesh<
     THREE.BufferGeometry,
     THREE.MeshBasicMaterial
   > | null = null
   private readonly textureLoader = new THREE.TextureLoader()
+  /**
+   * Textures loaded by showConstellationArt, keyed by imageUrl. The mesh
+   * itself is rebuilt on every date/location recompute (its geometry depends
+   * on the anchors' current sky positions), but without this cache each
+   * rebuild also re-triggered an async texture load — the freshly-created
+   * MeshBasicMaterial has no map yet during that gap, so it renders as a
+   * flash of its default opaque white. Reusing an already-loaded texture lets
+   * the new material start with the image (or, on the very first load, start
+   * fully transparent instead of white) so the flash never happens after the
+   * first show.
+   */
+  private readonly loadedArtTextures = new Map<string, THREE.Texture>()
 
   private readonly unwatchReducedMotion: () => void
   private readonly unwatchVisibility: () => void
@@ -810,6 +823,14 @@ export class StarfieldRenderer {
     )
   }
 
+  getScreenProjection(position: StarPosition): {
+    xPercent: number
+    yPercent: number
+    visible: boolean
+  } {
+    return projectToScreen(this.camera, position)
+  }
+
   /**
    * Shows one constellation's line segments (Task 3), replacing whatever was
    * previously shown. Only one constellation is ever shown at a time (D017);
@@ -844,21 +865,20 @@ export class StarfieldRenderer {
   }
 
   /**
-   * Prototype only (Phase 13 Task 4 — see
-   * docs/features/phase-13-implementation-tasks.md for the still-open
-   * direction question this is exploring): shows an externally-generated
-   * constellation image warped onto the sky sphere via a pre-built mesh grid
-   * (constellationArtTexturePlacement.ts's buildTexturedArtMeshGrid). Unlike
-   * showConstellationLines this isn't part of the usual selection lifecycle
-   * — Starfield.tsx calls this directly, gated to the one constellation
-   * being prototyped. The mesh renders immediately (untextured/transparent)
-   * while the image loads asynchronously, then gets its texture once loaded.
+   * Shows one constellation's art image (Phase 13 Task 4), warped onto the
+   * sky sphere via a pre-built mesh grid
+   * (constellationArtTexturePlacement.ts's buildTexturedArtMeshGrid), paired
+   * with showConstellationLines the same way hideConstellationArt pairs with
+   * hideConstellationLines. Starfield.tsx rebuilds the mesh from scratch on
+   * every date/location recompute (its geometry depends on the anchors'
+   * current sky positions) and calls this again each time. If imageUrl was
+   * already loaded before (loadedArtTextures cache), the new mesh gets it
+   * immediately; otherwise the mesh renders fully transparent (not the
+   * material's default opaque white) while the image loads asynchronously,
+   * then gets its texture once loaded.
    */
-  showConstellationArtTexturePrototype(
-    meshGrid: ArtMeshGrid,
-    imageUrl: string,
-  ): void {
-    this.hideConstellationArtTexturePrototype()
+  showConstellationArt(meshGrid: ArtMeshGrid, imageUrl: string): void {
+    this.hideConstellationArt()
 
     const geometry = new THREE.BufferGeometry()
     geometry.setAttribute(
@@ -868,45 +888,61 @@ export class StarfieldRenderer {
     geometry.setAttribute('uv', new THREE.BufferAttribute(meshGrid.uvs, 2))
     geometry.setIndex(new THREE.BufferAttribute(meshGrid.indices, 1))
 
+    const targetOpacity = starfieldConfig.render.constellationArt.opacity
+    const cachedTexture = this.loadedArtTextures.get(imageUrl)
     const material = new THREE.MeshBasicMaterial({
       transparent: true,
-      opacity: 0.9,
+      opacity: cachedTexture ? targetOpacity : 0,
       depthWrite: false,
       side: THREE.DoubleSide,
+      map: cachedTexture ?? null,
     })
     const mesh = new THREE.Mesh(geometry, material)
+    // Constellation art is a calm background layer: behind its line figure
+    // and stars, but in front of the distant Milky Way/horizon layers.
+    mesh.renderOrder = -0.5
     // A hand-built BufferGeometry has no bounding sphere until computed —
     // frustum culling silently drops the mesh without one rather than
     // erroring, so this either needs an explicit computeBoundingSphere() or
     // (simpler, and fine for one decorative mesh) skipping culling entirely.
     mesh.frustumCulled = false
-    this.constellationArtTexturePrototype = mesh
+    this.constellationArt = mesh
     this.scene.add(mesh)
     this.render()
+
+    if (cachedTexture) return
 
     this.textureLoader.load(imageUrl, (texture) => {
       // A stale load resolving after a newer show/hide call would otherwise
       // clobber whatever's showing now.
-      if (this.constellationArtTexturePrototype !== mesh) {
+      if (this.constellationArt !== mesh) {
         texture.dispose()
         return
       }
       texture.colorSpace = THREE.SRGBColorSpace
+      this.loadedArtTextures.set(imageUrl, texture)
       material.map = texture
+      material.opacity = targetOpacity
       material.needsUpdate = true
       this.render()
     })
   }
 
-  /** Hides/disposes the prototype constellation art texture mesh, if one is shown. */
-  hideConstellationArtTexturePrototype(): void {
-    const mesh = this.constellationArtTexturePrototype
+  /**
+   * Hides/disposes the constellation art mesh, if one is shown (D017 default
+   * state, paired with hideConstellationLines). Disposes the mesh's own
+   * geometry/material, but not its texture — loadedArtTextures may still be
+   * holding it for reuse by a future showConstellationArt call with the same
+   * imageUrl (see dispose() for where cached textures actually get
+   * disposed).
+   */
+  hideConstellationArt(): void {
+    const mesh = this.constellationArt
     if (mesh === null) return
     this.scene.remove(mesh)
     mesh.geometry.dispose()
-    mesh.material.map?.dispose()
     mesh.material.dispose()
-    this.constellationArtTexturePrototype = null
+    this.constellationArt = null
     this.render()
   }
 
@@ -1103,7 +1139,9 @@ export class StarfieldRenderer {
     this.stop()
     this.unwatchReducedMotion()
     this.unwatchVisibility()
-    this.hideConstellationArtTexturePrototype()
+    this.hideConstellationArt()
+    for (const texture of this.loadedArtTextures.values()) texture.dispose()
+    this.loadedArtTextures.clear()
     this.points.geometry.dispose()
     this.points.material.dispose()
     this.celestialBodyPoints.geometry.dispose()

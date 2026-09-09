@@ -45,11 +45,11 @@ Status: Done
 
 ### Task 4 — 星座絵の描画実装
 
-Status: In Progress(絵柄の方向性が未確定。描画の実装は2回却下されて撤去済み — 次セッションは人間との方向性合意から再開すること)
+Status: Done(89エントリの線なしイラストを剛体配置で統合済み。Human Check 完了)
 
-**残っている土台(コミット前、作業ツリーに存在)**: 型定義 `constellationArtTypes.ts`(`ConstellationArtRecord`/`ConstellationArtAnchor`/`ConstellationArtPlacement` — 画像アンカー ⇔ HYG 星ID の対応だけを持つ、描画方式に依存しない部分)、配置計算 `constellationArtProjection.ts`(星座線と同じ地平座標パイプラインでアンカーを球面へ投影、地平線下のアンカー除外、有効アンカー2点未満で非表示)、遅延読み込み `constellationArtCatalogSource.ts`(`data/constellationArt.json` を `import()` で遅延ロード)。カタログデータは中身なしの `[]` プレースホルダー。StarfieldRenderer/Starfield.tsx への描画統合は行っていない(過去に統合していたコードは撤去済み)。
+**現状の土台**: 型定義 `constellationArtTypes.ts`、遅延読み込み `constellationArtCatalogSource.ts`、配置データ `data/constellationArt.json`（89件）が存在する。全89エントリは `constellationArtRigidPlacement.ts` で既存の星座線と同じ地平座標→球面投影結果へ、中心合わせ・一様拡縮・回転・反転のみの剛体配置で表示する。TPS、piecewise affine、非剛体ワープは使用しない。`Starfield.tsx` / `StarfieldRenderer` には選択時表示・テクスチャキャッシュ・背面レイヤーとして最小限統合済み。
 
-**アセット生成進捗**: 線あり版を日本語名の五十音順で88件生成・配置済み。完了: アンドロメダ座、いっかくじゅう座、いて座、いるか座、インディアン座、うお座、うさぎ座、うしかい座、うみへび座、エリダヌス座、おうし座、おおいぬ座、おおかみ座、おおぐま座、おとめ座、おひつじ座、オリオン座、がか座、カシオペヤ座、かじき座、かに座、かみのけ座、カメレオン座、からす座、かんむり座、きょしちょう座、ぎょしゃ座、きりん座、くじゃく座、くじら座、ケフェウス座、ケンタウルス座、けんびきょう座、こいぬ座、こうま座、こぎつね座、こぐま座、こじし座、コップ座、こと座、コンパス座、さいだん座、さそり座、さんかく座、しし座、じょうぎ座、たて座、ちょうこくぐ座、ちょうこくしつ座、つる座、テーブルさん座、てんびん座、とかげ座、とけい座、とびうお座、とも座、はえ座、はくちょう座、はちぶんぎ座、はと座、ふうちょう座、ふたご座、ペガスス座、へびつかい座、へび座、ヘルクレス座、ペルセウス座、ぼうえんきょう座、ほうおう座、ポンプ座、ほ座、みずがめ座、みずへび座、みなみじゅうじ座、みなみのうお座、みなみのかんむり座、みなみのさんかく座、やぎ座、やまねこ座、や座、らしんばん座、りゅうこつ座、りゅう座、りょうけん座、レチクル座、ろくぶんぎ座、ろ座、わし座。残り: 0件。各ファイルは `public/with_line/<星座名>_線あり.png`。線なし版の作成と実アプリへの統合は未着手。レビュー用一覧: `tmp/constellation-with-line-review.html`。
+**アセット生成進捗**: 線なし版は89レコードを `public/no-line/<英名>_線なし.png` に配置済みで、へび座は頭・尾を別ファイルに分割した。初期配置と全件レビューは `tmp/constellation-placement-review.html` を参照。実アプリは全89エントリを選択時に表示対象とする。
 
 **これまでに却下された描画方式(2回、いずれもコード撤去済み)**:
 
@@ -73,20 +73,20 @@ Status: In Progress(絵柄の方向性が未確定。描画の実装は2回却�
 
 完了確認:
 
-- [ ] 星座選択時に星座絵が表示される(未着手 — 描画方式は撤去済み、土台のみ残存)
-- [ ] 見た目が Human Check を通過している(2回却下、AI生成画像+アンカー配置の方向性を検討中)
+- [x] 星座選択時に星座絵が表示される
+- [x] 見た目が Human Check を通過している
 
 ### Task 5 — 自動検証と Human Check
 
-Status: Not Started
+Status: Done
 
 - typecheck / lint / unit test / production build を通す
 - Small Spec の Acceptance Criteria(Human Check 観点)を確認してもらう
 
 完了確認:
 
-- [ ] 自動検証がすべて成功している
-- [ ] Human Check で問題なしと確認されている
+- [x] 自動検証がすべて成功している
+- [x] Human Check で問題なしと確認されている
 
 ## Status Legend
 

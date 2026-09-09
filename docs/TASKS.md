@@ -5,10 +5,13 @@
 
 ## Current Status
 
-- Current phase: Phase 13(D032: 11次より先に着手。スコープは星座絵表示のみ)
-- Next task: Phase 13 Task 4(星座絵の描画実装)は絵柄が2回却下され、描画コードは撤去済み(型定義・投影ロジックのみ残存)。人間が外部AIで画像を生成し、Claude 側でアンカー配置する方向を検討中。詳細は `phase-13-implementation-tasks.md` の Task 4 を参照
-- Detail file: [`phase-13-implementation-tasks.md`](features/phase-13-implementation-tasks.md)
-- Small Spec: [`phase-13-constellation-art.md`](features/phase-13-constellation-art.md)
+- Current phase: 操作・設定導線の再設計(#15) — Small Spec 作成済み、実装未着手
+- Next task: [`操作・設定導線の再設計 実装タスク`](features/control-navigation-implementation-tasks.md)の Task 1（操作 UI の状態モデルを再設計する）
+- GitHub Issue 記録: [`ISSUE_DRAFTS.md`](ISSUE_DRAFTS.md)
+- 今後の開発整理: [`FUTURE_DEVELOPMENT.md`](FUTURE_DEVELOPMENT.md)（まだ追加 Issue は作成しない）
+- Issue テンプレート: [`ISSUE_TEMPLATE.md`](ISSUE_TEMPLATE.md)
+- Detail file: [`control-navigation-implementation-tasks.md`](features/control-navigation-implementation-tasks.md)
+- Small Spec: [`control-navigation.md`](features/control-navigation.md)
 - 参考: プロジェクター投影時のブラウザ chrome 対策(iOS Safari 以外)が未解決のまま残っている(`DECISIONS.md` D031)。着手するなら別タスクとして起票してから
 
 作業を開始するときは、対象フェーズの詳細ファイルを開き、上から最初に
@@ -31,7 +34,7 @@
 | Phase 10 — 雰囲気プリセット / 表現設定 | Done | [`phase-10-implementation-tasks.md`](features/phase-10-implementation-tasks.md) |
 | Phase 11 — 音楽 / リラクゼーション拡張 | Planned(13次より後回し, D032) | これから作成 |
 | Phase 12 — 同期 / 共有 | Candidate | これから作成 |
-| Phase 13 — 天文拡張機能(星座絵表示) | In Progress | [`phase-13-implementation-tasks.md`](features/phase-13-implementation-tasks.md) |
+| Phase 13 — 天文拡張機能(星座絵表示) | Done | [`phase-13-implementation-tasks.md`](features/phase-13-implementation-tasks.md) |
 
 ## Status Rules
 

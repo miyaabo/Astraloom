@@ -3,7 +3,7 @@ import { equatorialToHorizontal } from '../astronomy/coordinates'
 import { loadHygStarCatalog } from '../stars/hygCatalogSource'
 import { projectHorizontalToSphere } from '../stars/skyProjection'
 import type { HygStarRecord } from '../stars/starTypes'
-import { findConstellationArtByConstellationId } from './constellationArtCatalogSource'
+import { findConstellationArtByConstellationName } from './constellationArtCatalogSource'
 import type { ConstellationArtPlacement } from './constellationArtTypes'
 
 /** An outline needs at least this many above-horizon anchors to be placeable (Task 3/4: fitting the outline onto the sphere needs 2 points for a rotation+scale fit; below that there's nothing to fit). */
@@ -24,19 +24,22 @@ function getStarsById(): Map<number, HygStarRecord> {
  * Projects a constellation's art anchors onto the sky sphere (Task 4),
  * reusing the same equatorial→horizontal→sphere pipeline as
  * constellationProjection.ts's computeConstellationLineSegments, so the art
- * stays aligned with the stars/lines it's drawn against. Returns null when
- * the constellation has no art record (e.g. Serpens) or fewer than
- * MIN_ANCHORS_TO_PLACE anchors are above the horizon right now — nothing
- * useful to fit art through in either case, matching
- * computeConstellationLineSegments dropping below-horizon segments. Async
- * because the underlying catalog is now lazy-loaded (loadConstellationArtCatalog).
+ * stays aligned with the stars/lines it's drawn against. Takes
+ * `ConstellationRecord.name` (not `.id` — see constellationArtTypes.ts's
+ * ConstellationArtRecord doc comment for why). Returns null when the
+ * constellation has no art record or fewer than MIN_ANCHORS_TO_PLACE anchors
+ * are above the horizon right now — nothing useful to fit art through in
+ * either case, matching computeConstellationLineSegments dropping
+ * below-horizon segments. Async because the underlying catalog is now
+ * lazy-loaded (loadConstellationArtCatalog).
  */
 export async function computeConstellationArtPlacement(
-  constellationId: string,
+  constellationName: string,
   location: ObserverLocation,
   date: Date,
 ): Promise<ConstellationArtPlacement | null> {
-  const record = await findConstellationArtByConstellationId(constellationId)
+  const record =
+    await findConstellationArtByConstellationName(constellationName)
   if (record === null) return null
 
   const starsById = getStarsById()

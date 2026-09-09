@@ -1,1 +1,2614 @@
-[]
+[
+  {
+    "constellationNames": ["Andromeda"],
+    "imageUrl": "/no-line/Andromeda_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 183,
+      "minY": 87,
+      "maxX": 1056,
+      "maxY": 1166
+    },
+    "anchors": [],
+    "constellationId": "And",
+    "imagePath": "public/no-line/Andromeda_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/And.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.50481742,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 209.39,
+      "maxX": 901.12,
+      "maxY": 814.61
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Antlia"],
+    "imageUrl": "/no-line/Antlia_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 411,
+      "minY": 122,
+      "maxX": 844,
+      "maxY": 1134
+    },
+    "anchors": [],
+    "constellationId": "Ant",
+    "imagePath": "public/no-line/Antlia_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ant.svg",
+    "offsetX": -20,
+    "offsetY": 10,
+    "scale": 0.4,
+    "rotationDeg": 45,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 370.01,
+      "maxX": 901.12,
+      "maxY": 653.99
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Apus"],
+    "imageUrl": "/no-line/Apus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 14,
+      "minY": 43,
+      "maxX": 1240,
+      "maxY": 1212
+    },
+    "anchors": [],
+    "constellationId": "Aps",
+    "imagePath": "public/no-line/Apus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Aps.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.34,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 371.5,
+      "maxX": 901.12,
+      "maxY": 652.5
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Aquarius"],
+    "imageUrl": "/no-line/Aquarius_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 41,
+      "minY": 2,
+      "maxX": 1530,
+      "maxY": 1007
+    },
+    "anchors": [],
+    "constellationId": "Aqr",
+    "imagePath": "public/no-line/Aquarius_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Aqr.svg",
+    "offsetX": 0,
+    "offsetY": -24,
+    "scale": 0.60400858,
+    "rotationDeg": -8,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 309.15,
+      "maxX": 901.12,
+      "maxY": 714.85
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Aquila"],
+    "imageUrl": "/no-line/Aquila_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 92,
+      "minY": 21,
+      "maxX": 1205,
+      "maxY": 1163
+    },
+    "anchors": [],
+    "constellationId": "Aql",
+    "imagePath": "public/no-line/Aquila_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Aql.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.54318598,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 176.13,
+      "minY": 122.88,
+      "maxX": 847.87,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Ara"],
+    "imageUrl": "/no-line/Ara_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 153,
+      "minY": 289,
+      "maxX": 1140,
+      "maxY": 1032
+    },
+    "anchors": [],
+    "constellationId": "Ara",
+    "imagePath": "public/no-line/Ara_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ara.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.39231611,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 296.88,
+      "minY": 122.88,
+      "maxX": 727.12,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Aries"],
+    "imageUrl": "/no-line/Aries_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 121,
+      "minY": 0,
+      "maxX": 1524,
+      "maxY": 1002
+    },
+    "anchors": [],
+    "constellationId": "Ari",
+    "imagePath": "public/no-line/Aries_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ari.svg",
+    "offsetX": -24,
+    "offsetY": 24,
+    "scale": 0.66664941,
+    "rotationDeg": -180,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 262.1,
+      "maxX": 901.12,
+      "maxY": 761.9
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Auriga"],
+    "imageUrl": "/no-line/Auriga_線なし.png",
+    "imageWidthPx": 1024,
+    "imageHeightPx": 1536,
+    "pixelBounds": {
+      "minX": 25,
+      "minY": 24,
+      "maxX": 1024,
+      "maxY": 1514
+    },
+    "anchors": [],
+    "constellationId": "Aur",
+    "imagePath": "public/no-line/Auriga_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Aur.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.34140541,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 322.52,
+      "minY": 122.88,
+      "maxX": 701.48,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Boötes"],
+    "imageUrl": "/no-line/Boötes_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 384,
+      "minY": 49,
+      "maxX": 857,
+      "maxY": 1197
+    },
+    "anchors": [],
+    "constellationId": "Boo",
+    "imagePath": "public/no-line/Boötes_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Boo.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.61011847,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 313.96,
+      "minY": 122.88,
+      "maxX": 710.04,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Caelum"],
+    "imageUrl": "/no-line/Caelum_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 195,
+      "minY": 41,
+      "maxX": 1168,
+      "maxY": 1206
+    },
+    "anchors": [],
+    "constellationId": "Cae",
+    "imagePath": "public/no-line/Caelum_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cae.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.49375128,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 245.1,
+      "minY": 122.88,
+      "maxX": 778.9,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Camelopardalis"],
+    "imageUrl": "/no-line/Camelopardalis_線なし.png",
+    "imageWidthPx": 1230,
+    "imageHeightPx": 1278,
+    "pixelBounds": {
+      "minX": 191,
+      "minY": 15,
+      "maxX": 1108,
+      "maxY": 1263
+    },
+    "anchors": [],
+    "constellationId": "Cam",
+    "imagePath": "public/no-line/Camelopardalis_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cam.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.52578844,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 244.14,
+      "minY": 122.88,
+      "maxX": 779.86,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Cancer"],
+    "imageUrl": "/no-line/Cancer_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 242,
+      "minY": 16,
+      "maxX": 1076,
+      "maxY": 1235
+    },
+    "anchors": [],
+    "constellationId": "Cnc",
+    "imagePath": "public/no-line/Cancer_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cnc.svg",
+    "offsetX": 120,
+    "offsetY": 0,
+    "scale": 0.77862411,
+    "rotationDeg": -180,
+    "flipX": false,
+    "flipY": true,
+    "guideBounds": {
+      "minX": 305.85,
+      "minY": 122.88,
+      "maxX": 718.15,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Canes Venatici"],
+    "imageUrl": "/no-line/Canes Venatici_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 96,
+      "minY": 144,
+      "maxX": 1190,
+      "maxY": 1098
+    },
+    "anchors": [],
+    "constellationId": "CVn",
+    "imagePath": "public/no-line/Canes Venatici_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/CVn.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.52350943,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 234.54,
+      "maxX": 901.12,
+      "maxY": 789.46
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Canis Major"],
+    "imageUrl": "/no-line/Canis Major_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 17,
+      "minY": 9,
+      "maxX": 1526,
+      "maxY": 1000
+    },
+    "anchors": [],
+    "constellationId": "CMa",
+    "imagePath": "public/no-line/Canis Major_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/CMa.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.35559841,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 213.89,
+      "minY": 122.88,
+      "maxX": 810.11,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Canis Minor"],
+    "imageUrl": "/no-line/Canis Minor_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 126,
+      "minY": 153,
+      "maxX": 1113,
+      "maxY": 1105
+    },
+    "anchors": [],
+    "constellationId": "CMi",
+    "imagePath": "public/no-line/Canis Minor_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/CMi.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.69835258,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 129.07,
+      "minY": 122.88,
+      "maxX": 894.93,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Capricornus"],
+    "imageUrl": "/no-line/Capricornus_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 123,
+      "minY": 84,
+      "maxX": 1363,
+      "maxY": 942
+    },
+    "anchors": [],
+    "constellationId": "Cap",
+    "imagePath": "public/no-line/Capricornus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cap.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.78884654,
+    "rotationDeg": -180,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 258.79,
+      "maxX": 901.12,
+      "maxY": 765.21
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Carina"],
+    "imageUrl": "/no-line/Carina_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 49,
+      "minY": 23,
+      "maxX": 1522,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Car",
+    "imagePath": "public/no-line/Carina_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Car.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.34047153,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 322.66,
+      "maxX": 901.12,
+      "maxY": 701.34
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Cassiopeia"],
+    "imageUrl": "/no-line/Cassiopeia_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 49,
+      "minY": 76,
+      "maxX": 1205,
+      "maxY": 1151
+    },
+    "anchors": [],
+    "constellationId": "Cas",
+    "imagePath": "public/no-line/Cassiopeia_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cas.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.40144186,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 272.25,
+      "maxX": 901.12,
+      "maxY": 751.75
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Centaurus"],
+    "imageUrl": "/no-line/Centaurus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 23,
+      "minY": 82,
+      "maxX": 1234,
+      "maxY": 1177
+    },
+    "anchors": [],
+    "constellationId": "Cen",
+    "imagePath": "public/no-line/Centaurus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cen.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.46479452,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 229.25,
+      "maxX": 901.12,
+      "maxY": 794.75
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Cepheus"],
+    "imageUrl": "/no-line/Cepheus_線なし.png",
+    "imageWidthPx": 1206,
+    "imageHeightPx": 1305,
+    "pixelBounds": {
+      "minX": 222,
+      "minY": 13,
+      "maxX": 1094,
+      "maxY": 1305
+    },
+    "anchors": [],
+    "constellationId": "Cep",
+    "imagePath": "public/no-line/Cepheus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cep.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.54211765,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 247.77,
+      "minY": 122.88,
+      "maxX": 776.23,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Cetus"],
+    "imageUrl": "/no-line/Cetus_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 144,
+      "minY": 83,
+      "maxX": 1413,
+      "maxY": 942
+    },
+    "anchors": [],
+    "constellationId": "Cet",
+    "imagePath": "public/no-line/Cetus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cet.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.55194326,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 239.47,
+      "maxX": 901.12,
+      "maxY": 784.53
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Chamaeleon"],
+    "imageUrl": "/no-line/Chamaeleon_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 0,
+      "minY": 20,
+      "maxX": 1516,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Cha",
+    "imagePath": "public/no-line/Chamaeleon_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cha.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.28,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 451.98,
+      "maxX": 901.12,
+      "maxY": 572.02
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Circinus"],
+    "imageUrl": "/no-line/Circinus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 223,
+      "minY": 31,
+      "maxX": 1184,
+      "maxY": 1169
+    },
+    "anchors": [],
+    "constellationId": "Cir",
+    "imagePath": "public/no-line/Circinus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cir.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.53438085,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 226.7,
+      "minY": 122.88,
+      "maxX": 797.3,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Columba"],
+    "imageUrl": "/no-line/Columba_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 153,
+      "minY": 23,
+      "maxX": 1512,
+      "maxY": 1004
+    },
+    "anchors": [],
+    "constellationId": "Col",
+    "imagePath": "public/no-line/Columba_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Col.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.51539073,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 172.49,
+      "maxX": 901.12,
+      "maxY": 851.51
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Coma Berenices"],
+    "imageUrl": "/no-line/Coma Berenices_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 93,
+      "minY": 31,
+      "maxX": 1248,
+      "maxY": 1190
+    },
+    "anchors": [],
+    "constellationId": "Com",
+    "imagePath": "public/no-line/Coma Berenices_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Com.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.5510026,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 158.44,
+      "minY": 122.88,
+      "maxX": 865.56,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Corona Australis"],
+    "imageUrl": "/no-line/Corona Australis_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 33,
+      "minY": 35,
+      "maxX": 1242,
+      "maxY": 1192
+    },
+    "anchors": [],
+    "constellationId": "CrA",
+    "imagePath": "public/no-line/Corona Australis_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/CrA.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56548315,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 148.52,
+      "maxX": 901.12,
+      "maxY": 875.48
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Corona Borealis"],
+    "imageUrl": "/no-line/Corona Borealis_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 17,
+      "minY": 144,
+      "maxX": 1222,
+      "maxY": 1095
+    },
+    "anchors": [],
+    "constellationId": "CrB",
+    "imagePath": "public/no-line/Corona Borealis_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/CrB.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.53462461,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 229.54,
+      "maxX": 901.12,
+      "maxY": 794.46
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Corvus"],
+    "imageUrl": "/no-line/Corvus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 17,
+      "minY": 17,
+      "maxX": 1234,
+      "maxY": 1236
+    },
+    "anchors": [],
+    "constellationId": "Crv",
+    "imagePath": "public/no-line/Corvus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Crv.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.41534593,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 231.18,
+      "minY": 122.88,
+      "maxX": 792.82,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Crater"],
+    "imageUrl": "/no-line/Crater_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 72,
+      "minY": 0,
+      "maxX": 1228,
+      "maxY": 1214
+    },
+    "anchors": [],
+    "constellationId": "Crt",
+    "imagePath": "public/no-line/Crater_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Crt.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56240362,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 132.69,
+      "maxX": 901.12,
+      "maxY": 891.31
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Crux"],
+    "imageUrl": "/no-line/Crux_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 277,
+      "minY": 123,
+      "maxX": 1010,
+      "maxY": 1115
+    },
+    "anchors": [],
+    "constellationId": "Cru",
+    "imagePath": "public/no-line/Crux_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cru.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.66356889,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 241.78,
+      "minY": 122.88,
+      "maxX": 782.22,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Cygnus"],
+    "imageUrl": "/no-line/Cygnus_線なし.png",
+    "imageWidthPx": 1237,
+    "imageHeightPx": 1271,
+    "pixelBounds": {
+      "minX": 31,
+      "minY": 19,
+      "maxX": 1237,
+      "maxY": 1271
+    },
+    "anchors": [],
+    "constellationId": "Cyg",
+    "imagePath": "public/no-line/Cygnus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Cyg.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.5079403,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 171.68,
+      "minY": 122.88,
+      "maxX": 852.32,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Delphinus"],
+    "imageUrl": "/no-line/Delphinus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 132,
+      "minY": 21,
+      "maxX": 1134,
+      "maxY": 1204
+    },
+    "anchors": [],
+    "constellationId": "Del",
+    "imagePath": "public/no-line/Delphinus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Del.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.47288623,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 248.76,
+      "minY": 122.88,
+      "maxX": 775.24,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Dorado"],
+    "imageUrl": "/no-line/Dorado_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 47,
+      "minY": 37,
+      "maxX": 1220,
+      "maxY": 1204
+    },
+    "anchors": [],
+    "constellationId": "Dor",
+    "imagePath": "public/no-line/Dorado_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Dor.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56969309,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 140.75,
+      "minY": 122.88,
+      "maxX": 883.25,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Draco"],
+    "imageUrl": "/no-line/Draco_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 0,
+      "minY": 29,
+      "maxX": 1522,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Dra",
+    "imagePath": "public/no-line/Draco_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Dra.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.46019448,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 147.55,
+      "maxX": 901.12,
+      "maxY": 876.45
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Equuleus"],
+    "imageUrl": "/no-line/Equuleus_線なし.png",
+    "imageWidthPx": 1240,
+    "imageHeightPx": 1269,
+    "pixelBounds": {
+      "minX": 421,
+      "minY": 101,
+      "maxX": 911,
+      "maxY": 1167
+    },
+    "anchors": [],
+    "constellationId": "Equ",
+    "imagePath": "public/no-line/Equuleus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Equ.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.39677143,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 403.99,
+      "minY": 122.88,
+      "maxX": 620.01,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Eridanus"],
+    "imageUrl": "/no-line/Eridanus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 146,
+      "minY": 17,
+      "maxX": 1233,
+      "maxY": 1240
+    },
+    "anchors": [],
+    "constellationId": "Eri",
+    "imagePath": "public/no-line/Eridanus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Eri.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.46227047,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 232.84,
+      "minY": 122.88,
+      "maxX": 791.16,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Fornax"],
+    "imageUrl": "/no-line/Fornax_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 81,
+      "minY": 180,
+      "maxX": 1186,
+      "maxY": 1078
+    },
+    "anchors": [],
+    "constellationId": "For",
+    "imagePath": "public/no-line/Fornax_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/For.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.23,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 427.5,
+      "maxX": 901.12,
+      "maxY": 596.5
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Gemini"],
+    "imageUrl": "/no-line/Gemini_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 200,
+      "minY": 82,
+      "maxX": 1051,
+      "maxY": 1147
+    },
+    "anchors": [],
+    "constellationId": "Gem",
+    "imagePath": "public/no-line/Gemini_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Gem.svg",
+    "offsetX": 48,
+    "offsetY": 0,
+    "scale": 0.83270282,
+    "rotationDeg": -172,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 147.05,
+      "maxX": 901.12,
+      "maxY": 876.95
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Grus"],
+    "imageUrl": "/no-line/Grus_線なし.png",
+    "imageWidthPx": 1216,
+    "imageHeightPx": 1294,
+    "pixelBounds": {
+      "minX": 49,
+      "minY": 23,
+      "maxX": 1176,
+      "maxY": 1256
+    },
+    "anchors": [],
+    "constellationId": "Gru",
+    "imagePath": "public/no-line/Grus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Gru.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.46688199,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 219.68,
+      "minY": 122.88,
+      "maxX": 804.32,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Hercules"],
+    "imageUrl": "/no-line/Hercules_線なし.png",
+    "imageWidthPx": 1244,
+    "imageHeightPx": 1264,
+    "pixelBounds": {
+      "minX": 246,
+      "minY": 101,
+      "maxX": 983,
+      "maxY": 1163
+    },
+    "anchors": [],
+    "constellationId": "Her",
+    "imagePath": "public/no-line/Hercules_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Her.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.65952542,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 187.75,
+      "minY": 122.88,
+      "maxX": 836.25,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Horologium"],
+    "imageUrl": "/no-line/Horologium_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 457,
+      "minY": 56,
+      "maxX": 891,
+      "maxY": 1183
+    },
+    "anchors": [],
+    "constellationId": "Hor",
+    "imagePath": "public/no-line/Horologium_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Hor.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.62148713,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 187.26,
+      "minY": 122.88,
+      "maxX": 836.74,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Hydra"],
+    "imageUrl": "/no-line/Hydra_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 21,
+      "minY": 250,
+      "maxX": 1230,
+      "maxY": 1158
+    },
+    "anchors": [],
+    "constellationId": "Hya",
+    "imagePath": "public/no-line/Hydra_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Hya.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.40297797,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 308.72,
+      "maxX": 901.12,
+      "maxY": 715.28
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Hydrus"],
+    "imageUrl": "/no-line/Hydrus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 95,
+      "minY": 31,
+      "maxX": 1176,
+      "maxY": 1207
+    },
+    "anchors": [],
+    "constellationId": "Hyi",
+    "imagePath": "public/no-line/Hydrus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Hyi.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.45724329,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 237.4,
+      "minY": 122.88,
+      "maxX": 786.6,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Indus"],
+    "imageUrl": "/no-line/Indus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 212,
+      "minY": 40,
+      "maxX": 1025,
+      "maxY": 1179
+    },
+    "anchors": [],
+    "constellationId": "Ind",
+    "imagePath": "public/no-line/Indus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ind.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.55068306,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 163.54,
+      "maxX": 901.12,
+      "maxY": 860.46
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Lacerta"],
+    "imageUrl": "/no-line/Lacerta_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 417,
+      "minY": 33,
+      "maxX": 885,
+      "maxY": 1218
+    },
+    "anchors": [],
+    "constellationId": "Lac",
+    "imagePath": "public/no-line/Lacerta_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lac.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.50811538,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 379.89,
+      "minY": 122.88,
+      "maxX": 644.11,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Leo"],
+    "imageUrl": "/no-line/Leo_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 123,
+      "minY": 82,
+      "maxX": 1401,
+      "maxY": 942
+    },
+    "anchors": [],
+    "constellationId": "Leo",
+    "imagePath": "public/no-line/Leo_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Leo.svg",
+    "offsetX": 0,
+    "offsetY": 24,
+    "scale": 0.7510186,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 325.6,
+      "maxX": 901.12,
+      "maxY": 698.4
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Leo Minor"],
+    "imageUrl": "/no-line/Leo Minor_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 100,
+      "minY": 277,
+      "maxX": 1161,
+      "maxY": 971
+    },
+    "anchors": [],
+    "constellationId": "LMi",
+    "imagePath": "public/no-line/Leo Minor_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/LMi.svg",
+    "offsetX": 0,
+    "offsetY": -20,
+    "scale": 0.32,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 437.76,
+      "maxX": 901.12,
+      "maxY": 586.24
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Lepus"],
+    "imageUrl": "/no-line/Lepus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 50,
+      "minY": 215,
+      "maxX": 1200,
+      "maxY": 1038
+    },
+    "anchors": [],
+    "constellationId": "Lep",
+    "imagePath": "public/no-line/Lepus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lep.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56237424,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 254.87,
+      "maxX": 901.12,
+      "maxY": 769.13
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Libra"],
+    "imageUrl": "/no-line/Libra_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 134,
+      "minY": 123,
+      "maxX": 1121,
+      "maxY": 1081
+    },
+    "anchors": [],
+    "constellationId": "Lib",
+    "imagePath": "public/no-line/Libra_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lib.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.73660214,
+    "rotationDeg": 82,
+    "flipX": false,
+    "flipY": true,
+    "guideBounds": {
+      "minX": 302.18,
+      "minY": 122.88,
+      "maxX": 721.82,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Lupus"],
+    "imageUrl": "/no-line/Lupus_線なし.png",
+    "imageWidthPx": 1240,
+    "imageHeightPx": 1269,
+    "pixelBounds": {
+      "minX": 91,
+      "minY": 46,
+      "maxX": 1224,
+      "maxY": 1269
+    },
+    "anchors": [],
+    "constellationId": "Lup",
+    "imagePath": "public/no-line/Lupus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lup.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.51934687,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 185.1,
+      "minY": 122.88,
+      "maxX": 838.9,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Lynx"],
+    "imageUrl": "/no-line/Lynx_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 13,
+      "minY": 25,
+      "maxX": 1248,
+      "maxY": 1254
+    },
+    "anchors": [],
+    "constellationId": "Lyn",
+    "imagePath": "public/no-line/Lynx_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lyn.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.5411131,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 142.54,
+      "maxX": 901.12,
+      "maxY": 881.46
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Lyra"],
+    "imageUrl": "/no-line/Lyra_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 320,
+      "minY": 62,
+      "maxX": 965,
+      "maxY": 1192
+    },
+    "anchors": [],
+    "constellationId": "Lyr",
+    "imagePath": "public/no-line/Lyra_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Lyr.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.61983717,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 260.83,
+      "minY": 122.88,
+      "maxX": 763.17,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Mensa"],
+    "imageUrl": "/no-line/Mensa_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 28,
+      "minY": 131,
+      "maxX": 1225,
+      "maxY": 1206
+    },
+    "anchors": [],
+    "constellationId": "Men",
+    "imagePath": "public/no-line/Mensa_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Men.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.57642105,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 128.68,
+      "minY": 122.88,
+      "maxX": 895.32,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Microscopium"],
+    "imageUrl": "/no-line/Microscopium_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 341,
+      "minY": 18,
+      "maxX": 965,
+      "maxY": 1228
+    },
+    "anchors": [],
+    "constellationId": "Mic",
+    "imagePath": "public/no-line/Microscopium_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Mic.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.57631731,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 312.21,
+      "minY": 122.88,
+      "maxX": 711.79,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Monoceros"],
+    "imageUrl": "/no-line/Monoceros_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 51,
+      "minY": 51,
+      "maxX": 1226,
+      "maxY": 1186
+    },
+    "anchors": [],
+    "constellationId": "Mon",
+    "imagePath": "public/no-line/Monoceros_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Mon.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.41967753,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 247.37,
+      "maxX": 901.12,
+      "maxY": 776.63
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Musca"],
+    "imageUrl": "/no-line/Musca_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 150,
+      "minY": 23,
+      "maxX": 1238,
+      "maxY": 1196
+    },
+    "anchors": [],
+    "constellationId": "Mus",
+    "imagePath": "public/no-line/Musca_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Mus.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.43621995,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 227.73,
+      "maxX": 901.12,
+      "maxY": 796.27
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Norma"],
+    "imageUrl": "/no-line/Norma_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 211,
+      "minY": 57,
+      "maxX": 1238,
+      "maxY": 1167
+    },
+    "anchors": [],
+    "constellationId": "Nor",
+    "imagePath": "public/no-line/Norma_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Nor.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.54597663,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 200.49,
+      "minY": 122.88,
+      "maxX": 823.51,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Octans"],
+    "imageUrl": "/no-line/Octans_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 186,
+      "minY": 41,
+      "maxX": 1147,
+      "maxY": 1206
+    },
+    "anchors": [],
+    "constellationId": "Oct",
+    "imagePath": "public/no-line/Octans_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Oct.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56189594,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 212.01,
+      "minY": 122.88,
+      "maxX": 811.99,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Ophiuchus"],
+    "imageUrl": "/no-line/Ophiuchus_線なし.png",
+    "imageWidthPx": 1024,
+    "imageHeightPx": 1536,
+    "pixelBounds": {
+      "minX": 122,
+      "minY": 19,
+      "maxX": 1004,
+      "maxY": 1486
+    },
+    "anchors": [],
+    "constellationId": "Oph",
+    "imagePath": "public/no-line/Ophiuchus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Oph.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.468,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 282.68,
+      "minY": 122.88,
+      "maxX": 741.32,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Orion"],
+    "imageUrl": "/no-line/Orion_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 248,
+      "minY": 25,
+      "maxX": 1067,
+      "maxY": 1216
+    },
+    "anchors": [
+      {
+        "starId": 26142,
+        "pixelX": 683.4300000000001,
+        "pixelY": 376.2
+      },
+      {
+        "starId": 25273,
+        "pixelX": 601.92,
+        "pixelY": 463.98
+      },
+      {
+        "starId": 27919,
+        "pixelX": 739.86,
+        "pixelY": 451.44
+      },
+      {
+        "starId": 22396,
+        "pixelX": 338.58000000000004,
+        "pixelY": 589.38
+      },
+      {
+        "starId": 24378,
+        "pixelX": 438.9,
+        "pixelY": 1103.52
+      },
+      {
+        "starId": 27298,
+        "pixelX": 802.5600000000001,
+        "pixelY": 1141.14
+      }
+    ],
+    "constellationId": "Ori",
+    "imagePath": "public/no-line/Orion_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ori.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56549451,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 254.7,
+      "minY": 122.88,
+      "maxX": 769.3,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Pavo"],
+    "imageUrl": "/no-line/Pavo_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 100,
+      "minY": 101,
+      "maxX": 1148,
+      "maxY": 1128
+    },
+    "anchors": [],
+    "constellationId": "Pav",
+    "imagePath": "public/no-line/Pavo_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Pav.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.46608958,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 246.07,
+      "maxX": 901.12,
+      "maxY": 777.93
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Pegasus"],
+    "imageUrl": "/no-line/Pegasus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 109,
+      "minY": 129,
+      "maxX": 1205,
+      "maxY": 1045
+    },
+    "anchors": [],
+    "constellationId": "Peg",
+    "imagePath": "public/no-line/Pegasus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Peg.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.55847162,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 227.8,
+      "maxX": 901.12,
+      "maxY": 796.2
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Perseus"],
+    "imageUrl": "/no-line/Perseus_線なし.png",
+    "imageWidthPx": 1244,
+    "imageHeightPx": 1264,
+    "pixelBounds": {
+      "minX": 99,
+      "minY": 104,
+      "maxX": 1144,
+      "maxY": 1125
+    },
+    "anchors": [],
+    "constellationId": "Per",
+    "imagePath": "public/no-line/Perseus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Per.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.67025455,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 126.15,
+      "maxX": 901.12,
+      "maxY": 897.85
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Phoenix"],
+    "imageUrl": "/no-line/Phoenix_線なし.png",
+    "imageWidthPx": 1243,
+    "imageHeightPx": 1266,
+    "pixelBounds": {
+      "minX": 99,
+      "minY": 101,
+      "maxX": 1143,
+      "maxY": 1164
+    },
+    "anchors": [],
+    "constellationId": "Phe",
+    "imagePath": "public/no-line/Phoenix_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Phe.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.59850423,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 158.55,
+      "maxX": 901.12,
+      "maxY": 865.45
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Pictor"],
+    "imageUrl": "/no-line/Pictor_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 228,
+      "minY": 12,
+      "maxX": 1032,
+      "maxY": 1174
+    },
+    "anchors": [],
+    "constellationId": "Pic",
+    "imagePath": "public/no-line/Pictor_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Pic.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.60276764,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 238.25,
+      "minY": 122.88,
+      "maxX": 785.75,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Piscis Austrinus"],
+    "imageUrl": "/no-line/Piscis Austrinus_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 8,
+      "minY": 48,
+      "maxX": 1254,
+      "maxY": 1093
+    },
+    "anchors": [],
+    "constellationId": "PsA",
+    "imagePath": "public/no-line/Piscis Austrinus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/PsA.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.27620096,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 351.65,
+      "maxX": 901.12,
+      "maxY": 672.35
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Pisces"],
+    "imageUrl": "/no-line/Pisces_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 25,
+      "minY": 15,
+      "maxX": 1524,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Psc",
+    "imagePath": "public/no-line/Pisces_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Psc.svg",
+    "offsetX": -24,
+    "offsetY": 24,
+    "scale": 0.56776746,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 263.84,
+      "maxX": 901.12,
+      "maxY": 760.16
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Puppis"],
+    "imageUrl": "/no-line/Puppis_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 196,
+      "minY": 38,
+      "maxX": 1075,
+      "maxY": 1224
+    },
+    "anchors": [],
+    "constellationId": "Pup",
+    "imagePath": "public/no-line/Puppis_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Pup.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.56936519,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 233.96,
+      "minY": 122.88,
+      "maxX": 790.04,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Pyxis"],
+    "imageUrl": "/no-line/Pyxis_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 203,
+      "minY": 114,
+      "maxX": 1079,
+      "maxY": 1098
+    },
+    "anchors": [],
+    "constellationId": "Pyx",
+    "imagePath": "public/no-line/Pyxis_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Pyx.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.60575342,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 217.2,
+      "minY": 122.88,
+      "maxX": 806.8,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Reticulum"],
+    "imageUrl": "/no-line/Reticulum_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 79,
+      "minY": 57,
+      "maxX": 1176,
+      "maxY": 1159
+    },
+    "anchors": [],
+    "constellationId": "Ret",
+    "imagePath": "public/no-line/Reticulum_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ret.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.42530538,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 252.8,
+      "minY": 122.88,
+      "maxX": 771.2,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Sagitta"],
+    "imageUrl": "/no-line/Sagitta_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 31,
+      "minY": 298,
+      "maxX": 1232,
+      "maxY": 962
+    },
+    "anchors": [],
+    "constellationId": "Sge",
+    "imagePath": "public/no-line/Sagitta_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Sge.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.48640663,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 332.57,
+      "maxX": 901.12,
+      "maxY": 691.43
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Sagittarius"],
+    "imageUrl": "/no-line/Sagittarius_線なし.png",
+    "imageWidthPx": 1240,
+    "imageHeightPx": 1269,
+    "pixelBounds": {
+      "minX": 21,
+      "minY": 19,
+      "maxX": 1232,
+      "maxY": 1253
+    },
+    "anchors": [],
+    "constellationId": "Sgr",
+    "imagePath": "public/no-line/Sagittarius_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Sgr.svg",
+    "offsetX": 0,
+    "offsetY": -48,
+    "scale": 0.72016492,
+    "rotationDeg": -90,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 185.73,
+      "minY": 122.88,
+      "maxX": 838.27,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Scorpius"],
+    "imageUrl": "/no-line/Scorpius_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 101,
+      "minY": 56,
+      "maxX": 1142,
+      "maxY": 1161
+    },
+    "anchors": [],
+    "constellationId": "Sco",
+    "imagePath": "public/no-line/Scorpius_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Sco.svg",
+    "offsetX": 24,
+    "offsetY": -24,
+    "scale": 0.81292626,
+    "rotationDeg": -180,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 138.25,
+      "minY": 122.88,
+      "maxX": 885.75,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Sculptor"],
+    "imageUrl": "/no-line/Sculptor_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 255,
+      "minY": 155,
+      "maxX": 978,
+      "maxY": 1077
+    },
+    "anchors": [],
+    "constellationId": "Scl",
+    "imagePath": "public/no-line/Sculptor_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Scl.svg",
+    "offsetX": -30,
+    "offsetY": 25,
+    "scale": 0.38,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 336.01,
+      "maxX": 901.12,
+      "maxY": 687.99
+    },
+    "needsHumanCheck": true
+  },
+  {
+    "constellationNames": ["Scutum"],
+    "imageUrl": "/no-line/Scutum_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 367,
+      "minY": 120,
+      "maxX": 1023,
+      "maxY": 1168
+    },
+    "anchors": [],
+    "constellationId": "Sct",
+    "imagePath": "public/no-line/Scutum_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Sct.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.48021037,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 336.99,
+      "minY": 122.88,
+      "maxX": 687.01,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Serpens Caput"],
+    "imageUrl": "/no-line/Serpens Caput_線なし.png",
+    "imageWidthPx": 1237,
+    "imageHeightPx": 1271,
+    "pixelBounds": {
+      "minX": 97,
+      "minY": 92,
+      "maxX": 784,
+      "maxY": 1225
+    },
+    "anchors": [],
+    "constellationId": "Ser-Caput",
+    "imagePath": "public/no-line/Serpens Caput_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ser.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.42359576,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 245.37,
+      "maxX": 901.12,
+      "maxY": 778.63
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Serpens Cauda"],
+    "imageUrl": "/no-line/Serpens Cauda_線なし.png",
+    "imageWidthPx": 1236,
+    "imageHeightPx": 1273,
+    "pixelBounds": {
+      "minX": 46,
+      "minY": 31,
+      "maxX": 797,
+      "maxY": 1202
+    },
+    "anchors": [],
+    "constellationId": "Ser-Cauda",
+    "imagePath": "public/no-line/Serpens Cauda_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Ser.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.4098497,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 245.37,
+      "maxX": 901.12,
+      "maxY": 778.63
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Sextans"],
+    "imageUrl": "/no-line/Sextans_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 0,
+      "minY": 0,
+      "maxX": 1165,
+      "maxY": 1162
+    },
+    "anchors": [],
+    "constellationId": "Sex",
+    "imagePath": "public/no-line/Sextans_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Sex.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.49737005,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 190.92,
+      "maxX": 901.12,
+      "maxY": 833.08
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Taurus"],
+    "imageUrl": "/no-line/Taurus_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 23,
+      "minY": 17,
+      "maxX": 1516,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Tau",
+    "imagePath": "public/no-line/Taurus_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Tau.svg",
+    "offsetX": 0,
+    "offsetY": 24,
+    "scale": 0.56999695,
+    "rotationDeg": -196,
+    "flipX": false,
+    "flipY": true,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 156.61,
+      "maxX": 901.12,
+      "maxY": 867.39
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Telescopium"],
+    "imageUrl": "/no-line/Telescopium_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 49,
+      "minY": 23,
+      "maxX": 1222,
+      "maxY": 1192
+    },
+    "anchors": [],
+    "constellationId": "Tel",
+    "imagePath": "public/no-line/Telescopium_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Tel.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.57512532,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 137.21,
+      "minY": 122.88,
+      "maxX": 886.79,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Triangulum"],
+    "imageUrl": "/no-line/Triangulum_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 206,
+      "minY": 143,
+      "maxX": 1088,
+      "maxY": 1073
+    },
+    "anchors": [],
+    "constellationId": "Tri",
+    "imagePath": "public/no-line/Triangulum_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Tri.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.75313548,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 137.63,
+      "minY": 122.88,
+      "maxX": 886.37,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Triangulum Australe"],
+    "imageUrl": "/no-line/Triangulum Australe_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 105,
+      "minY": 193,
+      "maxX": 1084,
+      "maxY": 1147
+    },
+    "anchors": [],
+    "constellationId": "TrA",
+    "imagePath": "public/no-line/Triangulum Australe_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/TrA.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.54873585,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 221.17,
+      "maxX": 901.12,
+      "maxY": 802.83
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Tucana"],
+    "imageUrl": "/no-line/Tucana_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 25,
+      "minY": 0,
+      "maxX": 1496,
+      "maxY": 1007
+    },
+    "anchors": [],
+    "constellationId": "Tuc",
+    "imagePath": "public/no-line/Tucana_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Tuc.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.33291956,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 325.75,
+      "maxX": 901.12,
+      "maxY": 698.25
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Ursa Major"],
+    "imageUrl": "/no-line/Ursa Major_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 39,
+      "minY": 160,
+      "maxX": 1230,
+      "maxY": 1102
+    },
+    "anchors": [],
+    "constellationId": "UMa",
+    "imagePath": "public/no-line/Ursa Major_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/UMa.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.54189172,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 228.41,
+      "maxX": 901.12,
+      "maxY": 795.59
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Ursa Minor"],
+    "imageUrl": "/no-line/Ursa Minor_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 305,
+      "minY": 305,
+      "maxX": 887,
+      "maxY": 1088
+    },
+    "anchors": [],
+    "constellationId": "UMi",
+    "imagePath": "public/no-line/Ursa Minor_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/UMi.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.36924742,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 392.61,
+      "minY": 122.88,
+      "maxX": 631.39,
+      "maxY": 901.12
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Vela"],
+    "imageUrl": "/no-line/Vela_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 100,
+      "minY": 182,
+      "maxX": 1153,
+      "maxY": 1072
+    },
+    "anchors": [],
+    "constellationId": "Vel",
+    "imagePath": "public/no-line/Vela_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Vel.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.44472135,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 292.11,
+      "maxX": 901.12,
+      "maxY": 731.89
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Virgo"],
+    "imageUrl": "/no-line/Virgo_線なし.png",
+    "imageWidthPx": 1536,
+    "imageHeightPx": 1024,
+    "pixelBounds": {
+      "minX": 23,
+      "minY": 15,
+      "maxX": 1518,
+      "maxY": 1024
+    },
+    "anchors": [],
+    "constellationId": "Vir",
+    "imagePath": "public/no-line/Virgo_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Vir.svg",
+    "offsetX": 24,
+    "offsetY": 48,
+    "scale": 0.60095539,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 328.67,
+      "maxX": 901.12,
+      "maxY": 695.33
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Volans"],
+    "imageUrl": "/no-line/Volans_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 51,
+      "minY": 33,
+      "maxX": 1208,
+      "maxY": 1121
+    },
+    "anchors": [],
+    "constellationId": "Vol",
+    "imagePath": "public/no-line/Volans_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Vol.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.29360846,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 334.53,
+      "maxX": 901.12,
+      "maxY": 689.47
+    },
+    "needsHumanCheck": false
+  },
+  {
+    "constellationNames": ["Vulpecula"],
+    "imageUrl": "/no-line/Vulpecula_線なし.png",
+    "imageWidthPx": 1254,
+    "imageHeightPx": 1254,
+    "pixelBounds": {
+      "minX": 27,
+      "minY": 154,
+      "maxX": 1242,
+      "maxY": 1014
+    },
+    "anchors": [],
+    "constellationId": "Vul",
+    "imagePath": "public/no-line/Vulpecula_線なし.png",
+    "guideImagePath": "tmp/constellation-guides/Vul.svg",
+    "offsetX": 0,
+    "offsetY": 0,
+    "scale": 0.38616279,
+    "rotationDeg": 0,
+    "flipX": false,
+    "flipY": false,
+    "guideBounds": {
+      "minX": 122.88,
+      "minY": 327.5,
+      "maxX": 901.12,
+      "maxY": 696.5
+    },
+    "needsHumanCheck": false
+  }
+]
