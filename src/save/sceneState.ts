@@ -1,9 +1,5 @@
 import type { ObserverLocation } from '../astronomy/coordinates'
-import {
-  createInitialDisplayState,
-  type DisplayMode,
-  type DisplayState,
-} from '../displayState'
+import { createInitialDisplayState, type DisplayState } from '../displayState'
 import { clamp, normalizeDegrees } from '../mathUtils'
 import type { PlaybackDirection } from '../playback/playbackTime'
 import { starfieldConfig } from '../stars/starfieldConfig'
@@ -29,7 +25,6 @@ export interface SavedSceneView {
 }
 
 export interface SavedSceneDisplay {
-  mode: DisplayMode
   isProjectorMode: boolean
   /**
    * Night Mode UI (10次 Task 6): added after version 1 shipped, so parsing
@@ -60,10 +55,7 @@ export interface SceneSnapshotInput {
   locationLabel: string | null
   speedMagnitude: number
   direction: PlaybackDirection
-  displayState: Pick<
-    DisplayState,
-    'mode' | 'isProjectorMode' | 'isNightModeUi'
-  >
+  displayState: Pick<DisplayState, 'isProjectorMode' | 'isNightModeUi'>
   view: SavedSceneView
 }
 
@@ -84,7 +76,6 @@ export function createSavedSceneSnapshot(
     },
     view: input.view,
     display: {
-      mode: input.displayState.mode,
       isProjectorMode: input.displayState.isProjectorMode,
       isNightModeUi: input.displayState.isNightModeUi,
     },
@@ -118,7 +109,10 @@ export function parsePersistedSceneState(
     const parsed: unknown = JSON.parse(raw)
     if (!isRecord(parsed)) return null
     if (parsed.version !== PERSISTED_SCENE_STATE_VERSION) return null
-    if (typeof parsed.savedAtIso !== 'string' || !isIsoDateString(parsed.savedAtIso)) {
+    if (
+      typeof parsed.savedAtIso !== 'string' ||
+      !isIsoDateString(parsed.savedAtIso)
+    ) {
       return null
     }
     const scene = parseSavedSceneState(parsed.scene)
@@ -139,7 +133,6 @@ export function createDisplayStateFromSavedScene(
   const initial = createInitialDisplayState()
   return {
     ...initial,
-    mode: scene.display.mode,
     isProjectorMode: scene.display.isProjectorMode,
     isNightModeUi: scene.display.isNightModeUi,
   }
@@ -214,13 +207,13 @@ function parseSavedSceneView(raw: unknown): SavedSceneView | null {
 
 function parseSavedSceneDisplay(raw: unknown): SavedSceneDisplay | null {
   if (!isRecord(raw)) return null
-  if (!isDisplayMode(raw.mode)) return null
   if (typeof raw.isProjectorMode !== 'boolean') return null
 
   return {
-    mode: raw.mode,
     isProjectorMode: raw.isProjectorMode,
-    // Additive field (10次 Task 6): absent in data saved before Night Mode
+    // `mode` from pre-#15 data is intentionally ignored: the retired
+    // immersive mode now restores as the standard auto-hiding UI.
+    // isNightModeUi is additive (10次 Task 6): absent in data saved before Night Mode
     // UI shipped, so a missing/invalid value falls back to false instead of
     // rejecting the whole payload.
     isNightModeUi: raw.isNightModeUi === true,
@@ -245,7 +238,6 @@ function normalizeSavedSceneState(scene: SavedSceneState): SavedSceneState {
     },
     view: normalizeView(scene.view),
     display: {
-      mode: scene.display.mode,
       isProjectorMode: scene.display.isProjectorMode,
       isNightModeUi: scene.display.isNightModeUi,
     },
@@ -274,8 +266,4 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isIsoDateString(value: string): boolean {
   return !Number.isNaN(Date.parse(value))
-}
-
-function isDisplayMode(value: unknown): value is DisplayMode {
-  return value === 'standard' || value === 'immersive'
 }

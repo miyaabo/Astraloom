@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createInitialDisplayState, requestChromeAutoHide, toggleOverlayPanel } from '../displayState'
+import {
+  createInitialDisplayState,
+  requestChromeAutoHide,
+} from '../displayState'
 import {
   createDisplayStateFromSavedScene,
   createPersistedSceneState,
@@ -11,9 +14,7 @@ import {
 
 describe('sceneState', () => {
   it('builds a saved-scene snapshot from runtime state and keeps only restorable fields', () => {
-    const hiddenOpenPanel = requestChromeAutoHide(
-      toggleOverlayPanel(createInitialDisplayState(), 'search'),
-    )
+    const hiddenOpenPanel = requestChromeAutoHide(createInitialDisplayState())
     const snapshot = createSavedSceneSnapshot({
       date: new Date('2026-08-31T12:34:56.000Z'),
       location: {
@@ -25,7 +26,6 @@ describe('sceneState', () => {
       speedMagnitude: 50,
       direction: -1,
       displayState: {
-        mode: hiddenOpenPanel.mode,
         isProjectorMode: hiddenOpenPanel.isProjectorMode,
         isNightModeUi: hiddenOpenPanel.isNightModeUi,
       },
@@ -54,7 +54,6 @@ describe('sceneState', () => {
         fovDegrees: 30,
       },
       display: {
-        mode: 'standard',
         isProjectorMode: false,
         isNightModeUi: false,
       },
@@ -81,7 +80,6 @@ describe('sceneState', () => {
           fovDegrees: 70,
         },
         display: {
-          mode: 'immersive',
           isProjectorMode: true,
           isNightModeUi: true,
         },
@@ -89,7 +87,9 @@ describe('sceneState', () => {
       new Date('2026-08-31T13:00:00.000Z'),
     )
 
-    const parsed = parsePersistedSceneState(serializePersistedSceneState(persisted))
+    const parsed = parsePersistedSceneState(
+      serializePersistedSceneState(persisted),
+    )
 
     expect(parsed).toEqual({
       version: PERSISTED_SCENE_STATE_VERSION,
@@ -143,7 +143,6 @@ describe('sceneState', () => {
             fovDegrees: 200,
           },
           display: {
-            mode: 'standard',
             isProjectorMode: false,
             isNightModeUi: true,
           },
@@ -169,7 +168,6 @@ describe('sceneState', () => {
         fovDegrees: 90,
       },
       display: {
-        mode: 'standard',
         isProjectorMode: false,
         isNightModeUi: true,
       },
@@ -199,7 +197,6 @@ describe('sceneState', () => {
             fovDegrees: 70,
           },
           display: {
-            mode: 'standard',
             isProjectorMode: false,
             // isNightModeUi intentionally absent — matches data saved before
             // 10次 Task 6 added the field.
@@ -209,6 +206,32 @@ describe('sceneState', () => {
     )
 
     expect(parsed?.scene.display.isNightModeUi).toBe(false)
+  })
+
+  it('ignores the retired immersive mode in pre-#15 saved data', () => {
+    const parsed = parsePersistedSceneState(
+      JSON.stringify({
+        version: PERSISTED_SCENE_STATE_VERSION,
+        savedAtIso: '2026-08-31T13:00:00.000Z',
+        scene: {
+          dateIso: '2026-08-31T12:34:56.000Z',
+          location: {
+            latitudeDegrees: 35.6762,
+            longitudeDegrees: 139.6503,
+            timeZoneId: 'Asia/Tokyo',
+            label: '東京',
+          },
+          playback: { speedMagnitude: 50, direction: 1 },
+          view: { azimuthDegrees: 180, altitudeDegrees: 25, fovDegrees: 70 },
+          display: { mode: 'immersive', isProjectorMode: true },
+        },
+      }),
+    )
+
+    expect(parsed?.scene.display).toEqual({
+      isProjectorMode: true,
+      isNightModeUi: false,
+    })
   })
 
   it('ignores a stray visualPreset field from a pre-D030 saved scene', () => {
@@ -234,7 +257,6 @@ describe('sceneState', () => {
             fovDegrees: 70,
           },
           display: {
-            mode: 'standard',
             // visualPreset intentionally present — matches data saved before
             // D030 abolished the preset feature. Should be ignored, not
             // rejected.
@@ -247,7 +269,6 @@ describe('sceneState', () => {
     )
 
     expect(parsed?.scene.display).toEqual({
-      mode: 'standard',
       isProjectorMode: false,
       isNightModeUi: false,
     })
@@ -272,18 +293,15 @@ describe('sceneState', () => {
         fovDegrees: 70,
       },
       display: {
-        mode: 'immersive',
         isProjectorMode: true,
         isNightModeUi: true,
       },
     })
 
     expect(restored).toEqual({
-      activePanel: null,
       isControlMenuOpen: false,
       activeControlMenuSection: null,
       isSelectionInfoOpen: false,
-      mode: 'immersive',
       chromeVisibility: 'visible',
       isProjectorMode: true,
       isNightModeUi: true,

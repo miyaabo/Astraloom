@@ -129,13 +129,19 @@ describe('Starfield', () => {
 
   it('lets the user jump to a celestial body, constellation, or star from the dropdown', () => {
     render(<Starfield />)
-    const select = screen.getByLabelText('天体・星・星座を選択')
+    expect(screen.queryByLabelText('天体・星・星座を選択')).toBeNull()
+    openSearch()
 
-    fireEvent.change(select, { target: { value: 'celestial-moon' } })
+    fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
+      target: { value: 'celestial-moon' },
+    })
     expect(highlightCelestialBody).toHaveBeenLastCalledWith('moon')
     expect(screen.getByText('Moon (月)', { selector: 'strong' })).toBeTruthy()
 
-    fireEvent.change(select, { target: { value: 'constellation-Aquila' } })
+    openSearch()
+    fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
+      target: { value: 'constellation-Aquila' },
+    })
     expect(highlightCelestialBody).toHaveBeenLastCalledWith(null)
     expect(
       screen.getByText('Aquila (わし座)', { selector: 'strong' }),
@@ -146,7 +152,10 @@ describe('Starfield', () => {
         option.type === 'star' && option.label === 'Altair (アルタイル)',
     )
     expect(altairOption?.type).toBe('star')
-    fireEvent.change(select, { target: { value: altairOption!.value } })
+    openSearch()
+    fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
+      target: { value: altairOption!.value },
+    })
     expect(screen.getByText(/Altair/, { selector: 'strong' })).toBeTruthy()
     expect(highlightCelestialBody).toHaveBeenLastCalledWith(null)
   })
@@ -164,6 +173,7 @@ describe('Starfield', () => {
     showConstellationLines.mockClear()
     lookAt.mockClear()
 
+    fireEvent.click(screen.getByRole('button', { name: '空を探す' }))
     fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
       target: { value: 'constellation-Leo' },
     })
@@ -193,6 +203,7 @@ describe('Starfield', () => {
     })
     updateStars.mockClear()
 
+    fireEvent.click(screen.getByRole('button', { name: '空を探す' }))
     fireEvent.change(screen.getByLabelText('天体・星・星座を選択'), {
       target: { value: 'constellation-Aquila' },
     })
@@ -244,9 +255,9 @@ describe('Starfield', () => {
     expect(lookAt).toHaveBeenLastCalledWith(0, 90)
     expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
     expect(
-      screen.getByRole('button', { name: '空を探す' }).getAttribute(
-        'aria-expanded',
-      ),
+      screen
+        .getByRole('button', { name: '空を探す' })
+        .getAttribute('aria-expanded'),
     ).toBe('true')
   })
 
@@ -298,49 +309,6 @@ describe('Starfield', () => {
     expect(setLabelTargets).toHaveBeenCalledWith([])
   })
 
-  it('toggles immersive mode and hides the main overlays until restored', () => {
-    render(<Starfield />)
-
-    expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
-    expect(screen.queryByLabelText('再生を開始')).toBeNull()
-
-    fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
-
-    expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
-    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
-
-    fireEvent.click(screen.getByLabelText('通常表示に戻る'))
-
-    expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
-    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
-    expect(screen.queryByLabelText('再生を開始')).toBeNull()
-  })
-
-  it('keeps the active selection when entering immersive mode, while hiding its UI', () => {
-    render(<Starfield />)
-
-    openSearch()
-    fireEvent.change(screen.getByLabelText('星座名・星名・主要天体で検索'), {
-      target: { value: 'Aquila' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Aquila (わし座)' }))
-
-    showConstellationLines.mockClear()
-    hideConstellationLines.mockClear()
-    setLabelTargets.mockClear()
-
-    fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
-
-    expect(hideConstellationLines).not.toHaveBeenCalled()
-    expect(setLabelTargets).not.toHaveBeenCalledWith([])
-    expect(screen.queryByLabelText('選択情報を閉じる')).toBeNull()
-
-    fireEvent.click(screen.getByLabelText('通常表示に戻る'))
-    expect(screen.getByLabelText('選択情報を開く')).toBeTruthy()
-    expect(showConstellationLines).not.toHaveBeenCalled()
-  })
-
   it('auto-hides the chrome after five seconds of inactivity in standard mode', () => {
     vi.useFakeTimers()
     render(<Starfield />)
@@ -353,6 +321,17 @@ describe('Starfield', () => {
 
     expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
     vi.useRealTimers()
+  })
+
+  it('toggles the standalone immersive-mode button', () => {
+    render(<Starfield />)
+
+    fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
+    expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
+    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
+
+    fireEvent.click(screen.getByLabelText('通常表示に戻る'))
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
   })
 
   it('shows display settings only in the display section', () => {
@@ -483,26 +462,12 @@ describe('Starfield', () => {
         fovDegrees: 70,
       },
       display: {
-        mode: 'standard',
         isProjectorMode: true,
       },
     })
   })
 
-  it('does not auto-hide the chrome after inactivity in immersive mode', () => {
-    vi.useFakeTimers()
-    render(<Starfield />)
-    fireEvent.click(screen.getByLabelText('鑑賞モードに切替'))
-
-    act(() => {
-      vi.advanceTimersByTime(3000)
-    })
-
-    expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
-    vi.useRealTimers()
-  })
-
-  it('does not auto-hide standard chrome while an overlay panel is open', () => {
+  it('does not auto-hide chrome while the search section is open', () => {
     vi.useFakeTimers()
     render(<Starfield />)
     openSearch()
@@ -596,8 +561,8 @@ describe('Starfield', () => {
 
     expect(restoreViewState).toHaveBeenCalledWith(210, 12, 55)
     expect(applyProjectorMode).toHaveBeenCalledWith(true)
-    expect(screen.getByLabelText('通常表示に戻る')).toBeTruthy()
-    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
+    expect(screen.queryByLabelText('通常表示に戻る')).toBeNull()
   })
 
   it('preserves restored location metadata when saving again before changing location', () => {

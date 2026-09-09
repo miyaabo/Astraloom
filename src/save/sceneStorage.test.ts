@@ -26,7 +26,6 @@ function createScene() {
         fovDegrees: 70,
       },
       display: {
-        mode: 'standard',
         isProjectorMode: false,
         isNightModeUi: false,
       },
@@ -41,7 +40,10 @@ describe('sceneStorage', () => {
     storage.clear()
 
     const scene = createScene()
-    expect(saveSceneToStorage(storage, scene)).toEqual({ ok: true, error: null })
+    expect(saveSceneToStorage(storage, scene)).toEqual({
+      ok: true,
+      error: null,
+    })
     expect(loadSceneFromStorage(storage)).toEqual(scene)
     expect(storage.getItem(SAVED_SCENE_STORAGE_KEY)).not.toBeNull()
   })

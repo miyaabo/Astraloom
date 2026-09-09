@@ -32,24 +32,21 @@ import type { ConstellationRecord } from './constellations/constellationTypes'
 import {
   canAutoHideChrome,
   closeControlMenu,
-  closeOverlayPanel,
   closeSelectionInfo,
   createInitialDisplayState,
-  enterImmersiveMode,
-  exitImmersiveMode,
   isChromeSuppressed,
   openSelectionInfo,
   requestChromeAutoHide,
   revealChrome,
   toggleControlMenu,
   toggleControlMenuSection,
+  toggleImmersiveMode,
   toggleNightModeUi,
   toggleProjectorMode,
 } from './displayState'
 import { ControlMenuOverlay } from './ControlMenuOverlay'
 import { ImmersiveModeToggle } from './ImmersiveModeToggle'
 import { findLocationPreset, locationPresets } from './locationPresets'
-import { NextConstellationButton } from './NextConstellationButton'
 import type { PlaybackDirection } from './playback/playbackTime'
 import {
   accumulatePlaybackTick,
@@ -60,11 +57,13 @@ import { attachCameraControls } from './render/cameraControls'
 import type { LabelTarget } from './render/StarfieldRenderer'
 import { StarfieldRenderer } from './render/StarfieldRenderer'
 import { SearchSection } from './SearchSection'
-import { SelectionOverlay } from './SelectionOverlay'
 import { SkySelectionSection } from './SkySelectionSection'
 import { TimeControlsSection } from './TimeControlsSection'
 import { DisplaySettingsSection } from './DisplaySettingsSection'
-import { equatorialToHorizontal, zenithObserverLocation } from './astronomy/coordinates'
+import {
+  equatorialToHorizontal,
+  zenithObserverLocation,
+} from './astronomy/coordinates'
 import { generateCelestialBodyRenderData } from './celestialBodies/celestialBodyDataSource'
 import {
   createDisplayStateFromSavedScene,
@@ -174,7 +173,7 @@ export function Starfield() {
     createInitialLocationMetadata(initialSavedScene),
   )
   const [isPlaying, setIsPlaying] = useState(false)
-  // Must match one of PlaybackOverlay's SPEED_PRESET_MAGNITUDES so the speed
+  // Must match TimeControlsSection's preset values so the speed
   // <select> reflects the actual playback rate on first render.
   const [speedMagnitude, setSpeedMagnitude] = useState(
     () => initialSavedScene?.playback.speedMagnitude ?? 50,
@@ -253,7 +252,7 @@ export function Starfield() {
     function scheduleAutoHide(): void {
       const current = displayStateRef.current
       if (
-        current.mode !== 'standard' ||
+        current.isImmersiveMode ||
         current.chromeVisibility !== 'visible' ||
         !canAutoHideChrome(current)
       ) {
@@ -266,50 +265,43 @@ export function Starfield() {
     }
 
     function revealChromeAndScheduleAutoHide(): void {
-      const current = displayStateRef.current
-      if (current.mode !== 'standard') return
-
+      if (displayStateRef.current.isImmersiveMode) return
       setDisplayState((state) => revealChrome(state))
       clearAutoHideTimeout()
       scheduleAutoHide()
     }
 
     function handlePointerDown(): void {
-      if (displayStateRef.current.mode !== 'standard') return
+      if (displayStateRef.current.isImmersiveMode) return
       isPointerInteractingRef.current = true
       revealChromeAndScheduleAutoHide()
     }
 
     function handlePointerMove(): void {
-      if (displayStateRef.current.mode !== 'standard') return
+      if (displayStateRef.current.isImmersiveMode) return
       if (!isPointerInteractingRef.current) return
       revealChromeAndScheduleAutoHide()
     }
 
     function handlePointerUp(): void {
-      if (displayStateRef.current.mode !== 'standard') return
+      if (displayStateRef.current.isImmersiveMode) return
       isPointerInteractingRef.current = false
       revealChromeAndScheduleAutoHide()
     }
 
     function handlePointerCancel(): void {
-      if (displayStateRef.current.mode !== 'standard') return
+      if (displayStateRef.current.isImmersiveMode) return
       isPointerInteractingRef.current = false
       revealChromeAndScheduleAutoHide()
     }
 
     function handleKeyDown(event: KeyboardEvent): void {
+      if (displayStateRef.current.isImmersiveMode) return
       if (event.key === 'Escape' && displayStateRef.current.isControlMenuOpen) {
         setDisplayState((state) => closeControlMenu(state))
         return
       }
       revealChromeAndScheduleAutoHide()
-    }
-
-    if (displayState.mode !== 'standard') {
-      isPointerInteractingRef.current = false
-      clearAutoHideTimeout()
-      return clearAutoHideTimeout
     }
 
     clearAutoHideTimeout()
@@ -350,12 +342,11 @@ export function Starfield() {
       })
     }
   }, [
-    displayState.activePanel,
     displayState.activeControlMenuSection,
     displayState.chromeVisibility,
     displayState.isControlMenuOpen,
+    displayState.isImmersiveMode,
     displayState.isSelectionInfoOpen,
-    displayState.mode,
   ])
 
   useEffect(() => {
@@ -627,15 +618,6 @@ export function Starfield() {
     setConstellationLabels([])
   }
 
-  function handleToggleImmersiveMode(): void {
-    if (displayState.mode === 'immersive') {
-      setDisplayState((current) => exitImmersiveMode(current))
-      return
-    }
-
-    setDisplayState((current) => enterImmersiveMode(current))
-  }
-
   function handleToggleProjectorMode(): void {
     const nextProjectorMode = !displayState.isProjectorMode
     setDisplayState((current) => toggleProjectorMode(current))
@@ -644,6 +626,10 @@ export function Starfield() {
 
   function handleToggleNightModeUi(): void {
     setDisplayState((current) => toggleNightModeUi(current))
+  }
+
+  function handleToggleImmersiveMode(): void {
+    setDisplayState((current) => toggleImmersiveMode(current))
   }
 
   function handleToggleFullscreen(): void {
@@ -670,7 +656,6 @@ export function Starfield() {
         speedMagnitude,
         direction,
         displayState: {
-          mode: displayState.mode,
           isProjectorMode: displayState.isProjectorMode,
           isNightModeUi: displayState.isNightModeUi,
         },
@@ -713,7 +698,7 @@ export function Starfield() {
   // under the pointer and, on a hit, selects it (selectStar above). Tapping
   // empty space deselects.
   function handleCanvasTap(clientX: number, clientY: number): void {
-    if (displayState.mode === 'immersive') return
+    if (displayState.isImmersiveMode) return
 
     const canvas = canvasRef.current
     const renderer = rendererRef.current
@@ -749,8 +734,6 @@ export function Starfield() {
   // the star's current direction — equatorialToHorizontal is the same
   // conversion constellationProjection.ts uses for line/label placement.
   function handleSelectStarResult(star: HygStarRecord): void {
-    if (displayState.mode === 'immersive') return
-
     selectStar(star, findConstellationByStarId(star.id))
     const horizontal = equatorialToHorizontal(
       { raHours: star.raHours, decDegrees: star.decDegrees },
@@ -765,7 +748,7 @@ export function Starfield() {
       horizontal.azimuthDegrees,
       Math.max(horizontal.altitudeDegrees, 2),
     )
-    setDisplayState((current) => closeOverlayPanel(current))
+    setDisplayState((current) => closeControlMenu(current))
   }
 
   // Task 6: a search-selected constellation has no single star to show info
@@ -780,12 +763,10 @@ export function Starfield() {
     constellation: ConstellationRecord,
     atLocation: ObserverLocation = location,
   ): void {
-    if (displayState.mode === 'immersive') return
-
     selectedCelestialBodyIdRef.current = null
     rendererRef.current?.highlightCelestialBody(null)
     setSelectedStarInfo(buildSelectedConstellationInfo(constellation))
-    setDisplayState((current) => openSelectionInfo(closeOverlayPanel(current)))
+    setDisplayState((current) => openSelectionInfo(closeControlMenu(current)))
     selectedConstellationRef.current = constellation
     const lookDirection = refreshConstellationDisplay(
       constellation,
@@ -833,7 +814,7 @@ export function Starfield() {
     )
   }
 
-  // Used by both SearchOverlay and SelectionOverlay's constellation picks
+  // Used by both search results and the menu's direct-selection list.
   // (the latter already lists all 89 catalog records in a plain dropdown —
   // no separate "browse all" UI needed). Picking one that's already visible
   // from here just selects it, same as before. Picking one that isn't (e.g.
@@ -845,8 +826,6 @@ export function Starfield() {
   function handleSelectConstellationFromList(
     constellation: ConstellationRecord,
   ): void {
-    if (displayState.mode === 'immersive') return
-
     const visibleHere =
       computeConstellationLineSegments(constellation, location, date).length > 0
     if (visibleHere) {
@@ -925,14 +904,12 @@ export function Starfield() {
   function handleSelectCelestialBodyResult(
     celestialBody: CelestialBodySearchRecord,
   ): void {
-    if (displayState.mode === 'immersive') return
-
     clearSelection()
     const state = findCelestialBodyState(celestialBody.id, location, date)
     selectedCelestialBodyIdRef.current = celestialBody.id
     rendererRef.current?.highlightCelestialBody(celestialBody.id)
     setSelectedStarInfo(buildSelectedCelestialBodyInfo(state))
-    setDisplayState((current) => openSelectionInfo(closeOverlayPanel(current)))
+    setDisplayState((current) => openSelectionInfo(closeControlMenu(current)))
     if (state.horizontal.altitudeDegrees >= 0) {
       rendererRef.current?.lookAt(
         state.horizontal.azimuthDegrees,
@@ -942,27 +919,45 @@ export function Starfield() {
   }
 
   // Search is for identifying an object, not changing the current view.
-  function handleSelectCelestialBodyFromSearch(celestialBody: CelestialBodySearchRecord): void {
-    if (displayState.mode === 'immersive') return
+  function handleSelectCelestialBodyFromSearch(
+    celestialBody: CelestialBodySearchRecord,
+  ): void {
     clearSelection()
-    const currentState = findCelestialBodyState(celestialBody.id, location, date)
+    const currentState = findCelestialBodyState(
+      celestialBody.id,
+      location,
+      date,
+    )
     const searchLocation = zenithObserverLocation(currentState.equatorial, date)
     handleLocationChange(searchLocation)
-    setLocationMetadata({ label: describeComputedLocation(searchLocation), timeZoneId: 'Etc/UTC' })
+    setLocationMetadata({
+      label: describeComputedLocation(searchLocation),
+      timeZoneId: 'Etc/UTC',
+    })
     const state = findCelestialBodyState(celestialBody.id, searchLocation, date)
     selectedCelestialBodyIdRef.current = celestialBody.id
     rendererRef.current?.highlightCelestialBody(celestialBody.id)
     setSelectedStarInfo(buildSelectedCelestialBodyInfo(state))
     setDisplayState((current) => openSelectionInfo(current))
-    rendererRef.current?.lookAt(state.horizontal.azimuthDegrees, state.horizontal.altitudeDegrees)
+    rendererRef.current?.lookAt(
+      state.horizontal.azimuthDegrees,
+      state.horizontal.altitudeDegrees,
+    )
   }
 
   function handleSelectStarFromSearch(star: HygStarRecord): void {
-    const searchLocation = zenithObserverLocation({ raHours: star.raHours, decDegrees: star.decDegrees }, date)
+    const searchLocation = zenithObserverLocation(
+      { raHours: star.raHours, decDegrees: star.decDegrees },
+      date,
+    )
     handleLocationChange(searchLocation)
-    setLocationMetadata({ label: describeComputedLocation(searchLocation), timeZoneId: 'Etc/UTC' })
+    setLocationMetadata({
+      label: describeComputedLocation(searchLocation),
+      timeZoneId: 'Etc/UTC',
+    })
     selectStar(star, findConstellationByStarId(star.id))
     rendererRef.current?.lookAt(0, 90)
+    setDisplayState((current) => closeControlMenu(current))
   }
 
   // Constellations whose visible portion sits below this altitude are
@@ -979,8 +974,6 @@ export function Starfield() {
   // via search or a tap) rather than always restarting from the best-placed
   // one.
   function handleNextConstellation(): void {
-    if (displayState.mode === 'immersive') return
-
     const visible = rankConstellationsByAltitude(
       loadConstellationCatalog(),
       location,
@@ -1054,6 +1047,10 @@ export function Starfield() {
                 onSelectCelestialBody={handleSelectCelestialBodyFromSearch}
                 onSelectConstellation={handleSelectConstellationFromList}
                 onSelectStar={handleSelectStarFromSearch}
+                onSelectBrowseCelestialBody={handleSelectCelestialBodyResult}
+                onSelectBrowseConstellation={handleSelectConstellationFromList}
+                onSelectBrowseStar={handleSelectStarResult}
+                onSelectNextConstellation={handleNextConstellation}
               />
             }
             displaySection={
@@ -1070,12 +1067,6 @@ export function Starfield() {
               />
             }
           />
-          <SelectionOverlay
-            onSelectCelestialBody={handleSelectCelestialBodyResult}
-            onSelectConstellation={handleSelectConstellationFromList}
-            onSelectStar={handleSelectStarResult}
-          />
-          <NextConstellationButton onClick={handleNextConstellation} />
           <StarInfoOverlay
             info={selectedStarInfo}
             isOpen={displayState.isSelectionInfoOpen}
@@ -1091,7 +1082,7 @@ export function Starfield() {
       )}
       {displayState.chromeVisibility === 'visible' && (
         <ImmersiveModeToggle
-          isImmersive={displayState.mode === 'immersive'}
+          isImmersive={displayState.isImmersiveMode}
           onToggle={handleToggleImmersiveMode}
         />
       )}

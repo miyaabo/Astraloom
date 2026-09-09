@@ -12,6 +12,7 @@ interface ImmersiveModeToggleProps {
   onToggle: () => void
 }
 
+/** A direct entry to distraction-free viewing, separate from auto-hide. */
 export function ImmersiveModeToggle({
   isImmersive,
   onToggle,

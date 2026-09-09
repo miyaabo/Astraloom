@@ -9,7 +9,7 @@ interface StarInfoOverlayProps {
   onClearSelection: () => void
 }
 
-// PlaybackOverlay (src/PlaybackOverlay.tsx) sits at bottom: 16px + safe-area,
+// Bottom safe-area spacing leaves room for device controls,
 // with a button-height row (overlayButtonSizePx) plus 6px vertical padding on
 // each side. This panel stacks just above it, plus an 8px gap, so the two
 // never overlap.
@@ -156,7 +156,14 @@ export function StarInfoOverlay({
         </div>
       )}
       {info.trivia && (
-        <div style={{ marginTop: 6, fontSize: 12.5, opacity: 0.75, lineHeight: 1.5 }}>
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 12.5,
+            opacity: 0.75,
+            lineHeight: 1.5,
+          }}
+        >
           {info.trivia}
         </div>
       )}

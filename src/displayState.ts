@@ -1,23 +1,15 @@
-export type OverlayPanel = 'date' | 'location' | 'search' | 'settings'
-
 /** Sections of the unified control menu introduced by Issue #15. */
 export type ControlMenuSection = 'sky' | 'time' | 'search' | 'display'
-
-export type DisplayMode = 'standard' | 'immersive'
 
 export type ChromeVisibility = 'visible' | 'hidden'
 
 export interface DisplayState {
-  /**
-   * Temporary compatibility state for the pre-#15 individual overlays.
-   * Task 7 removes this once every entry point has moved into the control menu.
-   */
-  activePanel: OverlayPanel | null
   isControlMenuOpen: boolean
   /** At most one section can be expanded in the control menu. */
   activeControlMenuSection: ControlMenuSection | null
   isSelectionInfoOpen: boolean
-  mode: DisplayMode
+  /** Temporary, non-persisted viewing state controlled by the standalone button. */
+  isImmersiveMode: boolean
   chromeVisibility: ChromeVisibility
   isProjectorMode: boolean
   isNightModeUi: boolean
@@ -25,11 +17,10 @@ export interface DisplayState {
 
 export function createInitialDisplayState(): DisplayState {
   return {
-    activePanel: null,
     isControlMenuOpen: false,
     activeControlMenuSection: null,
     isSelectionInfoOpen: false,
-    mode: 'standard',
+    isImmersiveMode: false,
     chromeVisibility: 'visible',
     isProjectorMode: false,
     isNightModeUi: false,
@@ -39,7 +30,6 @@ export function createInitialDisplayState(): DisplayState {
 export function openControlMenu(state: DisplayState): DisplayState {
   return {
     ...state,
-    activePanel: null,
     isControlMenuOpen: true,
     chromeVisibility: 'visible',
   }
@@ -77,27 +67,6 @@ export function toggleControlMenuSection(
   }
 }
 
-export function toggleOverlayPanel(
-  state: DisplayState,
-  panel: OverlayPanel,
-): DisplayState {
-  return {
-    ...state,
-    activePanel: state.activePanel === panel ? null : panel,
-    isControlMenuOpen: false,
-    activeControlMenuSection: null,
-    chromeVisibility: 'visible',
-  }
-}
-
-export function closeOverlayPanel(state: DisplayState): DisplayState {
-  if (state.activePanel === null) return state
-  return {
-    ...state,
-    activePanel: null,
-  }
-}
-
 export function openSelectionInfo(state: DisplayState): DisplayState {
   if (state.isSelectionInfoOpen && state.chromeVisibility === 'visible') {
     return state
@@ -117,23 +86,14 @@ export function closeSelectionInfo(state: DisplayState): DisplayState {
   }
 }
 
-export function enterImmersiveMode(state: DisplayState): DisplayState {
+export function toggleImmersiveMode(state: DisplayState): DisplayState {
+  const isImmersiveMode = !state.isImmersiveMode
   return {
     ...state,
-    mode: 'immersive',
-    activePanel: null,
+    isImmersiveMode,
     isControlMenuOpen: false,
     activeControlMenuSection: null,
     isSelectionInfoOpen: false,
-    chromeVisibility: 'visible',
-  }
-}
-
-export function exitImmersiveMode(state: DisplayState): DisplayState {
-  if (state.mode === 'standard') return state
-  return {
-    ...state,
-    mode: 'standard',
     chromeVisibility: 'visible',
   }
 }
@@ -154,15 +114,9 @@ export function toggleNightModeUi(state: DisplayState): DisplayState {
   }
 }
 
-export function toggleImmersiveMode(state: DisplayState): DisplayState {
-  return state.mode === 'immersive'
-    ? exitImmersiveMode(state)
-    : enterImmersiveMode(state)
-}
-
 export function canAutoHideChrome(state: DisplayState): boolean {
   return (
-    state.activePanel === null &&
+    !state.isImmersiveMode &&
     !state.isControlMenuOpen &&
     state.activeControlMenuSection === null &&
     !state.isSelectionInfoOpen
@@ -188,5 +142,5 @@ export function revealChrome(state: DisplayState): DisplayState {
 }
 
 export function isChromeSuppressed(state: DisplayState): boolean {
-  return state.mode === 'immersive' || state.chromeVisibility === 'hidden'
+  return state.isImmersiveMode || state.chromeVisibility === 'hidden'
 }
