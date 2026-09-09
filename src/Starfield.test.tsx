@@ -82,6 +82,26 @@ describe('Starfield', () => {
     expect(screen.queryByLabelText('日時')).toBeNull()
   })
 
+  it('opens the unified control menu and keeps one section expanded at a time', () => {
+    render(<Starfield />)
+
+    fireEvent.click(screen.getByLabelText('操作メニューを開く'))
+    expect(screen.getByLabelText('操作メニュー')).toBeTruthy()
+    expect(screen.getByText('現在の空')).toBeTruthy()
+
+    const time = screen.getByRole('button', { name: '時間を動かす' })
+    const display = screen.getByRole('button', { name: '表示・投影' })
+    fireEvent.click(time)
+    expect(time.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.click(display)
+    expect(time.getAttribute('aria-expanded')).toBe('false')
+    expect(display.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByLabelText('操作メニュー')).toBeNull()
+  })
+
   it('lets the user jump to a celestial body, constellation, or star from the dropdown', () => {
     render(<Starfield />)
     const select = screen.getByLabelText('天体・星・星座を選択')
@@ -295,19 +315,19 @@ describe('Starfield', () => {
     expect(showConstellationLines).not.toHaveBeenCalled()
   })
 
-  it('does not auto-hide the chrome after inactivity in standard mode', () => {
+  it('auto-hides the chrome after five seconds of inactivity in standard mode', () => {
     vi.useFakeTimers()
     render(<Starfield />)
 
     expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
-    expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
+    expect(screen.getByLabelText('操作メニューを開く')).toBeTruthy()
 
     act(() => {
-      vi.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(5000)
     })
 
-    expect(screen.getByLabelText('星・星座を検索')).toBeTruthy()
-    expect(screen.getByLabelText('鑑賞モードに切替')).toBeTruthy()
+    expect(screen.queryByLabelText('星・星座を検索')).toBeNull()
+    expect(screen.queryByLabelText('操作メニューを開く')).toBeNull()
     vi.useRealTimers()
   })
 

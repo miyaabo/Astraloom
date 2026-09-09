@@ -10,7 +10,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 | # | Task | Status |
 |---|---|---|
 | 1 | 操作 UI の状態モデルを再設計する | Done |
-| 2 | ハンバーガーと左サイドパネルを実装する | Not Started |
+| 2 | ハンバーガーと左サイドパネルを実装する | Done |
 | 3 | 「空を選ぶ」を統合する | Not Started |
 | 4 | 「時間を動かす」を統合する | Not Started |
 | 5 | 「空を探す」を統合する | Not Started |
@@ -42,7 +42,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 2 — ハンバーガーと左サイドパネルを実装する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -58,10 +58,10 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] ハンバーガーだけでパネルを開閉できる
-- [ ] 同時に複数の section が開かない
-- [ ] PC とスマホ縦画面でパネルが画面外へはみ出さない
-- [ ] キーボードとタッチ操作で閉じられる
+- [x] ハンバーガーだけでパネルを開閉できる
+- [x] 同時に複数の section が開かない
+- [x] PC とスマホ縦画面でパネルが画面外へはみ出さない
+- [x] キーボードとタッチ操作で閉じられる
 
 ## Task 3 — 「空を選ぶ」を統合する
 

@@ -31,6 +31,8 @@ import {
 import type { ConstellationRecord } from './constellations/constellationTypes'
 import { DateTimeOverlay } from './DateTimeOverlay'
 import {
+  canAutoHideChrome,
+  closeControlMenu,
   closeOverlayPanel,
   closeSelectionInfo,
   createInitialDisplayState,
@@ -38,11 +40,15 @@ import {
   exitImmersiveMode,
   isChromeSuppressed,
   openSelectionInfo,
+  requestChromeAutoHide,
   revealChrome,
+  toggleControlMenu,
+  toggleControlMenuSection,
   toggleNightModeUi,
   toggleProjectorMode,
   toggleOverlayPanel,
 } from './displayState'
+import { ControlMenuOverlay } from './ControlMenuOverlay'
 import { ImmersiveModeToggle } from './ImmersiveModeToggle'
 import { LocationOverlay } from './LocationOverlay'
 import { findLocationPreset, locationPresets } from './locationPresets'
@@ -247,12 +253,28 @@ export function Starfield() {
       autoHideTimeoutRef.current = null
     }
 
+    function scheduleAutoHide(): void {
+      const current = displayStateRef.current
+      if (
+        current.mode !== 'standard' ||
+        current.chromeVisibility !== 'visible' ||
+        !canAutoHideChrome(current)
+      ) {
+        return
+      }
+      clearAutoHideTimeout()
+      autoHideTimeoutRef.current = window.setTimeout(() => {
+        setDisplayState((state) => requestChromeAutoHide(state))
+      }, 5_000)
+    }
+
     function revealChromeAndScheduleAutoHide(): void {
       const current = displayStateRef.current
       if (current.mode !== 'standard') return
 
       setDisplayState((state) => revealChrome(state))
       clearAutoHideTimeout()
+      scheduleAutoHide()
     }
 
     function handlePointerDown(): void {
@@ -279,6 +301,14 @@ export function Starfield() {
       revealChromeAndScheduleAutoHide()
     }
 
+    function handleKeyDown(event: KeyboardEvent): void {
+      if (event.key === 'Escape' && displayStateRef.current.isControlMenuOpen) {
+        setDisplayState((state) => closeControlMenu(state))
+        return
+      }
+      revealChromeAndScheduleAutoHide()
+    }
+
     if (displayState.mode !== 'standard') {
       isPointerInteractingRef.current = false
       clearAutoHideTimeout()
@@ -295,9 +325,10 @@ export function Starfield() {
     window.addEventListener('wheel', revealChromeAndScheduleAutoHide, {
       capture: true,
     })
-    window.addEventListener('keydown', revealChromeAndScheduleAutoHide, {
+    window.addEventListener('keydown', handleKeyDown, {
       capture: true,
     })
+    scheduleAutoHide()
 
     return () => {
       isPointerInteractingRef.current = false
@@ -317,13 +348,15 @@ export function Starfield() {
       window.removeEventListener('wheel', revealChromeAndScheduleAutoHide, {
         capture: true,
       })
-      window.removeEventListener('keydown', revealChromeAndScheduleAutoHide, {
+      window.removeEventListener('keydown', handleKeyDown, {
         capture: true,
       })
     }
   }, [
     displayState.activePanel,
+    displayState.activeControlMenuSection,
     displayState.chromeVisibility,
+    displayState.isControlMenuOpen,
     displayState.isSelectionInfoOpen,
     displayState.mode,
   ])
@@ -955,6 +988,24 @@ export function Starfield() {
           <ConstellationLabelsOverlay
             ref={labelsOverlayRef}
             labels={constellationLabels}
+          />
+          <ControlMenuOverlay
+            isOpen={displayState.isControlMenuOpen}
+            activeSection={displayState.activeControlMenuSection}
+            locationLabel={locationMetadata.label}
+            date={date}
+            timeZoneId={locationMetadata.timeZoneId}
+            onToggleMenu={() =>
+              setDisplayState((current) => toggleControlMenu(current))
+            }
+            onCloseMenu={() =>
+              setDisplayState((current) => closeControlMenu(current))
+            }
+            onToggleSection={(section) =>
+              setDisplayState((current) =>
+                toggleControlMenuSection(current, section),
+              )
+            }
           />
           <SearchOverlay
             isOpen={displayState.activePanel === 'search'}
