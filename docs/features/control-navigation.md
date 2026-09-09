@@ -2,7 +2,7 @@
 
 ## Status
 
-要件確定。Task 7（旧 UI の撤去と保存互換性の確保）まで実装済み。
+要件確定。Task 8（自動検証と Human Check）まで完了。
 
 ## Goal
 

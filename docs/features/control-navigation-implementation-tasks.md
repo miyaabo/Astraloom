@@ -16,7 +16,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 | 5 | 「空を探す」を統合する | Done |
 | 6 | 「表示・投影」と保存を統合する | Done |
 | 7 | 旧 UI を撤去し、保存互換性を確保する | Done |
-| 8 | 自動検証と Human Check を完了する | Not Started |
+| 8 | 自動検証と Human Check を完了する | Done |
 
 ## Task 1 — 操作 UI の状態モデルを再設計する
 
@@ -171,7 +171,7 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ## Task 8 — 自動検証と Human Check を完了する
 
-**Status:** Not Started
+**Status:** Done
 
 ### Goal
 
@@ -187,16 +187,16 @@ GitHub Issue: [#15](https://github.com/miyaabo/Astraloom/issues/15)
 
 ### Done
 
-- [ ] typecheck / lint / unit test / production build が成功する
-- [ ] PC／モバイル viewport で console error がない
-- [ ] Human Check の Acceptance Criteria を満たす
-- [ ] #15 の完了条件と Small Spec の Acceptance Criteria を更新できる
+- [x] typecheck / lint / unit test / production build が成功する
+- [x] PC／モバイル viewport で console error がない
+- [x] Human Check の Acceptance Criteria を満たす
+- [x] #15 の完了条件と Small Spec の Acceptance Criteria を更新できる
 
 ## Human Check Checklist
 
-- [ ] 左上の入口から日時・場所・再生・検索・表示設定・保存を迷わず見つけられる
-- [ ] パネルを閉じた後、5 秒で UI が自然に退避する
-- [ ] 空白タップで UI を戻せ、天体選択とも競合しない
-- [ ] パネルを閉じると星空が主役に戻る
-- [ ] スマホ縦画面で、日時・場所・検索・再生を問題なく操作できる
-- [ ] 夜間モード・プロジェクター補正・フルスクリーンの配置が自然である
+- [x] 左上の入口から日時・場所・再生・検索・表示設定・保存を迷わず見つけられる
+- [x] パネルを閉じた後、5 秒で UI が自然に退避する
+- [x] 空白タップで UI を戻せ、天体選択とも競合しない
+- [x] パネルを閉じると星空が主役に戻る
+- [x] スマホ縦画面で、日時・場所・検索・再生を問題なく操作できる
+- [x] 夜間モード・プロジェクター補正・フルスクリーンの配置が自然である
